@@ -44,22 +44,23 @@ Tu as maintenant **ta propre copie privée** du scaffold. Personne ne peut la vo
 
 Sans cette étape, l'IA ne pourra pas répondre aux requêtes de ton app.
 
-1. Ouvre le panneau **Secrets** :
-   - Cherche un onglet **Secrets** dans le dock du bas, **ou**
-   - Clique sur le bouton **+** (nouvelle vue) en haut → tape `Secrets` → ouvre
-   - Si tu ne trouves pas : `Ctrl+K` (ou `Cmd+K` sur Mac) → tape `Secrets`
-2. Ajoute ces 4 entrées une par une (clique **+ New Secret** à chaque fois) :
+**Le plus simple : demande à l'Agent.** Dans le chat Agent, tape :
 
-   | Clé | Valeur |
-   |-----|--------|
-   | `AZURE_OPENAI_ENDPOINT` | l'URL fournie par ton référent (commence par `https://`) |
-   | `AZURE_OPENAI_API_KEY` | ta clé API |
-   | `AZURE_OPENAI_DEPLOYMENT` | le nom du déploiement (souvent `gpt-4.1` ou `gpt-5-chat`) |
-   | `AZURE_OPENAI_API_VERSION` | `2025-01-01-preview` |
+> **"I need to enter my Azure credentials"**
 
-3. Les secrets sont sauvegardés automatiquement
+L'Agent ouvre un formulaire sécurisé directement dans le chat. Renseigne les 4 valeurs :
+
+| Clé | Valeur |
+|-----|--------|
+| `AZURE_OPENAI_ENDPOINT` | l'URL fournie par ton référent (commence par `https://`) |
+| `AZURE_OPENAI_API_KEY` | ta clé API |
+| `AZURE_OPENAI_DEPLOYMENT` | le nom du déploiement (souvent `gpt-4.1` ou `gpt-5-chat`) |
+| `AZURE_OPENAI_API_VERSION` | `2025-01-01-preview` |
+
+Les secrets sont chiffrés et sauvegardés automatiquement.
 
 > 💡 Ces secrets restent dans **ta** copie. Personne d'autre n'y a accès.
+> ⚠️ Après avoir ajouté/modifié les secrets, **redémarre les serveurs** (Stop ▶ puis Run ▶) — les variables d'environnement ne sont chargées qu'au démarrage.
 
 ---
 

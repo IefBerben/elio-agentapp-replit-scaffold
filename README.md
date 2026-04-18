@@ -20,7 +20,11 @@ Bouton **Fork** en haut à droite → renomme avec le nom de ton app.
 
 ### 2. Configure tes credentials Azure
 
-Dans Replit, ouvre le panneau **Secrets** (`Ctrl+K` → tape `Secrets`, ou cherche-le dans le dock) :
+Le plus simple : demande à l'Agent dans le chat :
+
+> **"I need to enter my Azure credentials"**
+
+L'Agent ouvre un formulaire sécurisé pour saisir les 4 valeurs :
 
 | Clé | Valeur |
 |-----|--------|
@@ -28,6 +32,9 @@ Dans Replit, ouvre le panneau **Secrets** (`Ctrl+K` → tape `Secrets`, ou cherc
 | `AZURE_OPENAI_API_KEY` | ta clé API |
 | `AZURE_OPENAI_DEPLOYMENT` | nom du déploiement (ex: `gpt-4.1`) |
 | `AZURE_OPENAI_API_VERSION` | `2025-01-01-preview` |
+
+Alternative : panneau **Secrets** (`Ctrl+K` → tape `Secrets`) si tu es en mode Workspace classique.
+Après ajout, redémarre les serveurs (Stop ▶ puis Run ▶).
 
 ### 3. Clique sur Run ▶
 
