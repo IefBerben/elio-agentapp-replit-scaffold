@@ -10,6 +10,7 @@ Usage:
 
 import json
 import logging
+import os
 import shutil
 import uuid
 from collections.abc import AsyncGenerator
@@ -49,8 +50,30 @@ logger = logging.getLogger("elio_scaffold")
 app = FastAPI(
     title="Elio Scaffold — Agent App Server",
     description="Scaffold conforme au toolkit Elio pour le développement d'Agent Apps.",
-    version="8.0.0",
+    version="9.0.0",
 )
+
+
+@app.on_event("startup")
+async def _check_required_secrets() -> None:
+    """Print a clear banner when Azure secrets are missing.
+
+    First-run UX for the Replit Template: without this, the first SSE call
+    fails with an opaque 500. Here the consultant sees the missing keys at
+    boot and knows exactly which Replit Secrets to set.
+    """
+    required = ["AZURE_OPENAI_ENDPOINT", "AZURE_OPENAI_API_KEY"]
+    missing = [k for k in required if not os.getenv(k)]
+    if missing:
+        bar = "─" * 70
+        logger.warning(
+            "\n%s\n⚠️  Missing Replit Secrets: %s\n"
+            "    Open the Secrets panel (lock icon) and add them, then click Run again.\n"
+            "    See README → 'Configure tes credentials Azure'.\n%s",
+            bar, ", ".join(missing), bar,
+        )
+    else:
+        logger.info("✓ Azure OpenAI secrets detected — agents are ready to call the LLM.")
 
 app.add_middleware(
     CORSMiddleware,
