@@ -103,12 +103,12 @@ _Généré par le skill `platform-integration-check`_
 
 **Entrée :**
 ```json
-// À compléter par /builder après la première story Built
+// À compléter par le skill `build-backend` après la première story livrée
 ```
 
 **Sortie :**
 ```json
-// À compléter par /builder
+// À compléter par le skill `build-backend`
 ```
 
 **Pourquoi cette sortie est satisfaisante :**
@@ -121,12 +121,12 @@ _Généré par le skill `build-backend` / `build-frontend`_
 
 **Entrée :**
 ```json
-// À compléter par /builder
+// À compléter par le skill `build-backend`
 ```
 
 **Sortie :**
 ```json
-// À compléter par /builder
+// À compléter par le skill `build-backend`
 ```
 
 **Pourquoi cette sortie est satisfaisante :**

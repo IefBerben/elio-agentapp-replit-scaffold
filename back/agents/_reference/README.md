@@ -5,7 +5,7 @@ Ce dossier est un exemple de référence. **NE PAS MODIFIER.**
 Il sert de modèle pour comprendre le pattern SSE.
 Pour créer un nouvel agent, copier ce dossier et le renommer.
 
-Le `/builder` ne doit jamais toucher à ce dossier.
+Les skills `build-backend` / `build-frontend` ne doivent jamais toucher à ce dossier.
 
 ---
 
@@ -31,5 +31,6 @@ _reference/
 
 ## Lancer les tests
 
-- **Windows:** `cd back; .venv/Scripts/python -m pytest agents/_reference/tests/ -v`
-- **Mac/Linux:** `cd back; .venv/bin/python -m pytest agents/_reference/tests/ -v`
+```bash
+cd back && uv run pytest agents/_reference/tests/ -v
+```
