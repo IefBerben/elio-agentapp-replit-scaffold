@@ -19,7 +19,9 @@ Avant de commencer, vérifie que tu as :
 
 ## Par où commencer ?
 
-👉 **Lis [VIBE-CODING-GUIDE.md](VIBE-CODING-GUIDE.md)** — tout est là.
+👉 **Nouveau sur ce scaffold ?** Lis [GETTING-STARTED.md](GETTING-STARTED.md) — démarrage en 5 étapes.
+
+👉 **Guide complet :** [VIBE-CODING-GUIDE.md](VIBE-CODING-GUIDE.md)
 
 ---
 

@@ -26,11 +26,11 @@ from fastapi.responses import FileResponse, StreamingResponse
 TEMPFILES_DIR = Path(__file__).parent / "tempfiles"
 TEMPFILES_DIR.mkdir(exist_ok=True)
 
-# ─── Reference example (code mort — ne pas décommenter pour la production) ────
-# from agents._reference import (
-#     reference_step_1_stream,
-#     reference_step_2_stream,
-# )
+# ─── Reference example ────────────────────────────────────────────────────────
+from agents._reference import (
+    reference_step_1_stream,
+    reference_step_2_stream,
+)
 
 # ─── Vos agents — ajouter vos imports ici ─────────────────────────────────────
 # from agents.{mon_usecase} import (
@@ -72,7 +72,11 @@ app.add_middleware(
 #   "mon-usecase-step-1": mon_usecase_step_1_stream,
 #   "mon-usecase-step-2": mon_usecase_step_2_stream,
 AGENTS_MAP: dict[str, Any] = {
-    # Ajouter vos agents ici
+    # ── Reference example (wired — shows the scaffold pattern in action) ──────
+    "_reference-step-1": reference_step_1_stream,
+    "_reference-step-2": reference_step_2_stream,
+    # ── Your agents — add here ────────────────────────────────────────────────
+    # "mon-usecase-step-1": mon_usecase_step_1_stream,
 }
 
 SSE_MEDIA_TYPE = "text/event-stream"

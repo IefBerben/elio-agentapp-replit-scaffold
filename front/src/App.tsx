@@ -1,7 +1,9 @@
-import { Component, useEffect } from "react";
+import { Component, useState, useEffect } from "react";
 import type { ErrorInfo, ReactNode } from "react";
 import { useTranslation } from "react-i18next";
+import { LayoutGrid, Sparkles } from "lucide-react";
 import { ReferencePage } from "@/pages/_ReferencePage";
+import { ShowcasePage } from "@/pages/ShowcasePage";
 
 // ─── Error Boundary ──────────────────────────────────────────────────────────
 
@@ -52,19 +54,62 @@ class AppErrorBoundary extends Component<
   }
 }
 
+// ─── Nav ─────────────────────────────────────────────────────────────────────
+
+type Page = "demo" | "showcase";
+
+function Nav({ current, onChange }: { current: Page; onChange: (p: Page) => void }) {
+  return (
+    <div className="fixed top-3 right-4 z-50 flex gap-1 bg-card border border-border rounded-xl p-1 shadow-sm">
+      <button
+        onClick={() => onChange("demo")}
+        title="Demo agent"
+        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+          current === "demo"
+            ? "bg-[#009de0] text-white"
+            : "text-muted-foreground hover:text-foreground hover:bg-muted"
+        }`}
+      >
+        <Sparkles className="w-3.5 h-3.5" />
+        Demo
+      </button>
+      <button
+        onClick={() => onChange("showcase")}
+        title="Design system showcase"
+        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+          current === "showcase"
+            ? "bg-purple-600 text-white"
+            : "text-muted-foreground hover:text-foreground hover:bg-muted"
+        }`}
+      >
+        <LayoutGrid className="w-3.5 h-3.5" />
+        Showcase
+      </button>
+    </div>
+  );
+}
+
 // ─── App ─────────────────────────────────────────────────────────────────────
 
 export default function App() {
   const { i18n } = useTranslation();
 
-  // Sync html lang attribute with current language
+  const [page, setPage] = useState<Page>(() =>
+    window.location.hash === "#showcase" ? "showcase" : "demo"
+  );
+
   useEffect(() => {
     document.documentElement.lang = i18n.language;
   }, [i18n.language]);
 
+  useEffect(() => {
+    window.location.hash = page === "showcase" ? "showcase" : "";
+  }, [page]);
+
   return (
     <AppErrorBoundary>
-      <ReferencePage />
+      <Nav current={page} onChange={setPage} />
+      {page === "demo" ? <ReferencePage /> : <ShowcasePage />}
     </AppErrorBoundary>
   );
 }
