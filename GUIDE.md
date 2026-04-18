@@ -44,7 +44,10 @@ Tu as maintenant **ta propre copie privée** du scaffold. Personne ne peut la vo
 
 Sans cette étape, l'IA ne pourra pas répondre aux requêtes de ton app.
 
-1. Dans la barre latérale gauche, clique sur l'icône **cadenas** 🔒 (Secrets)
+1. Ouvre le panneau **Secrets** :
+   - Cherche un onglet **Secrets** dans le dock du bas, **ou**
+   - Clique sur le bouton **+** (nouvelle vue) en haut → tape `Secrets` → ouvre
+   - Si tu ne trouves pas : `Ctrl+K` (ou `Cmd+K` sur Mac) → tape `Secrets`
 2. Ajoute ces 4 entrées une par une (clique **+ New Secret** à chaque fois) :
 
    | Clé | Valeur |
@@ -80,7 +83,9 @@ C'est l'app de référence. Elle te montre **ce que tu peux construire**.
 
 C'est ici que la magie opère.
 
-1. Dans la barre latérale, clique sur l'onglet **Agent** (icône en forme d'étoile ✨)
+1. Ouvre l'onglet **Agent** :
+   - Souvent visible en haut de l'écran ou dans le dock
+   - Sinon : `Ctrl+K` (ou `Cmd+K`) → tape `Agent` → ouvre
 2. Dans la zone de chat, tape simplement :
 
    > **"Build my app"**

@@ -20,7 +20,7 @@ Bouton **Fork** en haut à droite → renomme avec le nom de ton app.
 
 ### 2. Configure tes credentials Azure
 
-Dans Replit, ouvre le panneau **Secrets** (icône cadenas dans la barre latérale) :
+Dans Replit, ouvre le panneau **Secrets** (`Ctrl+K` → tape `Secrets`, ou cherche-le dans le dock) :
 
 | Clé | Valeur |
 |-----|--------|
