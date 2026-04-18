@@ -183,9 +183,11 @@ export default function App() {
         onChange={setPage}
         showStarter={!dismissed}
       />
-      {page === "starter" && <StarterPage />}
-      {page === "reference" && <ReferencePage />}
-      {page === "showcase" && <ShowcasePage />}
+      <div className="pt-3 md:pt-5">
+        {page === "starter" && <StarterPage />}
+        {page === "reference" && <ReferencePage />}
+        {page === "showcase" && <ShowcasePage />}
+      </div>
     </AppErrorBoundary>
   );
 }
