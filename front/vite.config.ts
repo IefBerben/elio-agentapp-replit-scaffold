@@ -16,7 +16,7 @@ export default defineConfig({
     host: '0.0.0.0',
     port: 5173,
     strictPort: true,
-    allowedHosts: 'all',
+    allowedHosts: true,
     proxy: {
       "/agent-apps": { target: "http://localhost:8000", changeOrigin: true },
       "/files": { target: "http://localhost:8000", changeOrigin: true },
