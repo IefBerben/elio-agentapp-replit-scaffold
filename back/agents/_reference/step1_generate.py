@@ -22,7 +22,7 @@ from typing import Any
 
 from langchain_core.messages import SystemMessage
 
-from llm_config import get_llm
+from services.llm_config import get_llm
 from utils.stream_error_handler import stream_safe
 
 logger = logging.getLogger(__name__)
