@@ -5,6 +5,11 @@ Scaffold pour construire des **Agent Apps** pour la plateforme Elio — Agentic 
 Un template Replit avec un agent de référence fonctionnel, les guidelines plateforme intégrées,
 et un Agent Replit configuré pour construire des apps conformes depuis une description en Markdown.
 
+> 👉 **Première fois ici ? Tu n'es pas développeur ?**
+> Va lire **[GUIDE.md](GUIDE.md)** — un guide pas-à-pas en français, sans jargon, qui te fait construire ta première app en 30 minutes.
+>
+> Le README ci-dessous est la doc technique de référence (architecture, structure, conventions).
+
 ---
 
 ## Démarrage en 4 étapes
