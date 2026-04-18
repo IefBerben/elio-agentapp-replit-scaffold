@@ -38,9 +38,13 @@ args = "cd front && ([ -f node_modules/.package-lock.json ] && diff -q package-l
 waitForPort = 5173
 
 [[ports]]
-localPort = 8000
-externalPort = 8000
-
-[[ports]]
 localPort = 5173
 externalPort = 80
+
+[[ports]]
+localPort = 8000
+externalPort = 8000
+exposeLocalhost = true
+
+[agent]
+expertMode = true
