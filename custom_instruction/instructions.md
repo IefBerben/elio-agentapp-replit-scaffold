@@ -145,9 +145,23 @@ Read these docs before writing any code. They are the integration standard.
 
 ## Skills available
 
-Use these skills in order for a new app build:
+### Persona — invoke when the consultant needs help thinking, not building
 
-1. `.agents/skills/intake-from-markdown/SKILL.md` — analyze inputs or run conversational intake
+- `.agents/skills/product-manager/SKILL.md` — **Product Manager persona.** Probes the consultant before any code is written. Owns `product.md` (strategic) and `backlog.md` (tactical). Never writes code.
+
+**Auto-invoke the PM when** the consultant says any of:
+- "Talk to the PM" / "parle au PM"
+- "I want to add a feature" / "ajouter une fonctionnalité"
+- "I want users to be able to..." / "je voudrais que les utilisateurs..."
+- "What should I build?" / "qu'est-ce que je dois construire ?"
+- "Help me think through this" / "aide-moi à réfléchir"
+- The consultant says "build my app" AND `product.md` is empty/template
+
+**Do NOT auto-invoke the PM when** `product.md` and `backlog.md` are already populated and the consultant says "build my app" — go straight to the build skills.
+
+### Build skills — invoke after the PM has locked the scope (or the consultant supplied complete specs)
+
+1. `.agents/skills/intake-from-markdown/SKILL.md` — parse existing `product.md` + `backlog.md` (or Google AI Studio export)
 2. `.agents/skills/generate-api-contracts/SKILL.md` — write API contracts before coding
 3. `.agents/skills/build-backend/SKILL.md` — build the Python backend
 4. `.agents/skills/build-frontend/SKILL.md` — build the React frontend
