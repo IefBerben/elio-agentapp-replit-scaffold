@@ -46,5 +46,47 @@
     "conclusionLabel": "Conclusion",
     "languageLabel": "Langue",
     "deepenAnalysis": "Approfondir l'analyse"
+  },
+  "starter": {
+    "title": "Bienvenue sur ton scaffold Elio",
+    "description": "Choisis comment démarrer ta première Agent App.",
+    "intro": "Comment veux-tu commencer ?",
+    "subIntro": "Trois chemins, choisis celui qui correspond à ta situation.",
+    "cleanupHint": "Une fois ton app construite, demande à l'IA Replit : « Supprime la starter page » pour nettoyer.",
+    "cards": {
+      "product": {
+        "title": "J'ai déjà un product.md",
+        "desc": "Tu as rédigé tes specs en amont (seul ou avec le PM).",
+        "cta": "Lancer le build"
+      },
+      "input": {
+        "title": "J'ai un prototype Google AI Studio",
+        "desc": "Dépose ton export .tsx ou .zip dans le dossier Input/.",
+        "descDetected": "Fichier détecté :",
+        "cta": "Construire à partir du prototype"
+      },
+      "idea": {
+        "title": "Pas encore d'idée",
+        "desc": "Réponds à 2 questions, l'IA te propose 3 idées d'app concrètes.",
+        "cta": "Ouvrir l'Idea Lab"
+      }
+    },
+    "idea": {
+      "back": "Revenir aux options",
+      "formTitle": "Trouve ton premier cas d'usage",
+      "roleLabel": "Quel est ton métier ?",
+      "roleHint": "Le rôle ou la fonction que tu occupes au quotidien.",
+      "rolePlaceholder": "Ex : consultant en transformation digitale, data analyst, chef de projet RH...",
+      "painLabel": "Quelle tâche te prend trop de temps chaque semaine ?",
+      "painHint": "Plus c'est concret, mieux ce sera.",
+      "painPlaceholder": "Ex : je passe 2h chaque vendredi à compiler les feedbacks clients pour les transformer en compte-rendu...",
+      "generate": "Générer 3 idées",
+      "generating": "L'IA réfléchit...",
+      "thinking": "Génération de 3 idées tailored à ton rôle...",
+      "resultsTitle": "Voici 3 pistes d'Agent App pour toi",
+      "inputs": "Entrée",
+      "outputs": "Sortie",
+      "nextStep": "Une idée te plaît ? Affine-la avec le PM :"
+    }
   }
 }

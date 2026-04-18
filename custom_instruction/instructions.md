@@ -166,3 +166,7 @@ Read these docs before writing any code. They are the integration standard.
 3. `.agents/skills/build-backend/SKILL.md` — build the Python backend
 4. `.agents/skills/build-frontend/SKILL.md` — build the React frontend
 5. `.agents/skills/platform-integration-check/SKILL.md` — validate and update SUBMISSION.md
+
+### Cleanup skills — invoke when the consultant explicitly asks
+
+- `.agents/skills/remove-starter/SKILL.md` — permanently delete the disposable Starter / Idea Lab. Triggered by "remove the starter page" / "supprime la starter page".

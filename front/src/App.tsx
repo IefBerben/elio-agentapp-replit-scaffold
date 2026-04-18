@@ -1,7 +1,8 @@
 import { Component, useState, useEffect } from "react";
 import type { ErrorInfo, ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { LayoutGrid, Sparkles } from "lucide-react";
+import { LayoutGrid, Sparkles, Home } from "lucide-react";
+import { StarterPage } from "@/pages/StarterPage";
 import { ReferencePage } from "@/pages/_ReferencePage";
 import { ShowcasePage } from "@/pages/ShowcasePage";
 
@@ -56,35 +57,37 @@ class AppErrorBoundary extends Component<
 
 // ─── Nav ─────────────────────────────────────────────────────────────────────
 
-type Page = "demo" | "showcase";
+type Page = "starter" | "reference" | "showcase";
+
+function readPageFromHash(): Page {
+  const h = window.location.hash;
+  if (h === "#reference") return "reference";
+  if (h === "#showcase") return "showcase";
+  return "starter";
+}
 
 function Nav({ current, onChange }: { current: Page; onChange: (p: Page) => void }) {
+  const items: ReadonlyArray<{ id: Page; label: string; icon: ReactNode; activeColor: string }> = [
+    { id: "starter", label: "Start", icon: <Home className="w-3.5 h-3.5" />, activeColor: "bg-[#009de0]" },
+    { id: "reference", label: "Reference", icon: <Sparkles className="w-3.5 h-3.5" />, activeColor: "bg-[#009de0]" },
+    { id: "showcase", label: "Components", icon: <LayoutGrid className="w-3.5 h-3.5" />, activeColor: "bg-purple-600" },
+  ];
   return (
     <div className="fixed top-3 right-4 z-50 flex gap-1 bg-card border border-border rounded-xl p-1 shadow-sm">
-      <button
-        onClick={() => onChange("demo")}
-        title="Demo agent"
-        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-          current === "demo"
-            ? "bg-[#009de0] text-white"
-            : "text-muted-foreground hover:text-foreground hover:bg-muted"
-        }`}
-      >
-        <Sparkles className="w-3.5 h-3.5" />
-        Demo
-      </button>
-      <button
-        onClick={() => onChange("showcase")}
-        title="Design system showcase"
-        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-          current === "showcase"
-            ? "bg-purple-600 text-white"
-            : "text-muted-foreground hover:text-foreground hover:bg-muted"
-        }`}
-      >
-        <LayoutGrid className="w-3.5 h-3.5" />
-        Showcase
-      </button>
+      {items.map((item) => (
+        <button
+          key={item.id}
+          onClick={() => onChange(item.id)}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+            current === item.id
+              ? `${item.activeColor} text-white`
+              : "text-muted-foreground hover:text-foreground hover:bg-muted"
+          }`}
+        >
+          {item.icon}
+          {item.label}
+        </button>
+      ))}
     </div>
   );
 }
@@ -93,23 +96,40 @@ function Nav({ current, onChange }: { current: Page; onChange: (p: Page) => void
 
 export default function App() {
   const { i18n } = useTranslation();
+  const [page, setPage] = useState<Page>(readPageFromHash);
+  const [dismissed, setDismissed] = useState<boolean | null>(null);
 
-  const [page, setPage] = useState<Page>(() =>
-    window.location.hash === "#showcase" ? "showcase" : "demo"
-  );
+  // Auto-route away from the Starter once the consultant has dismissed it
+  useEffect(() => {
+    fetch("/agent-apps/scaffold-status")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((s) => {
+        const isDismissed = !!s?.dismissed;
+        setDismissed(isDismissed);
+        if (isDismissed && page === "starter") setPage("reference");
+      })
+      .catch(() => setDismissed(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     document.documentElement.lang = i18n.language;
   }, [i18n.language]);
 
   useEffect(() => {
-    window.location.hash = page === "showcase" ? "showcase" : "";
+    const hash = page === "starter" ? "" : `#${page}`;
+    if (window.location.hash !== hash) window.location.hash = hash;
   }, [page]);
+
+  // Wait for the dismissed check before rendering, to avoid a flash of Starter
+  if (dismissed === null) return null;
 
   return (
     <AppErrorBoundary>
       <Nav current={page} onChange={setPage} />
-      {page === "demo" ? <ReferencePage /> : <ShowcasePage />}
+      {page === "starter" && <StarterPage />}
+      {page === "reference" && <ReferencePage />}
+      {page === "showcase" && <ShowcasePage />}
     </AppErrorBoundary>
   );
 }

@@ -57,19 +57,22 @@ Les secrets sont chiffrés et sauvegardés automatiquement.
 
 ---
 
-## Étape 3 — Lance l'app de démonstration (1 min)
+## Étape 3 — Lance l'app et choisis ton point de départ (1 min)
 
 1. En haut de l'écran, clique sur le gros bouton **Run** ▶
 2. Attends que les deux serveurs démarrent (1 à 2 minutes la première fois)
-3. L'onglet **Webview** s'ouvre automatiquement → tu vois l'app de démo
+3. L'onglet **Webview** s'ouvre automatiquement → tu vois la **page de démarrage**
 
-**Teste-la maintenant** :
-- Dans le formulaire, tape une question (ex : *"Comment améliorer l'engagement client ?"*)
-- Clique **Générer**
-- Regarde la réponse arriver progressivement (streaming)
-- Modifie un point clé, clique sur l'étape 2
+La page de démarrage te propose **3 chemins** :
 
-C'est l'app de référence. Elle te montre **ce que tu peux construire**.
+| Tu as déjà... | Tu cliques... |
+|---------------|---------------|
+| ✅ Un `product.md` rédigé en amont | **« Lancer le build »** → on te donne l'instruction à coller dans le chat IA |
+| 🎨 Un prototype Google AI Studio dans `Input/` | **« Construire à partir du prototype »** → idem |
+| 🤔 Pas encore d'idée | **« Idea Lab »** → réponds à 2 questions, l'IA propose 3 idées concrètes pour ton métier |
+
+> 💡 Onglet **Reference** en haut à droite : une app de démo complète (assistant consulting en 2 étapes) qui montre tous les patterns Elio.
+> 💡 Onglet **Components** : la galerie des composants UI disponibles.
 
 ---
 

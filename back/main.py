@@ -35,6 +35,10 @@ from agents._reference import (
     reference_step_2_stream,
 )
 
+# ─── Starter (idea_lab) — wired by the StarterPage on first Run ───────────────
+# Removed by the `remove-starter` skill once the consultant picks a path.
+from agents.idea_lab import idea_lab_step_1_stream
+
 # ─── Vos agents — ajouter vos imports ici ─────────────────────────────────────
 # from agents.{mon_usecase} import (
 #     mon_usecase_step_1_stream,
@@ -154,11 +158,54 @@ AGENTS_MAP: dict[str, Any] = {
     # ── Reference example (wired — shows the scaffold pattern in action) ──────
     "_reference-step-1": reference_step_1_stream,
     "_reference-step-2": reference_step_2_stream,
+    # ── Starter (disposable — removed by `remove-starter` skill) ──────────────
+    "idea-lab-step-1": idea_lab_step_1_stream,
     # ── Your agents — add here ────────────────────────────────────────────────
     # "mon-usecase-step-1": mon_usecase_step_1_stream,
 }
 
 SSE_MEDIA_TYPE = "text/event-stream"
+
+# ─── Starter dispatcher state ─────────────────────────────────────────────────
+# The StarterPage is a 3-card landing that helps the consultant choose between:
+#   1. "I have product.md" → coaching panel pointing to the Build skill
+#   2. "I have a Google AI Studio prototype in Input/" → same, different skill
+#   3. "No idea yet" → calls the idea_lab agent
+#
+# Soft-dismiss: clicking a card writes .starter-dismissed at the repo root.
+# Hard-delete: handled by the `remove-starter` skill (Agent reviews diff first).
+
+REPO_ROOT = Path(__file__).parent.parent
+STARTER_DISMISSED_MARKER = REPO_ROOT / ".starter-dismissed"
+PRODUCT_MD_PATH = REPO_ROOT / "product.md"
+INPUT_DIR = REPO_ROOT / "Input"
+
+
+def _product_md_status() -> tuple[bool, bool]:
+    """Return (exists, is_template) for product.md.
+
+    is_template is True when the file still contains the boilerplate
+    "_À compléter" markers — i.e. the consultant has not edited it yet.
+    """
+    if not PRODUCT_MD_PATH.is_file():
+        return False, False
+    try:
+        text = PRODUCT_MD_PATH.read_text(encoding="utf-8")
+    except OSError:
+        return True, True
+    is_template = "_À compléter" in text or len(text.strip()) < 200
+    return True, is_template
+
+
+def _input_files() -> list[str]:
+    """List filenames in Input/ that look like a Google AI Studio export."""
+    if not INPUT_DIR.is_dir():
+        return []
+    interesting = (".tsx", ".jsx", ".zip", ".json", ".ts", ".js")
+    return sorted(
+        f.name for f in INPUT_DIR.iterdir()
+        if f.is_file() and f.suffix.lower() in interesting and not f.name.startswith(".")
+    )
 
 
 # ─── Routes ───────────────────────────────────────────────────────────────────
@@ -172,9 +219,62 @@ async def health() -> dict[str, Any]:
     """
     return {
         "status": "ok",
-        "scaffold_version": "8.0.0",
+        "scaffold_version": "9.0.0",
         "agents": list(AGENTS_MAP.keys()),
     }
+
+
+@app.get("/agent-apps/scaffold-status")
+async def scaffold_status() -> dict[str, Any]:
+    """Return the consultant's situation so the StarterPage can route them.
+
+    Reads product.md and Input/ from the repo root. Used only by the
+    StarterPage — never by production agent code.
+
+    Returns:
+        Dict with hasProductMd, isProductMdTemplate, inputFiles, dismissed.
+    """
+    has_product_md, is_template = _product_md_status()
+    return {
+        "hasProductMd": has_product_md,
+        "isProductMdTemplate": is_template,
+        "inputFiles": _input_files(),
+        "dismissed": STARTER_DISMISSED_MARKER.is_file(),
+    }
+
+
+@app.post("/agent-apps/dismiss-starter")
+async def dismiss_starter() -> dict[str, Any]:
+    """Soft-dismiss the StarterPage.
+
+    Writes a marker file at the repo root. Subsequent /scaffold-status
+    calls return dismissed=true and the frontend redirects away from /.
+    Hard delete (file removal) is handled by the `remove-starter` skill.
+
+    Returns:
+        Dict with status.
+    """
+    STARTER_DISMISSED_MARKER.write_text(
+        "Starter dismissed by the consultant.\n"
+        "Delete this file to bring back the StarterPage at /.\n"
+        "Run the `remove-starter` skill to permanently delete the starter code.\n",
+        encoding="utf-8",
+    )
+    logger.info("Starter dismissed (marker written)")
+    return {"status": "dismissed"}
+
+
+@app.post("/agent-apps/restore-starter")
+async def restore_starter() -> dict[str, Any]:
+    """Undo a soft-dismiss by removing the marker file.
+
+    Returns:
+        Dict with status.
+    """
+    if STARTER_DISMISSED_MARKER.is_file():
+        STARTER_DISMISSED_MARKER.unlink()
+        logger.info("Starter restored (marker removed)")
+    return {"status": "restored"}
 
 
 @app.post("/agent-apps/execute/{agent_id}/stream")

@@ -46,5 +46,47 @@
     "conclusionLabel": "Conclusion",
     "languageLabel": "Language",
     "deepenAnalysis": "Deepen analysis"
+  },
+  "starter": {
+    "title": "Welcome to your Elio scaffold",
+    "description": "Choose how to start your first Agent App.",
+    "intro": "How do you want to begin?",
+    "subIntro": "Three paths — pick the one that matches your situation.",
+    "cleanupHint": "Once your app is built, ask the Replit AI: \"Remove the starter page\" to clean up.",
+    "cards": {
+      "product": {
+        "title": "I already have product.md",
+        "desc": "You wrote your specs ahead of time (alone or with the PM).",
+        "cta": "Run the build"
+      },
+      "input": {
+        "title": "I have a Google AI Studio prototype",
+        "desc": "Drop your .tsx or .zip export into the Input/ folder.",
+        "descDetected": "File detected:",
+        "cta": "Build from prototype"
+      },
+      "idea": {
+        "title": "No idea yet",
+        "desc": "Answer 2 questions, the AI suggests 3 concrete app ideas.",
+        "cta": "Open Idea Lab"
+      }
+    },
+    "idea": {
+      "back": "Back to options",
+      "formTitle": "Find your first use case",
+      "roleLabel": "What's your role?",
+      "roleHint": "The role or function you hold day-to-day.",
+      "rolePlaceholder": "e.g. digital transformation consultant, data analyst, HR project manager...",
+      "painLabel": "Which task takes too much of your time every week?",
+      "painHint": "The more concrete, the better.",
+      "painPlaceholder": "e.g. every Friday I spend 2h compiling customer feedback into a report...",
+      "generate": "Generate 3 ideas",
+      "generating": "The AI is thinking...",
+      "thinking": "Generating 3 ideas tailored to your role...",
+      "resultsTitle": "Here are 3 Agent App ideas for you",
+      "inputs": "Input",
+      "outputs": "Output",
+      "nextStep": "Like one? Refine it with the PM:"
+    }
   }
 }
