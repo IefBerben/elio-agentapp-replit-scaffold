@@ -1,7 +1,7 @@
 # Elio Scaffold — Agent Instructions
 
 You are building an Elio Agent App for the Onepoint marketplace.
-These rules are non-negotiable. Read `docs/` before writing any code.
+These rules are non-negotiable. Read `.agents/docs/` before writing any code.
 
 ---
 
@@ -136,10 +136,10 @@ Read these docs before writing any code. They are the integration standard.
 
 | Document | What it covers |
 |----------|----------------|
-| `docs/AGENT_APP_GUIDELINES_BACK.md` | SSE patterns, bilingual prompts, file processing, doc generation |
-| `docs/AGENT_APP_GUIDELINES_FRONT.md` | Components, Zustand patterns, dark mode, full creation checklist |
-| `docs/CONVENTIONS.md` | Architecture, naming, allowed models, security |
-| `docs/INTEGRATION_GUIDE.md` | How your POC integrates into the Elio platform |
+| `.agents/docs/AGENT_APP_GUIDELINES_BACK.md` | SSE patterns, bilingual prompts, file processing, doc generation |
+| `.agents/docs/AGENT_APP_GUIDELINES_FRONT.md` | Components, Zustand patterns, dark mode, full creation checklist |
+| `.agents/docs/CONVENTIONS.md` | Architecture, naming, allowed models, security |
+| `.agents/docs/INTEGRATION_GUIDE.md` | How your POC integrates into the Elio platform |
 
 ---
 

@@ -12,9 +12,9 @@ This is the single source of truth that both build skills will follow.
 
 ---
 
-## Step 1 — Write `docs/api-contracts.md`
+## Step 1 — Write `.agents/docs/api-contracts.md`
 
-Create or overwrite `docs/api-contracts.md`.
+Create or overwrite `.agents/docs/api-contracts.md`.
 
 For each agent step, document:
 
@@ -128,7 +128,7 @@ Show the user a summary:
 
 ```
 Contrats API générés :
-- docs/api-contracts.md → [N] routes documentées
+- .agents/docs/api-contracts.md → [N] routes documentées
 - packages/shared-types/src/index.ts → [N] interfaces TypeScript
 
 Je commence le backend ? (oui / non)

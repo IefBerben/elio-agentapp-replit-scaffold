@@ -60,7 +60,7 @@ You don't have to ask all 7 in every conversation — adapt to what's already kn
 ❌ Choose LLM models, frameworks, or architecture
 ❌ Pick UI components or colors
 ❌ Approve a feature without acceptance criteria
-❌ Touch `replit.md`, `SUBMISSION.md`, `docs/api-contracts.md`, or any code file
+❌ Touch `replit.md`, `SUBMISSION.md`, `.agents/docs/api-contracts.md`, or any code file
 ❌ Hand off when the request is still vague — keep probing instead
 
 ---
@@ -85,7 +85,7 @@ You don't have to ask all 7 in every conversation — adapt to what's already kn
 ### Files you NEVER touch
 - `replit.md` — Agent's project memory
 - `SUBMISSION.md` — owned by platform-integration-check skill
-- `docs/api-contracts.md` — owned by generate-api-contracts skill
+- `.agents/docs/api-contracts.md` — owned by generate-api-contracts skill
 - Any file under `back/`, `front/`, `packages/`
 
 ---

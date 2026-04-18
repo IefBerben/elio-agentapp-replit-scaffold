@@ -1,7 +1,7 @@
 # Skill: build-frontend
 
 Build the React frontend for the agent app.
-Read `docs/AGENT_APP_GUIDELINES_FRONT.md` and `docs/CONVENTIONS.md` before writing any code.
+Read `.agents/docs/AGENT_APP_GUIDELINES_FRONT.md` and `.agents/docs/CONVENTIONS.md` before writing any code.
 
 ---
 
@@ -9,7 +9,7 @@ Read `docs/AGENT_APP_GUIDELINES_FRONT.md` and `docs/CONVENTIONS.md` before writi
 
 - `build-backend` completed and tests pass
 - `packages/shared-types/src/index.ts` exists
-- `docs/api-contracts.md` exists
+- `.agents/docs/api-contracts.md` exists
 
 ---
 

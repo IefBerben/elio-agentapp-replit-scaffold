@@ -206,7 +206,7 @@ git pull upstream main
 ```
 intake-from-markdown       → analyse product.md + backlog.md (ou interview)
        ↓
-generate-api-contracts     → docs/api-contracts.md + packages/shared-types/src/index.ts
+generate-api-contracts     → .agents/docs/api-contracts.md + packages/shared-types/src/index.ts
        ↓
 build-backend              → back/agents/{name}/ + tests + AGENTS_MAP
        ↓
@@ -233,7 +233,7 @@ front/                         Frontend React (Vite · TS · Zustand · Tailwind
   src/i18n/locales/            fr.json + en.json
 
 packages/shared-types/src/     Interfaces TypeScript partagées (DTOs)
-docs/                          Guidelines plateforme Elio v3
+.agents/docs/                  Guidelines plateforme Elio v3 (lues par l'Agent)
 custom_instruction/            Règles auto-injectées dans l'Agent
 .agents/skills/                5 skills Replit Agent (auto-découverts)
 replit.md                      Mémoire projet
@@ -248,7 +248,7 @@ Assistant consulting fonctionnel en 2 étapes — illustre tous les patterns Eli
 
 **Ne jamais modifier** `back/agents/_reference/` ni `front/src/pages/_ReferencePage.tsx`.
 
-### Guidelines plateforme (`docs/`)
+### Guidelines plateforme (`.agents/docs/`)
 
 | Document | Contenu |
 |----------|---------|

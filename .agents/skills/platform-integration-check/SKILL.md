@@ -45,7 +45,7 @@ For each item, read the relevant file and verify. Mark ✅ or ❌ with the file 
 
 ### Integration (I)
 
-- [ ] **I1 — API contract match** — routes in `docs/api-contracts.md` match the registered AGENTS_MAP keys and actual step function signatures.
+- [ ] **I1 — API contract match** — routes in `.agents/docs/api-contracts.md` match the registered AGENTS_MAP keys and actual step function signatures.
 - [ ] **I2 — Types match** — interfaces in `packages/shared-types/src/index.ts` match the Pydantic models in `back/agents/{name}/models.py` field by field.
 - [ ] **I3 — SUBMISSION.md** — sections 1, 2, 3 have real content (not placeholder text).
 

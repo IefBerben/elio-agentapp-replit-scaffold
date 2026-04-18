@@ -1,13 +1,13 @@
 # Skill: build-backend
 
 Build the Python backend agent following the Elio platform conventions.
-Read `docs/AGENT_APP_GUIDELINES_BACK.md` and `docs/CONVENTIONS.md` before writing any code.
+Read `.agents/docs/AGENT_APP_GUIDELINES_BACK.md` and `.agents/docs/CONVENTIONS.md` before writing any code.
 
 ---
 
 ## Prerequisites
 
-- `docs/api-contracts.md` is approved
+- `.agents/docs/api-contracts.md` is approved
 - `packages/shared-types/src/index.ts` exists
 - `replit.md` "App being built" section is filled
 
