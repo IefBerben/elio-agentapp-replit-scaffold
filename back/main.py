@@ -8,10 +8,12 @@ Usage:
     uv run uvicorn main:app --reload --port 8000
 """
 
+import asyncio
 import json
 import logging
 import os
 import shutil
+import urllib.request
 import uuid
 from collections.abc import AsyncGenerator
 from pathlib import Path
@@ -74,6 +76,60 @@ async def _check_required_secrets() -> None:
         )
     else:
         logger.info("✓ Azure OpenAI secrets detected — agents are ready to call the LLM.")
+
+
+SCAFFOLD_VERSION_URL = (
+    "https://raw.githubusercontent.com/IefBerben/elio-agentapp-replit-scaffold/main/SCAFFOLD_VERSION"
+)
+
+
+def _read_local_scaffold_version() -> str | None:
+    version_file = Path(__file__).parent.parent / "SCAFFOLD_VERSION"
+    try:
+        return version_file.read_text(encoding="utf-8").strip()
+    except OSError:
+        return None
+
+
+def _fetch_remote_scaffold_version() -> str | None:
+    try:
+        req = urllib.request.Request(SCAFFOLD_VERSION_URL, headers={"User-Agent": "elio-scaffold"})
+        with urllib.request.urlopen(req, timeout=3) as resp:
+            return resp.read().decode("utf-8").strip()
+    except Exception:
+        return None
+
+
+@app.on_event("startup")
+async def _check_scaffold_version() -> None:
+    """Warn the consultant when their remix is behind the upstream scaffold.
+
+    Non-blocking, best-effort: runs in a background thread, swallows all errors.
+    Lets us push fixes to the template and have remixed copies notice within
+    one server restart, without forcing every consultant to track GitHub.
+    """
+    if os.getenv("ELIO_SKIP_VERSION_CHECK"):
+        return
+
+    async def _run() -> None:
+        local = _read_local_scaffold_version()
+        if not local:
+            return
+        remote = await asyncio.to_thread(_fetch_remote_scaffold_version)
+        if not remote or remote == local:
+            return
+        bar = "─" * 70
+        logger.warning(
+            "\n%s\n⚠️  Scaffold update available: you have v%s, latest is v%s\n"
+            "    Pull upstream changes:\n"
+            "      git remote add upstream https://github.com/IefBerben/elio-agentapp-replit-scaffold.git  # once\n"
+            "      git pull upstream main\n"
+            "    Set ELIO_SKIP_VERSION_CHECK=1 in Secrets to silence this.\n%s",
+            bar, local, remote, bar,
+        )
+
+    asyncio.create_task(_run())
+
 
 app.add_middleware(
     CORSMiddleware,
