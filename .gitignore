@@ -1,0 +1,41 @@
+# Python
+back/.venv/
+back/__pycache__/
+back/**/__pycache__/
+back/**/*.pyc
+back/.env
+back/tempfiles/
+
+# Node
+front/node_modules/
+front/dist/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+*.log
+
+# Build outputs
+elio-scaffold-v*.zip
+elio-scaffold-patch-*.zip
+deliverables/
+.testlogs/
+
+# Local tooling
+GSD/
+.claude/
+.cursor/
+
+# Input specs (only Input/README.md is tracked)
+Input/AI Studio/
+Input/JIRA/
+Input/~$*
+
+# Reference material (local only)
+google ai studio dev guide/
+
+# Credentials / personal
+AZURE Credentials.txt
+AI-STUDIO-CONTEXT.md

@@ -1,0 +1,50 @@
+{
+  "common": {
+    "generate": "Générer",
+    "generating": "Génération en cours...",
+    "reset": "Réinitialiser",
+    "stop": "Arrêter",
+    "copy": "Copier",
+    "copied": "Copié !",
+    "export": "Exporter",
+    "startOver": "Recommencer",
+    "error": "Une erreur est survenue",
+    "retry": "Réessayer",
+    "loading": "Chargement...",
+    "addDocument": "Ajouter un document",
+    "documentFormats": "PDF, Word, PowerPoint — optionnel"
+  },
+  "agentAppCommon": {
+    "generate": "Générer",
+    "generating": "Génération en cours...",
+    "stop": "Arrêter",
+    "regenerate": "Regénérer",
+    "reset": "Réinitialiser",
+    "resetConfirm": "Réinitialiser ?",
+    "noFiles": "Aucun fichier",
+    "uploading": "Téléversement en cours...",
+    "dropFilesHere": "Cliquer ou glisser des fichiers ici"
+  },
+  "yourUsecase": {
+    "title": "Votre Agent",
+    "description": "Description courte de ce que fait l'agent",
+    "step1Label": "Saisie",
+    "step2Label": "Résultats",
+    "promptLabel": "Votre demande",
+    "promptPlaceholder": "Décrivez votre besoin, objectifs et tout contexte pertinent...",
+    "contextLabel": "Contexte ou instructions",
+    "contextPlaceholder": "Informations complémentaires (contexte concurrentiel, enjeux spécifiques...)",
+    "documentsLabel": "Documents",
+    "chars": "caractères",
+    "step1Generating": "Analyse en cours...",
+    "step2Generating": "Génération des recommandations...",
+    "resultsTitle": "Résultats",
+    "summaryLabel": "Synthèse",
+    "keyPointsLabel": "Points clés",
+    "recommendationsLabel": "Recommandations",
+    "nextStepsLabel": "Prochaines étapes",
+    "conclusionLabel": "Conclusion",
+    "languageLabel": "Langue",
+    "deepenAnalysis": "Approfondir l'analyse"
+  }
+}

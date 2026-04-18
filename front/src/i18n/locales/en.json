@@ -1,0 +1,50 @@
+{
+  "common": {
+    "generate": "Generate",
+    "generating": "Generating...",
+    "reset": "Reset",
+    "stop": "Stop",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "export": "Export",
+    "startOver": "Start Over",
+    "error": "Something went wrong",
+    "retry": "Retry",
+    "loading": "Loading...",
+    "addDocument": "Add a document",
+    "documentFormats": "PDF, Word, PowerPoint — optional"
+  },
+  "agentAppCommon": {
+    "generate": "Generate",
+    "generating": "Generating...",
+    "stop": "Stop",
+    "regenerate": "Regenerate",
+    "reset": "Reset",
+    "resetConfirm": "Reset?",
+    "noFiles": "No files",
+    "uploading": "Uploading...",
+    "dropFilesHere": "Click or drop files here"
+  },
+  "yourUsecase": {
+    "title": "Your Agent",
+    "description": "Short description of what this agent does",
+    "step1Label": "Setup",
+    "step2Label": "Results",
+    "promptLabel": "Your Request",
+    "promptPlaceholder": "Describe your goals, requirements, and any relevant details...",
+    "contextLabel": "Context or instructions",
+    "contextPlaceholder": "Specify any useful information (competitive context, specific stakes...)",
+    "documentsLabel": "Documents",
+    "chars": "chars",
+    "step1Generating": "Analysing...",
+    "step2Generating": "Generating recommendations...",
+    "resultsTitle": "Results",
+    "summaryLabel": "Summary",
+    "keyPointsLabel": "Key Points",
+    "recommendationsLabel": "Recommendations",
+    "nextStepsLabel": "Next Steps",
+    "conclusionLabel": "Conclusion",
+    "languageLabel": "Language",
+    "deepenAnalysis": "Deepen analysis"
+  }
+}
