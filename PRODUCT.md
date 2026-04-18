@@ -1,72 +1,54 @@
-# PRODUCT — [Nom de votre Agent App]
+# Product — Consulting Assistant
 
-> Ce document est la vision globale du produit. Il est écrit une fois en début de projet
-> avec `/product-manager` et ne change pas au fil des sprints.
-> Le product-manager le consulte avant chaque session pour vérifier la cohérence des stories.
+## Vision
 
----
+A two-step AI agent that helps Onepoint consultants structure any subject quickly.
+The consultant submits a topic or question plus optional context; the agent produces
+a structured analysis (summary + key points), which the consultant can edit before
+expanding into concrete recommendations and next steps.
 
-## Problème métier
+## Users
 
-<!-- Quel problème concret cet agent résout-il ?
-     Éviter les formulations abstraites — décrire une situation réelle et douloureuse. -->
+**Primary:** Onepoint consultants (all levels)
+**Context:** Preparing client meetings, structuring first-pass research, framing a delivery
+**Frequency:** Daily, on-demand
 
-_À compléter avec /product-manager_
+## Problem solved
 
----
+Consultants spend 20–40 minutes structuring a first-pass analysis of any new topic.
+This agent reduces that to under 2 minutes by producing a bilingual, structured output
+they can edit directly and present to clients.
 
-## Utilisateurs cibles
+## Core workflow
 
-<!-- Qui va utiliser cet agent ? Dans quel contexte ? À quelle fréquence ?
-     Ex: "Un consultant senior en phase de réponse à appel d'offres, 2-3 fois par semaine" -->
+1. Consultant enters a topic or question (required) and optional context
+2. Agent generates a summary and 3–5 key points — Step 1
+3. Consultant reviews and edits the key points if needed
+4. Agent expands the edited key points into recommendations, next steps, and a conclusion — Step 2
+5. Consultant uses the output in a presentation or document
 
-_À compléter avec /product-manager_
+## Output format
 
----
+Structured JSON displayed as:
+- **Step 1:** summary card + editable key points list
+- **Step 2:** recommendations list + next steps list + conclusion paragraph
 
-## Valeur ajoutée mesurable
+## Constraints
 
-<!-- Gain de temps estimé ? Réduction d'une charge cognitive ? Amélioration d'une décision ?
-     Ex: "Réduit de 3h à 20min la préparation d'une analyse concurrentielle" -->
+- Bilingual: French and English (user selects language via toggle)
+- No file upload in MVP
+- Output stays on screen — no export in MVP
+- Results must stream progressively with visible progress
 
-_À compléter avec /product-manager_
+## Platform fit
 
----
+Standalone Agent App for the Elio marketplace.
+Backend logic is the deliverable; UI will be adapted by the Elio team for production integration.
 
-## Positionnement agentique
+## Success criteria
 
-<!-- Pourquoi une approche agent est justifiée vs un formulaire, un script ou un dashboard ? -->
-
-_À compléter avec /product-manager_
-
----
-
-## Périmètre
-
-### Ce que l'agent fait
--
-
-### Ce que l'agent ne fait pas (limites explicites)
--
-
----
-
-## Critères de succès du POC (preuve de concept)
-
-<!-- Comment saura-t-on que le POC est réussi ?
-     Ex: "Un consultant non-technique peut produire une analyse en moins de 5 minutes" -->
-
--
-
----
-
-## Contraintes connues
-
-<!-- Données sensibles, périmètre SI, intégrations requises, langue, etc. -->
-
--
-
----
-
-_Validé le : [date]_
-_Par : [nom du PO]_
+- Step 1 completes in under 15 seconds
+- Step 2 completes in under 20 seconds
+- Key points from Step 1 are editable by the user before Step 2 runs
+- App works correctly in both French and English
+- All platform conformity checks pass (B1–B10, F1–F10, I1–I3)

@@ -1,43 +1,43 @@
 # SUBMISSION — Dossier de soumission à l'équipe Neo
 
-> Ce document est co-écrit par les 3 agents au fil du projet.
+> Ce document est mis à jour automatiquement par les skills Agent au fil du build.
 > Il est remis à l'équipe Neo avec le code pour validation et intégration dans la plateforme Elio.
 
 ---
 
 ## Section 1 — Problème métier et utilisateurs cibles
-*Propriétaire : Product Manager — à compléter après validation de PRODUCT.md*
+*À compléter depuis `product.md` — skill `intake-from-markdown`*
 
 ### Problème métier concret
 <!-- Quelle situation douloureuse cet agent résout-il ?
      Eviter les formulations abstraites. -->
 
-_À compléter par /product-manager_
+_À compléter depuis product.md_
 
 ### Utilisateurs cibles
 <!-- Qui, dans quel contexte, à quelle fréquence -->
 
-_À compléter par /product-manager_
+_À compléter depuis product.md_
 
 ### Situation actuelle (sans l'agent)
 <!-- Comment l'utilisateur résout ce problème aujourd'hui ? Combien de temps ? -->
 
-_À compléter par /product-manager_
+_À compléter depuis product.md_
 
 ---
 
 ## Section 2 — Valeur ajoutée mesurable
-*Propriétaire : Product Manager*
+*À compléter depuis `product.md`*
 
 ### Valeur apportée
 <!-- Gain de temps, réduction d'erreurs, amélioration d'une décision... -->
 
-_À compléter par /product-manager_
+_À compléter depuis product.md_
 
 ### Positionnement agentique
 <!-- Pourquoi un agent IA plutôt qu'un formulaire, script ou dashboard ? -->
 
-_À compléter par /product-manager_
+_À compléter depuis product.md_
 
 ### Périmètre
 **Ce que l'agent fait :**
@@ -49,24 +49,22 @@ _À compléter par /product-manager_
 ---
 
 ## Section 3 — Fonctionnement global
-*Propriétaire : Product Manager*
+*À compléter depuis `product.md` + `backlog.md`*
 
 ### Workflow complet
 <!-- Étape par étape, du point de vue utilisateur -->
 
-_À compléter par /product-manager_
+_À compléter depuis product.md_
 
 ### Dépendances externes
 <!-- APIs tierces, fichiers, bases de données, et comment elles sont mockées pour le POC -->
 
-_À compléter par /product-manager_
+_À compléter depuis product.md_
 
 ---
 
 ## Section 4 — Critères d'acceptation
-*Propriétaire : Architect — à compléter au fur et à mesure des stories Confirmed*
-
-> Les sections techniques ci-dessous sont remplies automatiquement par les agents. Tu n'as rien à compléter ici.
+*Généré par le skill `platform-integration-check` depuis `backlog.md`*
 
 ### Format d'entrée
 
@@ -83,22 +81,22 @@ _À compléter par /product-manager_
 ### Comportement du streaming
 <!-- Granularité des chunks, progression 0-100, indicateurs d'état -->
 
-_À compléter par /architect_
+_Généré par le skill `platform-integration-check`_
 
 ### Choix techniques structurants
 <!-- Modèle LLM sélectionné et justification, nombre d'étapes, données en transit -->
 
-_À compléter par /architect_
+_Généré par le skill `platform-integration-check`_
 
 ### Gestion des cas limites
 <!-- Champ vide, texte trop long, entrée invalide -->
 
-_À compléter par /architect_
+_Généré par le skill `platform-integration-check`_
 
 ---
 
 ## Section 5 — Exemples d'entrées et de sorties
-*Propriétaire : Builder — à enrichir après chaque story Built*
+*À enrichir après chaque build — skill `build-backend`*
 
 ### Exemple 1 — Cas standard
 *À ajouter après US-XX Built*
@@ -114,7 +112,7 @@ _À compléter par /architect_
 ```
 
 **Pourquoi cette sortie est satisfaisante :**
-_À compléter par /builder_
+_Généré par le skill `build-backend` / `build-frontend`_
 
 ---
 
@@ -132,39 +130,70 @@ _À compléter par /builder_
 ```
 
 **Pourquoi cette sortie est satisfaisante :**
-_À compléter par /builder_
+_Généré par le skill `build-backend` / `build-frontend`_
 
 ---
 
-## Section 6 — Screenshots et qualité
-*Propriétaire : Builder — à enrichir après chaque story Built*
+## Section 6 — Screenshots et conformité
+*Screenshots pris par le consultant — conformité générée par le skill `platform-integration-check`*
 
-### Screenshots attendus
-*Le PO prend les screenshots — le builder indique ce qui doit être capturé*
+### Screenshots attendus (minimum 3)
 
 **Screenshot 1 — Écran de saisie**
-_Description par /builder : ce qui doit être visible, avec un exemple rempli_
+_Description : formulaire visible avec un exemple rempli_
 
 **Screenshot 2 — Génération en cours**
-_Description par /builder : la progression SSE visible_
+_Description : progress banner SSE visible_
 
 **Screenshot 3 — Résultat final**
-_Description par /builder : le résultat complet affiché_
+_Description : résultat complet affiché_
 
-### Résultats de conformité toolkit
-*Mis à jour par `/builder` après chaque story — voir `/quality`*
+### Résultats de conformité
+*Généré par le skill `platform-integration-check`*
 
-> **Légende :** B = Backend, F = Frontend, S = Submission · ✅ = conforme, ❌ = non conforme
-> B1 models · B2 @stream_safe · B3 SSE contract · B4 AGENTS_MAP · B5 get_llm() · B6 tests
-> F1 Zustand · F2 i18n · F3 dark mode · F4 agentService · F5 composants · F6 barrel · S1 SUBMISSION.md
+> **Légende :** ✅ conforme · ❌ non conforme
+> B = Backend · F = Frontend · I = Intégration
 
-| Story | B1 | B2 | B3 | B4 | B5 | B6 | F1 | F2 | F3 | F4 | F5 | F6 | S1 |
-|-------|----|----|----|----|----|----|----|----|----|----|----|----|-----|
-| _à compléter_ | | | | | | | | | | | | | |
+| Check | Résultat | Détail |
+|-------|----------|--------|
+| B1 — Modèles LLM autorisés | ⬜ | |
+| B2 — @stream_safe | ⬜ | |
+| B3 — Contrat SSE | ⬜ | |
+| B4 — AGENTS_MAP | ⬜ | |
+| B5 — get_llm() | ⬜ | |
+| B6 — Tests | ⬜ | |
+| B7 — Prompts bilingues | ⬜ | |
+| B8 — interface_language | ⬜ | |
+| B9 — Docstrings | ⬜ | |
+| B10 — Fichiers protégés | ⬜ | |
+| F1 — Zustand + partialize | ⬜ | |
+| F2 — Sélecteurs individuels | ⬜ | |
+| F3 — i18n complet | ⬜ | |
+| F4 — executeAgentStreaming | ⬜ | |
+| F5 — Composants Elio | ⬜ | |
+| F6 — Dark mode | ⬜ | |
+| F7 — Inputs disabled | ⬜ | |
+| F8 — interface_language payload | ⬜ | |
+| F9 — Résultats éditables | ⬜ | |
+| F10 — Fichiers protégés | ⬜ | |
+| I1 — API contracts match | ⬜ | |
+| I2 — Types TypeScript match | ⬜ | |
+| I3 — SUBMISSION.md rempli | ⬜ | |
 
 ---
 
-## Section 7 -- Pre-flight packaging report
+## Section 7 — Vidéo de démonstration (optionnelle)
+*Fortement recommandée — particulièrement utile pour montrer la fluidité du streaming*
+
+- **Durée :** 1 à 3 minutes maximum
+- **Contenu :** saisie → génération en streaming → résultat final (commenté ou sous-titré)
+- **Format :** MP4 ou lien Loom / démo hébergée
+
+_Lien ou fichier à ajouter ici_
+
+---
+
+## Section 8 -- Pre-flight packaging report
 *Auto-generated by `scripts/package-agent.ps1` -- do not edit manually*
 
 <!-- PACKAGE_PREFLIGHT_START -->
@@ -173,5 +202,7 @@ _Run the "Package Agent for Transfer" task to generate this section._
 
 ---
 
-*Document initie le : [date]*
-*Derniere mise a jour : [date]*
+---
+
+*Document initié le : [date]*
+*Dernière mise à jour : [date]*
