@@ -55,7 +55,7 @@ class AppErrorBoundary extends Component<
   }
 }
 
-// ─── Nav ─────────────────────────────────────────────────────────────────────
+// ─── Top app bar (scaffold chrome — sits above each page's header) ───────────
 
 type Page = "starter" | "reference" | "showcase";
 
@@ -66,28 +66,73 @@ function readPageFromHash(): Page {
   return "starter";
 }
 
-function Nav({ current, onChange }: { current: Page; onChange: (p: Page) => void }) {
-  const items: ReadonlyArray<{ id: Page; label: string; icon: ReactNode; activeColor: string }> = [
-    { id: "starter", label: "Start", icon: <Home className="w-3.5 h-3.5" />, activeColor: "bg-[#009de0]" },
-    { id: "reference", label: "Reference", icon: <Sparkles className="w-3.5 h-3.5" />, activeColor: "bg-[#009de0]" },
-    { id: "showcase", label: "Components", icon: <LayoutGrid className="w-3.5 h-3.5" />, activeColor: "bg-purple-600" },
+function ScaffoldTopBar({
+  current,
+  onChange,
+  showStarter,
+}: {
+  current: Page;
+  onChange: (p: Page) => void;
+  showStarter: boolean;
+}) {
+  const items: ReadonlyArray<{
+    id: Page;
+    label: string;
+    icon: ReactNode;
+    activeColor: string;
+    visible: boolean;
+  }> = [
+    {
+      id: "starter",
+      label: "Start",
+      icon: <Home className="w-3.5 h-3.5" />,
+      activeColor: "bg-[#009de0] text-white",
+      visible: showStarter,
+    },
+    {
+      id: "reference",
+      label: "Reference",
+      icon: <Sparkles className="w-3.5 h-3.5" />,
+      activeColor: "bg-[#009de0] text-white",
+      visible: true,
+    },
+    {
+      id: "showcase",
+      label: "Components",
+      icon: <LayoutGrid className="w-3.5 h-3.5" />,
+      activeColor: "bg-purple-600 text-white",
+      visible: true,
+    },
   ];
+
   return (
-    <div className="fixed top-3 right-4 z-50 flex gap-1 bg-card border border-border rounded-xl p-1 shadow-sm">
-      {items.map((item) => (
-        <button
-          key={item.id}
-          onClick={() => onChange(item.id)}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-            current === item.id
-              ? `${item.activeColor} text-white`
-              : "text-muted-foreground hover:text-foreground hover:bg-muted"
-          }`}
-        >
-          {item.icon}
-          {item.label}
-        </button>
-      ))}
+    <div className="sticky top-0 z-40 h-10 bg-card/95 backdrop-blur border-b border-border flex items-center justify-between px-3 md:px-5">
+      <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
+        <span className="w-5 h-5 rounded-md bg-gradient-to-br from-[#009de0] to-purple-600 text-white flex items-center justify-center text-[10px] font-bold">
+          E
+        </span>
+        <span className="hidden sm:inline">Elio Scaffold</span>
+      </div>
+      <nav className="flex items-center gap-0.5">
+        {items
+          .filter((item) => item.visible)
+          .map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => onChange(item.id)}
+              className={[
+                "flex items-center gap-1.5 px-3 h-7 rounded-md text-xs font-medium transition-colors",
+                current === item.id
+                  ? item.activeColor
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted",
+              ].join(" ")}
+            >
+              {item.icon}
+              <span className="hidden sm:inline">{item.label}</span>
+            </button>
+          ))}
+      </nav>
     </div>
   );
 }
@@ -116,17 +161,28 @@ export default function App() {
     document.documentElement.lang = i18n.language;
   }, [i18n.language]);
 
+  // Keep the URL hash in sync with the active page.
   useEffect(() => {
     const hash = page === "starter" ? "" : `#${page}`;
     if (window.location.hash !== hash) window.location.hash = hash;
   }, [page]);
 
-  // Wait for the dismissed check before rendering, to avoid a flash of Starter
+  // Listen to browser back/forward so the bar reflects the actual hash.
+  useEffect(() => {
+    const handler = () => setPage(readPageFromHash());
+    window.addEventListener("hashchange", handler);
+    return () => window.removeEventListener("hashchange", handler);
+  }, []);
+
   if (dismissed === null) return null;
 
   return (
     <AppErrorBoundary>
-      <Nav current={page} onChange={setPage} />
+      <ScaffoldTopBar
+        current={page}
+        onChange={setPage}
+        showStarter={!dismissed}
+      />
       {page === "starter" && <StarterPage />}
       {page === "reference" && <ReferencePage />}
       {page === "showcase" && <ShowcasePage />}
