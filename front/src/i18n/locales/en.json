@@ -87,6 +87,13 @@
       "inputs": "Input",
       "outputs": "Output",
       "nextStep": "Like one? Refine it with the PM:"
+    },
+    "upload": {
+      "specHint": "Drop your product.md (and backlog.md if you have one) below, or use the prompt if they're already at the project root.",
+      "specDropHint": "product.md or backlog.md only",
+      "prototypeHint": "Drop your Google AI Studio export (.tsx, .zip, .json…) below, or use the prompt if it's already in Input/.",
+      "prototypeDropHint": ".tsx · .jsx · .ts · .js · .zip · .json",
+      "thenStep": "Then trigger the build:"
     }
   }
 }

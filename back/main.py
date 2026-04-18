@@ -243,6 +243,82 @@ async def scaffold_status() -> dict[str, Any]:
     }
 
 
+_ALLOWED_SPEC_NAMES = {"product.md", "backlog.md"}
+_ALLOWED_PROTOTYPE_SUFFIXES = {".tsx", ".jsx", ".ts", ".js", ".zip", ".json"}
+
+
+@app.post("/agent-apps/upload-spec")
+async def upload_spec(files: list[UploadFile]) -> dict[str, Any]:
+    """Save product.md / backlog.md uploads at the repo root.
+
+    Used by the StarterPage so the consultant can drop their pre-written
+    spec without leaving the page. Filenames are whitelisted to prevent
+    overwriting unrelated repo files.
+
+    Returns:
+        Dict with the saved files and the updated scaffold status.
+
+    Raises:
+        HTTPException 400: filename not in {product.md, backlog.md}.
+    """
+    saved = []
+    for upload in files:
+        original_name = Path(upload.filename or "").name.lower()
+        if original_name not in _ALLOWED_SPEC_NAMES:
+            await upload.close()
+            raise HTTPException(
+                status_code=400,
+                detail=f"Only {sorted(_ALLOWED_SPEC_NAMES)} can be uploaded here.",
+            )
+        dest = REPO_ROOT / original_name
+        try:
+            with dest.open("wb") as out:
+                shutil.copyfileobj(upload.file, out)
+        finally:
+            await upload.close()
+        saved.append({"name": original_name, "size": dest.stat().st_size})
+        logger.info(f"Spec saved: {dest}")
+
+    return {"files": saved, "status": await scaffold_status()}
+
+
+@app.post("/agent-apps/upload-prototype")
+async def upload_prototype(files: list[UploadFile]) -> dict[str, Any]:
+    """Save a Google AI Studio export to Input/.
+
+    The Input/ folder is the contract used by the `intake-from-markdown`
+    skill — files dropped here are picked up automatically when the
+    consultant runs "Build my app from the prototype in Input/".
+
+    Returns:
+        Dict with the saved files and the updated scaffold status.
+
+    Raises:
+        HTTPException 400: file extension not allowed.
+    """
+    INPUT_DIR.mkdir(exist_ok=True)
+    saved = []
+    for upload in files:
+        original_name = Path(upload.filename or "file").name
+        suffix = Path(original_name).suffix.lower()
+        if suffix not in _ALLOWED_PROTOTYPE_SUFFIXES:
+            await upload.close()
+            raise HTTPException(
+                status_code=400,
+                detail=f"Only {sorted(_ALLOWED_PROTOTYPE_SUFFIXES)} files are accepted.",
+            )
+        dest = INPUT_DIR / original_name
+        try:
+            with dest.open("wb") as out:
+                shutil.copyfileobj(upload.file, out)
+        finally:
+            await upload.close()
+        saved.append({"name": original_name, "size": dest.stat().st_size})
+        logger.info(f"Prototype saved: {dest}")
+
+    return {"files": saved, "status": await scaffold_status()}
+
+
 @app.post("/agent-apps/dismiss-starter")
 async def dismiss_starter() -> dict[str, Any]:
     """Soft-dismiss the StarterPage.

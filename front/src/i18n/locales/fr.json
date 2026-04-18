@@ -87,6 +87,13 @@
       "inputs": "Entrée",
       "outputs": "Sortie",
       "nextStep": "Une idée te plaît ? Affine-la avec le PM :"
+    },
+    "upload": {
+      "specHint": "Glisse ton product.md (et backlog.md si tu en as un) ci-dessous, ou utilise l'instruction si tu les as déjà placés à la racine du projet.",
+      "specDropHint": "product.md ou backlog.md uniquement",
+      "prototypeHint": "Dépose ton export Google AI Studio (.tsx, .zip, .json…) ci-dessous, ou utilise l'instruction si tu l'as déjà placé dans Input/.",
+      "prototypeDropHint": ".tsx · .jsx · .ts · .js · .zip · .json",
+      "thenStep": "Ensuite, lance le build :"
     }
   }
 }

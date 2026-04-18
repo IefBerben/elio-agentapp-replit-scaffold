@@ -45,11 +45,13 @@ Use this skill only when the consultant explicitly asks to remove the starter co
    # ── Starter (disposable — removed by `remove-starter` skill) ──────────────
    "idea-lab-step-1": idea_lab_step_1_stream,
    ```
-3. Remove the three starter routes:
+3. Remove the five starter routes:
    - `GET /agent-apps/scaffold-status`
+   - `POST /agent-apps/upload-spec`
+   - `POST /agent-apps/upload-prototype`
    - `POST /agent-apps/dismiss-starter`
    - `POST /agent-apps/restore-starter`
-4. Remove the helpers `_product_md_status`, `_input_files`, and the related constants `REPO_ROOT`, `STARTER_DISMISSED_MARKER`, `PRODUCT_MD_PATH`, `INPUT_DIR`. Note: if any production agent code relies on `REPO_ROOT`, keep that constant — only remove what the starter introduced.
+4. Remove the helpers `_product_md_status`, `_input_files`, the constants `_ALLOWED_SPEC_NAMES`, `_ALLOWED_PROTOTYPE_SUFFIXES`, and the related path constants `REPO_ROOT`, `STARTER_DISMISSED_MARKER`, `PRODUCT_MD_PATH`, `INPUT_DIR`. Note: if any production agent code relies on `REPO_ROOT`, keep that constant — only remove what the starter introduced.
 
 ### `front/src/App.tsx`
 1. Remove the import: `import { StarterPage } from "@/pages/StarterPage";`

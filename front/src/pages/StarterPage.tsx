@@ -29,6 +29,7 @@ import {
   AgentAppPageShell,
   AgentAppSection,
   ErrorBanner,
+  FileUploadZone,
   FormField,
   FormInput,
   FormTextarea,
@@ -51,15 +52,23 @@ type Path = "product-md" | "input-file" | "idea-lab";
 
 // ─── Hook: scaffold-status ────────────────────────────────────────────────────
 
-function useScaffoldStatus(): ScaffoldStatus | null {
+function useScaffoldStatus(): {
+  status: ScaffoldStatus | null;
+  refresh: () => Promise<void>;
+} {
   const [status, setStatus] = useState<ScaffoldStatus | null>(null);
+  const refresh = async () => {
+    try {
+      const r = await fetch("/agent-apps/scaffold-status");
+      if (r.ok) setStatus(await r.json());
+    } catch {
+      /* best-effort */
+    }
+  };
   useEffect(() => {
-    fetch("/agent-apps/scaffold-status")
-      .then((r) => (r.ok ? r.json() : null))
-      .then(setStatus)
-      .catch(() => setStatus(null));
+    void refresh();
   }, []);
-  return status;
+  return { status, refresh };
 }
 
 // ─── Coach card — the prompt to paste into the Agent chat ─────────────────────
@@ -108,6 +117,81 @@ function CoachPanel({
           )}
         </button>
       </div>
+    </div>
+  );
+}
+
+// ─── Upload panel ─────────────────────────────────────────────────────────────
+
+function UploadPanel({
+  endpoint,
+  accept,
+  multiple,
+  hint,
+  detectedFiles,
+  language,
+  onUploaded,
+}: {
+  endpoint: "upload-spec" | "upload-prototype";
+  accept: string;
+  multiple: boolean;
+  hint: string;
+  detectedFiles: string[];
+  language: string;
+  onUploaded: () => Promise<void> | void;
+}) {
+  const [isUploading, setIsUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function upload(files: FileList) {
+    setIsUploading(true);
+    setError(null);
+    try {
+      const form = new FormData();
+      Array.from(files).forEach((f) => form.append("files", f));
+      const r = await fetch(`/agent-apps/${endpoint}`, {
+        method: "POST",
+        body: form,
+      });
+      if (!r.ok) {
+        const detail = await r.text().catch(() => "");
+        throw new Error(`Upload failed (${r.status}) ${detail}`);
+      }
+      await onUploaded();
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setIsUploading(false);
+    }
+  }
+
+  const detectedLabel =
+    language === "en" ? "Detected in repo:" : "Détectés dans le repo :";
+
+  return (
+    <div className="space-y-2">
+      <FileUploadZone
+        onFileSelect={upload}
+        accept={accept}
+        multiple={multiple}
+        isUploading={isUploading}
+        hint={hint}
+      />
+      {detectedFiles.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2 text-xs">
+          <span className="text-muted-foreground">{detectedLabel}</span>
+          {detectedFiles.map((name) => (
+            <span
+              key={name}
+              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-300 font-mono"
+            >
+              <CheckCircle2 className="w-3 h-3" />
+              {name}
+            </span>
+          ))}
+        </div>
+      )}
+      <ErrorBanner error={error} />
     </div>
   );
 }
@@ -332,7 +416,7 @@ function IdeaLabPanel({
 
 export function StarterPage() {
   const { t, i18n } = useTranslation();
-  const status = useScaffoldStatus();
+  const { status, refresh } = useScaffoldStatus();
   const [selected, setSelected] = useState<Path | null>(null);
 
   const lang = i18n.language;
@@ -431,10 +515,27 @@ export function StarterPage() {
 
             {selected === "product-md" && (
               <AgentAppCard>
-                <h3 className="text-sm font-bold text-foreground">
+                <h3 className="text-sm font-bold text-foreground mb-3">
                   {t("starter.cards.product.title")}
                 </h3>
-                <CoachPanel prompt={productPrompt} language={lang} />
+                <p className="text-xs text-muted-foreground mb-3">
+                  {t("starter.upload.specHint")}
+                </p>
+                <UploadPanel
+                  endpoint="upload-spec"
+                  accept=".md"
+                  multiple
+                  hint={t("starter.upload.specDropHint") as string}
+                  detectedFiles={hasProduct ? ["product.md"] : []}
+                  language={lang}
+                  onUploaded={refresh}
+                />
+                <div className="mt-4 pt-4 border-t border-border">
+                  <p className="text-xs font-semibold text-foreground">
+                    {t("starter.upload.thenStep")}
+                  </p>
+                  <CoachPanel prompt={productPrompt} language={lang} />
+                </div>
                 <p className="mt-3 text-xs text-muted-foreground">
                   {t("starter.cleanupHint")}
                 </p>
@@ -443,10 +544,27 @@ export function StarterPage() {
 
             {selected === "input-file" && (
               <AgentAppCard>
-                <h3 className="text-sm font-bold text-foreground">
+                <h3 className="text-sm font-bold text-foreground mb-3">
                   {t("starter.cards.input.title")}
                 </h3>
-                <CoachPanel prompt={inputPrompt} language={lang} />
+                <p className="text-xs text-muted-foreground mb-3">
+                  {t("starter.upload.prototypeHint")}
+                </p>
+                <UploadPanel
+                  endpoint="upload-prototype"
+                  accept=".tsx,.jsx,.ts,.js,.zip,.json"
+                  multiple
+                  hint={t("starter.upload.prototypeDropHint") as string}
+                  detectedFiles={status?.inputFiles ?? []}
+                  language={lang}
+                  onUploaded={refresh}
+                />
+                <div className="mt-4 pt-4 border-t border-border">
+                  <p className="text-xs font-semibold text-foreground">
+                    {t("starter.upload.thenStep")}
+                  </p>
+                  <CoachPanel prompt={inputPrompt} language={lang} />
+                </div>
                 <p className="mt-3 text-xs text-muted-foreground">
                   {t("starter.cleanupHint")}
                 </p>
