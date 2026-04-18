@@ -138,7 +138,7 @@ L'Agent comprend le langage naturel. Tu n'as pas besoin de toucher au code.
 
 ---
 
-## Étape 6 — Soumets à l'équipe Neo
+## Étape 6 — Soumets à l'équipe Elio
 
 Quand tu es satisfait :
 
@@ -147,9 +147,9 @@ Quand tu es satisfait :
 3. Il corrige automatiquement ce qui ne passe pas
 
 Quand tout est ✅ :
-- Ouvre `SUBMISSION.md` → c'est le dossier complet pour Neo
+- Ouvre `SUBMISSION.md` → c'est le dossier complet pour l'équipe Elio
 - Prends 3 captures d'écran (formulaire, génération en cours, résultat)
-- Partage le lien de ton Repl avec l'équipe Neo
+- Partage le lien de ton Repl avec l'équipe Elio
 
 ---
 
@@ -238,7 +238,7 @@ custom_instruction/            Règles auto-injectées dans l'Agent
 .agents/skills/                5 skills Replit Agent (auto-découverts)
 replit.md                      Mémoire projet
 product.md / backlog.md        Décris ton app ici
-SUBMISSION.md                  Dossier de remise à l'équipe Neo
+SUBMISSION.md                  Dossier de remise à l'équipe Elio
 ```
 
 ### App de référence

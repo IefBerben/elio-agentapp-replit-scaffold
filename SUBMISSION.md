@@ -1,7 +1,7 @@
-# SUBMISSION — Dossier de soumission à l'équipe Neo
+# SUBMISSION — Dossier de soumission à l'équipe Elio
 
 > Ce document est mis à jour automatiquement par les skills Agent au fil du build.
-> Il est remis à l'équipe Neo avec le code pour validation et intégration dans la plateforme Elio.
+> Il est remis à l'équipe Elio avec le code pour validation et intégration dans la plateforme.
 
 ---
 

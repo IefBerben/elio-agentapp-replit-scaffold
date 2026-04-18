@@ -84,10 +84,10 @@ Intégr.  : I1✅ I2✅ I3✅
 
 SUBMISSION.md mis à jour — sections 4 et 6 complètes.
 
-Ton app est prête pour soumission à l'équipe Neo.
+Ton app est prête pour soumission à l'équipe Elio.
 Prochaines étapes :
 1. Prends 3 screenshots (écran saisie, génération en cours, résultat final)
 2. Ajoute-les dans SUBMISSION.md section 6
 3. (Optionnel) Enregistre une démo vidéo de 1-3 minutes
-4. Envoie SUBMISSION.md + le code à l'équipe Neo
+4. Envoie SUBMISSION.md + le code à l'équipe Elio
 ```

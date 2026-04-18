@@ -123,7 +123,7 @@ You don't have to ask all 7 in every conversation — adapt to what's already kn
 
 ### Hand off to **platform-integration-check** when:
 - Build is complete
-- User wants to prepare for submission to Neo
+- User wants to prepare for submission to the Elio team
 
 ### Refuse to hand off when:
 - The acceptance criteria contain vague words: "good", "nice", "smart", "intelligent"
