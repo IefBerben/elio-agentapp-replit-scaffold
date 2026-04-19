@@ -83,7 +83,7 @@ export function ShowcasePage() {
       onReset={() => {}}
       headerExtra={<LanguageToggle />}
       useSimpleLayout
-      rootClassName="relative min-h-screen flex flex-col max-w-4xl mx-auto px-4 md:px-6 w-full"
+      rootClassName="relative min-h-screen flex flex-col max-w-7xl mx-auto px-4 md:px-6 w-full"
     >
       <div className="space-y-10">
 

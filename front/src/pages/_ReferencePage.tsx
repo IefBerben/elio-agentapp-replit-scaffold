@@ -86,7 +86,7 @@ export function ReferencePage() {
       }
       headerExtra={<LanguageToggle />}
       useSimpleLayout
-      rootClassName="relative min-h-screen flex flex-col max-w-4xl mx-auto px-4 md:px-6 w-full"
+      rootClassName="relative min-h-screen flex flex-col max-w-7xl mx-auto px-4 md:px-6 w-full"
     >
       <ErrorBanner error={error} className="mb-4" />
 

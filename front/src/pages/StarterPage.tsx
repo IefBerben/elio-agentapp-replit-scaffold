@@ -199,7 +199,7 @@ export function StarterPage() {
       iconContainerClassName="bg-gradient-to-br from-[#009de0] to-purple-600 text-white"
       isProcessing={false}
       headerActions={<LanguageToggle />}
-      rootClassName="relative min-h-screen flex flex-col max-w-4xl mx-auto px-4 md:px-6 w-full"
+      rootClassName="relative min-h-screen flex flex-col max-w-7xl mx-auto px-4 md:px-6 w-full"
     >
       <div className="space-y-6 pt-6">
         {/* ── Secondary card: pointer to Value Office ────────────────────── */}
