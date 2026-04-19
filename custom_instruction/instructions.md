@@ -14,14 +14,16 @@ These rules are non-negotiable. Read `.agents/docs/` before writing any code.
 
 ---
 
-## First-run setup — request these Replit Secrets
+## First-run setup — 4 env vars required
 
-The scaffold pre-commits `AZURE_OPENAI_DEPLOYMENT` and `AZURE_OPENAI_API_VERSION` in `.replit [env]`, so on remix only **2 secrets** are missing:
+All 4 Azure OpenAI env vars must be present before `get_llm()` runs. The scaffold ships defaults for the 2 non-sensitive ones in `.replit [env]`:
 
-- `AZURE_OPENAI_ENDPOINT`
-- `AZURE_OPENAI_API_KEY`
+- `AZURE_OPENAI_DEPLOYMENT` — shipped default `gpt-5-chat` (auto on remix)
+- `AZURE_OPENAI_API_VERSION` — shipped default `2025-01-01-preview` (auto on remix)
+- `AZURE_OPENAI_ENDPOINT` — must be provided by the consultant (Replit Secret)
+- `AZURE_OPENAI_API_KEY` — must be provided by the consultant (Replit Secret)
 
-If either is missing when `get_llm()` is called, request both via the Replit Secrets flow. Encourage linking from the consultant's Account Secrets vault (one-time setup, reusable across all their remixes) rather than pasting raw values each time. Do **not** hardcode or guess values.
+On first run, request the 2 missing Secrets via the Replit Secrets flow. Encourage linking from the consultant's Account Secrets vault (one-time setup, reusable across all their remixes) rather than pasting raw values each time. Do **not** hardcode or guess values.
 
 ---
 
