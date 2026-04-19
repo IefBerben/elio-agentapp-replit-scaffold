@@ -63,10 +63,6 @@ Acceptance criteria:
 
 ---
 
-## MVP slice
-
-_À compléter_ — list the epics/features that must ship in V1.
-
 ## Non-functional requirements
 
 - **Bilingual:** all UI text in `fr.json` + `en.json` — zero hardcoded strings
