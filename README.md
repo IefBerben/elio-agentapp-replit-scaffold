@@ -1,276 +1,260 @@
-# Elio Scaffold v9 — Construis ton app en 30 minutes
+# Elio Scaffold — Construis ton AgentApp en 30 minutes
 
-Scaffold pour construire des **Agent Apps** pour la plateforme Elio (Agentic Studio · Onepoint),
-sans avoir besoin de coder. Tu décris ton idée à un agent IA, qui écrit le code pour toi.
+Le scaffold officiel pour construire des **AgentApps** destinées à la plateforme **Elio** (Agentic Studio · Onepoint). Tu décris ton app à un agent IA dans Replit, il écrit le code pour toi.
+
+**Ce scaffold est le chaînon 2 d'un parcours en 2 temps :**
+
+1. **AgentApp Elio - Value Office** → transforme ton idée en `product.md` (vision, utilisateurs, valeur).
+2. **Ce scaffold** → transforme ton `product.md` en app fonctionnelle grâce à 2 agents : un **Agent PO** qui rédige le backlog avec toi, puis un **Agent Builder** qui écrit le code.
 
 ---
 
 ## Avant de commencer
 
-**Ce qu'il te faut :**
+**Il te faut :**
 - Un compte Replit (gratuit) → [replit.com](https://replit.com)
-- Tes credentials Azure OpenAI (endpoint + clé API) → si tu n'en as pas encore, envoie un mail à [elio@groupeonepoint.com](mailto:elio@groupeonepoint.com)
-- Une idée d'application
+- Tes credentials Azure OpenAI (endpoint + clé API) → demande-les à [elio@groupeonepoint.com](mailto:elio@groupeonepoint.com) si tu n'en as pas encore
+- Un `product.md` produit par l'**AgentApp Elio - Value Office** (optionnel, mais fortement conseillé)
+
+**Pas besoin de savoir** coder, utiliser Git ou configurer un serveur. L'Agent Replit s'occupe de tout.
 
 **Combien de temps ?**
-- Setup initial : **5 minutes**
-- Premier prototype fonctionnel : **20 à 30 minutes**
+- Setup initial : **5 min**
+- De `product.md` à app fonctionnelle : **20 à 30 min**
 - Itérations : autant que tu veux
-
-**Pas besoin de savoir** coder, utiliser Git, ou configurer un serveur. L'agent IA s'occupe de tout.
 
 ---
 
 ## Étape 1 — Récupère le scaffold (2 min)
 
-1. Ouvre la page du scaffold dans ton navigateur (ton référent te donne le lien)
-2. Connecte-toi à Replit
-3. Clique sur le bouton bleu **Remix this app**
-4. Donne un nom à ton projet (ex : `assistant-juridique-acme`)
-5. Confirme
+1. Ouvre la page du scaffold dans ton navigateur (lien fourni par l'équipe Elio).
+2. Connecte-toi à Replit.
+3. Clique sur **Remix this app**.
+4. Donne un nom à ton projet (ex : `cr-reunion-acme`).
+5. Confirme.
 
-Tu as maintenant **ta propre copie privée** du scaffold. Personne ne peut la voir sauf toi.
+Tu as maintenant **ta copie privée**. Personne d'autre n'y a accès.
 
 ---
 
 ## Étape 2 — Configure tes credentials Azure (3 min)
 
-Sans cette étape, l'IA ne pourra pas répondre aux requêtes de ton app.
+Sans ça, l'IA de ton app ne pourra pas répondre.
 
-### Tu n'as pas encore de credentials Azure ?
+### Pas encore de credentials ?
 
-Envoie un mail à [elio@groupeonepoint.com](mailto:elio@groupeonepoint.com) avec ton nom et ton projet. On te renvoie un `AZURE_OPENAI_ENDPOINT` et un `AZURE_OPENAI_API_KEY`.
+Envoie un mail à [elio@groupeonepoint.com](mailto:elio@groupeonepoint.com) avec ton nom et ton projet — on te renvoie un `AZURE_OPENAI_ENDPOINT` et un `AZURE_OPENAI_API_KEY`.
 
-### Ce dont tu as besoin
+### Ce qu'il faut renseigner
 
-Le scaffold ship avec **2 valeurs déjà pré-configurées** (inutile de les renseigner, sauf si tu veux les changer) :
+Le scaffold ship avec **2 valeurs déjà pré-remplies** dans `.replit` :
 
-| Clé | Valeur par défaut | Où c'est défini |
-|-----|-------------------|-----------------|
-| `AZURE_OPENAI_DEPLOYMENT` | `gpt-5-chat` | `.replit` (pré-commit) |
-| `AZURE_OPENAI_API_VERSION` | `2025-01-01-preview` | `.replit` (pré-commit) |
+| Clé | Valeur par défaut |
+|-----|-------------------|
+| `AZURE_OPENAI_DEPLOYMENT` | `gpt-5-chat` |
+| `AZURE_OPENAI_API_VERSION` | `2025-01-01-preview` |
 
-Tu dois seulement renseigner **2 secrets** (ceux que tu as reçus par mail) :
+Tu ajoutes seulement les **2 secrets** reçus par mail :
 
 | Clé | Valeur |
 |-----|--------|
-| `AZURE_OPENAI_ENDPOINT` | l'URL fournie (commence par `https://`) |
-| `AZURE_OPENAI_API_KEY` | ta clé API |
+| `AZURE_OPENAI_ENDPOINT` | l'URL (commence par `https://`) |
+| `AZURE_OPENAI_API_KEY` | la clé API |
 
-### Comment les renseigner — 2 options
+### Deux façons de les ajouter
 
-**Option A — Rapide (1 projet) :** demande à l'Agent. Dans le chat Agent, tape :
+**Rapide (un seul projet)** — dans le chat Agent Replit, tape :
 
 > **"I need to enter my Azure credentials"**
 
-L'Agent ouvre un formulaire sécurisé directement dans le chat. Colle endpoint + clé → Add to Secrets.
+L'Agent ouvre un formulaire sécurisé → colle endpoint + clé → Add to Secrets.
 
-**Option B — Recommandé si tu vas remixer plusieurs apps :** sauvegarde-les dans tes **Account Secrets** (coffre-fort personnel Replit, réutilisable sur tous tes remix) :
+**Recommandé si tu vas remixer plusieurs apps** — sauvegarde-les une fois dans tes **Account Secrets** (coffre-fort personnel Replit, réutilisable sur tous tes projets) :
 
 1. Ouvre l'outil **Secrets** : clique sur **+** dans les onglets d'outils → cherche "Secrets" → ouvre.
 2. Clique sur **Link Account Secrets** en haut à droite du panneau.
-3. Si tu n'en as pas encore, utilise le lien proposé pour ouvrir tes Account Secrets et ajoute `AZURE_OPENAI_ENDPOINT` + `AZURE_OPENAI_API_KEY`.
-4. De retour dans le panneau Secrets du projet → **Link Account Secrets** → lie les deux.
+3. S'il n'y a rien, utilise le lien proposé pour ouvrir tes Account Secrets et ajoute `AZURE_OPENAI_ENDPOINT` + `AZURE_OPENAI_API_KEY`.
+4. Retour dans le panneau Secrets du projet → **Link Account Secrets** → lie les deux.
 
-Sur chaque futur remix du scaffold, tu auras juste à refaire l'étape 4 — un clic au lieu d'un copier-coller.
+Sur chaque futur remix, il te suffira de refaire l'étape 4 : un clic.
 
-> 💡 Tes Account Secrets restent privés. Chaque projet doit explicitement demander à y accéder via **Link Account Secrets**.
-> ⚠️ Après avoir ajouté/modifié les secrets, **redémarre les serveurs** (Stop ▶ puis Run ▶) — les variables d'environnement ne sont chargées qu'au démarrage.
-
----
-
-## Étape 3 — Lance l'app et choisis ton point de départ (1 min)
-
-1. En haut de l'écran, clique sur le gros bouton **Run** ▶
-2. Attends que les deux serveurs démarrent (1 à 2 minutes la première fois)
-3. L'onglet **Webview** s'ouvre automatiquement → tu vois la **page de démarrage**
-
-La page de démarrage te propose **3 chemins** :
-
-| Tu as déjà... | Tu cliques... |
-|---------------|---------------|
-| ✅ Un `product.md` rédigé en amont | **« Lancer le build »** → on te donne l'instruction à coller dans le chat IA |
-| 🎨 Une maquette Google AI Studio dans `Input/` | **« Construire à partir de la maquette »** → idem |
-| 🤔 Pas encore d'idée | **« Idea Lab »** → réponds à 2 questions, l'IA propose 3 idées concrètes pour ton métier |
-
-> 💡 Onglet **Reference** en haut à droite : une app de démo complète (assistant consulting en 2 étapes) qui montre tous les patterns Elio.
-> 💡 Onglet **Components** : la galerie des composants UI disponibles.
+> ⚠️ **Redémarre les serveurs** (Stop ▶ puis Run ▶) après avoir ajouté ou modifié des secrets — les env vars ne sont chargées qu'au démarrage.
 
 ---
 
-## Étape 4 — Décris ton app à l'Agent (15 min)
+## Étape 3 — Lance l'app (1 min)
 
-C'est ici que la magie opère.
+1. Clique sur **Run** ▶ en haut de l'écran.
+2. Attends que les deux serveurs démarrent (1 à 2 min la première fois).
+3. L'onglet **Webview** s'ouvre sur la **Starter Page**.
 
-> 💡 **Pas sûr de ce que tu veux construire ?** Demande **"Invoque la skill product-owner"** dans le chat.
-> L'Agent PO lit ton `product.md` (produit par l'AgentApp Elio - Value Office) et itère avec toi pour rédiger le `backlog.md`, puis passe la main à l'Agent Builder.
+La Starter Page t'offre **2 chemins** :
 
-1. Ouvre l'onglet **Agent** :
-   - Souvent visible en haut de l'écran ou dans le dock
-   - Sinon : `Ctrl+K` (ou `Cmd+K`) → tape `Agent` → ouvre
-2. Dans la zone de chat, tape simplement :
+| Ta situation | Ce que tu fais |
+|--------------|----------------|
+| 🤔 Pas encore de `product.md` | Clique sur **Ouvrir l'AgentApp Elio - Value Office** → elle t'aide à formaliser ton cas d'usage. Reviens ensuite avec ton `product.md`. |
+| ✅ J'ai un `product.md` | Drop-le dans la zone d'upload (+ une maquette Google AI Studio optionnelle), puis clique **Copy prompt** — tu obtiens l'instruction exacte à coller dans le chat Agent Replit. |
 
-   > **"Build my app"**
-
-3. L'Agent va te poser **5 questions** :
-   - Quel problème métier ton app résout ?
-   - Qui sont les utilisateurs ?
-   - Quelles sont les étapes du workflow ?
-   - Quelles données entrent et sortent ?
-   - Combien d'étapes (1 ou 2) ?
-
-4. Réponds en français, naturellement, comme à un collègue
-
-L'Agent va ensuite :
-- Écrire les specs dans `product.md` et `backlog.md`
-- Te montrer un résumé pour validation
-- Construire le backend, le frontend, les tests
-- Vérifier que tout est conforme aux standards Elio
-- Mettre à jour `SUBMISSION.md` (le dossier de remise)
-
-> ⏱️ Compte 10 à 20 minutes selon la complexité de ton app.
-
-### Tu as déjà une spec écrite ?
-
-Si tu as déjà rédigé `product.md` et `backlog.md`, tape simplement :
-
-> **"Build my app from the existing product.md and backlog.md"**
-
-### Tu as une maquette Google AI Studio ?
-
-1. Dépose ton export `.tsx` ou `.zip` dans le dossier `Input/`
-2. Tape : **"Build my app from the Google AI Studio prototype in Input/"**
-
-L'Agent reprendra l'idée et la transformera en app conforme Elio.
+> 💡 Onglets en haut à droite : **Reference** (app de démo consulting qui illustre tous les patterns Elio) et **Components** (galerie des composants UI disponibles).
 
 ---
 
-## Étape 5 — Teste et itère (autant que tu veux)
+## Étape 4 — L'Agent PO rédige le backlog avec toi (5-10 min)
 
-Quand l'Agent te dit **"Build complete"** :
+Dans le chat Agent Replit, colle le prompt généré par la Starter Page. Par exemple :
 
-1. Si l'app n'est pas déjà rechargée, clique **Run** ▶ à nouveau
-2. Va dans l'onglet **Webview** → ton app est là
-3. Teste-la avec des cas réels
+> *"Invoke the product-owner skill. I dropped my product.md (from the AgentApp Elio - Value Office). Propose a backlog, iterate with me until I say it's OK, then hand off to the Agent Builder."*
 
-**Pour ajuster quelque chose**, retourne dans le chat Agent et demande :
+### Ce que fait l'Agent PO
+
+- Lit ton `product.md`.
+- Te pose des questions pour préciser le scope (critères d'acceptation concrets, out-of-scope, priorisation).
+- Propose un backlog (US-01, US-02, …) en 3 à 5 tours de conversation.
+- Attend ta validation explicite ("backlog OK") avant de passer à la suite.
+
+### Ce qu'il ne fait PAS
+
+- ❌ Écrire du code.
+- ❌ Choisir un framework ou une librairie.
+- ❌ Passer au build sans ton feu vert.
+
+Quand tu dis **"backlog OK, lance le build"**, l'Agent Builder prend le relais.
+
+---
+
+## Étape 5 — L'Agent Builder construit l'app (10-20 min)
+
+Le Builder :
+
+- Crée les contrats API (`.agents/docs/api-contracts.md` + `packages/shared-types/`).
+- Écrit le backend (`back/agents/{ton_agent}/`) et ses tests.
+- Écrit le frontend (`front/src/pages/` + store Zustand + i18n FR/EN).
+- Vérifie la conformité Elio (B1–B10, F1–F10, I1–I3) et met à jour `SUBMISSION.md`.
+- Te prévient quand c'est prêt : **"Build complete"**.
+
+Clique sur **Run** ▶ à nouveau si nécessaire, puis teste ton app dans la Webview.
+
+---
+
+## Étape 6 — Itère (autant que tu veux)
+
+Dans le chat Agent, parle en langage naturel :
+
 - *"Ajoute un champ optionnel 'date limite' au formulaire"*
 - *"Change le ton du prompt pour qu'il soit plus formel"*
 - *"La 2ème étape doit générer 5 recommandations au lieu de 3"*
 
-L'Agent comprend le langage naturel. Tu n'as pas besoin de toucher au code.
+Pour ajouter ou modifier une user story, repasse par l'Agent PO :
+
+> *"Parle au PO. Je veux ajouter une fonctionnalité : ..."*
 
 ---
 
-## Étape 6 — Soumets à l'équipe Elio
+## Étape 7 — Soumets à l'équipe Elio
 
 Quand tu es satisfait :
 
-1. Demande à l'Agent : **"Run the platform integration check and update SUBMISSION.md"**
-2. L'Agent vérifie 23 critères de conformité (B1–B10, F1–F10, I1–I3)
-3. Il corrige automatiquement ce qui ne passe pas
+1. Dans le chat Agent : **"Run the platform integration check and update SUBMISSION.md"**
+2. L'Agent vérifie les 23 critères de conformité et corrige les écarts.
+3. Ouvre `SUBMISSION.md` — c'est le dossier complet à partager.
+4. Prends 3 captures d'écran (formulaire, génération en cours, résultat) et envoie le lien de ton Repl à l'équipe Elio.
 
-Quand tout est ✅ :
-- Ouvre `SUBMISSION.md` → c'est le dossier complet pour l'équipe Elio
-- Prends 3 captures d'écran (formulaire, génération en cours, résultat)
-- Partage le lien de ton Repl avec l'équipe Elio
+### Tu n'as plus besoin de la Starter Page ?
+
+Demande à l'Agent : **"Supprime la starter page"**. Elle disparaît, ton app devient la page par défaut.
 
 ---
 
-## Bloqué ? Solutions aux erreurs courantes
+## Bloqué ?
 
-### ⚠️ "Missing Replit Secrets"
-Tu n'as pas configuré tes credentials Azure. **Étape 2** ci-dessus.
-
-### ⚠️ "Blocked request. This host is not allowed"
-Bug connu déjà corrigé. Si tu le vois, demande à l'Agent : *"Update vite.config.ts to allow all hosts"*
-
-### ⚠️ Le bouton "Run" ne fait rien
-- Vérifie l'onglet **Console** en bas — souvent une erreur de syntaxe
-- Demande à l'Agent : *"Fix the error in the console"*
-
-### ⚠️ L'app de démo fonctionne mais la mienne crash
-- Demande à l'Agent : *"Run the tests and fix any failures"*
-- Si ça persiste : *"Compare my agent to the reference agent and fix the differences"*
-
-### ⚠️ Bannière "Scaffold update available"
-Tape dans l'onglet **Shell** :
-```bash
-git remote add upstream https://github.com/IefBerben/elio-agentapp-replit-scaffold.git
-git pull upstream main
-```
+| Symptôme | Solution |
+|----------|----------|
+| ⚠️ *"Missing Replit Secrets"* | Tu n'as pas ajouté `AZURE_OPENAI_ENDPOINT` ou `AZURE_OPENAI_API_KEY`. Retour à l'Étape 2. |
+| ⚠️ *"DeploymentNotFound" (404)* | Ton Azure n'a pas de déploiement `gpt-5-chat`. Ouvre **Secrets → Configurations** et change `AZURE_OPENAI_DEPLOYMENT` par le nom réel sur ton Azure. |
+| ⚠️ *"Blocked request. This host is not allowed"* | Demande à l'Agent : *"Update vite.config.ts to allow all hosts"*. |
+| ⚠️ Le bouton **Run** ne fait rien | Regarde l'onglet Console en bas. Demande à l'Agent : *"Fix the error in the console"*. |
+| ⚠️ Ton app crash mais la démo Reference marche | *"Run the tests and fix any failures"* puis, si ça persiste, *"Compare my agent to the reference agent and fix the differences"*. |
+| 🔔 Bannière *"Scaffold update available"* | Dans l'onglet Shell : `git remote add upstream https://github.com/IefBerben/elio-agentapp-replit-scaffold.git && git pull upstream main` |
 
 ---
 
 ## Astuces pour bien collaborer avec l'Agent
 
-✅ **Sois précis** : *"Le champ 'email' doit être obligatoire"* > *"Améliore le formulaire"*
-✅ **Une demande à la fois** : laisse l'Agent finir avant d'enchaîner
-✅ **Lis ses propositions** : avant de valider, regarde ce qu'il s'apprête à faire
-✅ **Teste après chaque changement** : ouvre la Webview, vérifie que ça marche
+✅ **Sois précis** — *"Le champ 'email' doit être obligatoire"* > *"Améliore le formulaire"*.
+✅ **Une demande à la fois** — laisse-le finir avant d'enchaîner.
+✅ **Valide ses propositions** — lis le plan avant d'accepter.
+✅ **Teste après chaque changement** — ouvre la Webview.
 
-❌ **N'édite pas les fichiers `_reference`** : ce sont des exemples protégés
-❌ **N'efface pas `replit.md`** : c'est la mémoire du projet pour l'Agent
+❌ **Ne modifie pas `_reference`** — ce sont des exemples protégés.
+❌ **Ne supprime pas `replit.md`** — c'est la mémoire du projet pour l'Agent.
 
 ---
 
 ## Besoin d'aide ?
 
-- **Question technique** : ton référent Onepoint
-- **Bug dans le scaffold** : [signale ici](https://github.com/IefBerben/elio-agentapp-replit-scaffold/issues)
-- **Question Replit** : [docs.replit.com](https://docs.replit.com)
+- **Questions produit / credentials Azure** → [elio@groupeonepoint.com](mailto:elio@groupeonepoint.com)
+- **Bug dans le scaffold** → [ouvre une issue](https://github.com/IefBerben/elio-agentapp-replit-scaffold/issues)
+- **Questions Replit** → [docs.replit.com](https://docs.replit.com)
 
 ---
 
 <details>
 <summary><b>📐 Pour les développeurs — architecture & conventions</b></summary>
 
-### Séquence de build de l'Agent
+### Séquence de build
 
 ```
-intake-from-markdown       → analyse product.md + backlog.md (ou interview)
-       ↓
-generate-api-contracts     → .agents/docs/api-contracts.md + packages/shared-types/src/index.ts
-       ↓
-build-backend              → back/agents/{name}/ + tests + AGENTS_MAP
-       ↓
-build-frontend             → front/src/pages/ + store Zustand + i18n
-       ↓
-platform-integration-check → valide B1–B10, F1–F10, I1–I3 · met à jour SUBMISSION.md
+(Agent PO)                    itère product.md → backlog.md
+    ↓
+intake-from-markdown          lit product.md + backlog.md
+    ↓
+generate-api-contracts        api-contracts.md + shared-types/
+    ↓
+build-backend                 back/agents/{name}/ + tests + AGENTS_MAP
+    ↓
+build-frontend                front/src/pages/ + store + i18n
+    ↓
+platform-integration-check    valide B1–B10, F1–F10, I1–I3 → SUBMISSION.md
 ```
 
-### Structure du projet
+### Structure
 
 ```
 back/                          Backend Python (FastAPI · LangChain · uv)
-  agents/_reference/           Exemple de référence — NE PAS MODIFIER
-  agents/{ton_agent}/          Ton agent (créé par Agent)
-  services/llm_config.py       LLM factory — toujours utiliser get_llm()
+  agents/_reference/           Exemple protégé — NE PAS MODIFIER
+  agents/{ton_agent}/          Ton agent (créé par l'Agent Builder)
+  services/llm_config.py       LLM factory — toujours passer par get_llm()
   services/process_files.py    Extraction PDF/DOCX/PPTX/XLSX/audio
   services/generate_files.py   Génération DOCX/PPTX
   main.py                      FastAPI + AGENTS_MAP
 
 front/                         Frontend React (Vite · TS · Zustand · Tailwind)
-  src/pages/                   Une page par agent app
+  src/pages/                   Une page par agent
   src/components/agent-apps/   Bibliothèque de composants Elio
   src/stores/agent-apps/       Zustand — un store par agent
   src/i18n/locales/            fr.json + en.json
 
-packages/shared-types/src/     Interfaces TypeScript partagées (DTOs)
-.agents/docs/                  Guidelines plateforme Elio v3 (lues par l'Agent)
+packages/shared-types/src/     DTOs TypeScript partagés front/back
+.agents/docs/                  Guidelines plateforme Elio (lues par l'Agent)
+.agents/skills/                Skills découverts par l'Agent Replit
 custom_instruction/            Règles auto-injectées dans l'Agent
-.agents/skills/                5 skills Replit Agent (auto-découverts)
-replit.md                      Mémoire projet
-product.md / backlog.md        Décris ton app ici
+replit.md                      Mémoire du projet
+product.md                     Vision (produit par le Value Office)
+backlog.md                     Backlog (produit par l'Agent PO)
 SUBMISSION.md                  Dossier de remise à l'équipe Elio
 ```
 
-### App de référence
+### Skills disponibles
 
-Assistant consulting fonctionnel en 2 étapes — illustre tous les patterns Elio :
-`@stream_safe` · `get_llm()` · Zustand + `persist` + `partialize` · prompts bilingues · SSE streaming · `AgentAppPageShell` · `StepIndicator` · `LanguageToggle`
-
-**Ne jamais modifier** `back/agents/_reference/` ni `front/src/pages/_ReferencePage.tsx`.
+| Skill | Rôle |
+|-------|------|
+| `product-owner` | Persona **Agent PO** — itère le backlog à partir du `product.md` |
+| `intake-from-markdown` | Parse `product.md` + `backlog.md` |
+| `generate-api-contracts` | Génère les contrats d'API avant le code |
+| `build-backend` | Écrit le backend Python |
+| `build-frontend` | Écrit le frontend React |
+| `platform-integration-check` | Valide la conformité Elio |
+| `remove-starter` | Supprime la starter page quand tu n'en as plus besoin |
 
 ### Guidelines plateforme (`.agents/docs/`)
 
@@ -281,14 +265,12 @@ Assistant consulting fonctionnel en 2 étapes — illustre tous les patterns Eli
 | `AGENT_APP_GUIDELINES_FRONT.md` | Composants, Zustand, dark mode, checklist complète |
 | `INTEGRATION_GUIDE.md` | Processus d'intégration dans la plateforme Elio |
 
-L'Agent les lit automatiquement avant d'écrire du code.
-
-### Authentification Azure (avancé)
+### Auth Azure (avancé)
 
 | Mode | Comment |
 |------|---------|
-| **Recommandé** | `AZURE_OPENAI_API_KEY` dans Replit Secrets |
-| **Alternatif** | `az login` dans l'onglet Shell (session persistante) |
+| **Par défaut** | `AZURE_OPENAI_API_KEY` dans Replit Secrets |
+| **Alternatif (local)** | `az login` dans un terminal — requiert le rôle *Cognitive Services OpenAI User* |
 
 </details>
 
