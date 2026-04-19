@@ -33,8 +33,9 @@ All 4 env vars below are required at runtime. The scaffold ships committed defau
 | `AZURE_OPENAI_API_VERSION` | No | Committed default in `.replit` (`2025-01-01-preview`) | Override in Configurations pane if your deployment needs another version |
 
 **Recommended Secrets flow** — set once in Replit Account Secrets, link on every remix:
-1. Replit top-right avatar → **Account** → **Account Secrets** → add `AZURE_OPENAI_API_KEY` + `AZURE_OPENAI_ENDPOINT`.
-2. In this workspace → **🔒 Secrets** pane → **Link Account Secrets** → link both.
+1. Open the **Secrets** tool: click **+** in the tool tabs, search "Secrets", open it.
+2. Click **Link Account Secrets** at the top right. If you haven't created any yet, use the link in that panel to open your Account Secrets and add `AZURE_OPENAI_API_KEY` + `AZURE_OPENAI_ENDPOINT` there (they live at the account level and are reusable across every workspace you own).
+3. Back in this workspace's Secrets tool → **Link Account Secrets** → link both.
 
 If either is missing, the agent MUST request them via the Replit Secrets flow before running any code. Do not hardcode or guess values.
 
