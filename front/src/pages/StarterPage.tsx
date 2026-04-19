@@ -200,16 +200,7 @@ export function StarterPage() {
       isProcessing={false}
       headerActions={<LanguageToggle />}
     >
-      <div className="max-w-4xl mx-auto px-4 md:px-6 space-y-6">
-        <div className="text-center space-y-2 pt-2">
-          <h2 className="text-lg md:text-xl font-bold text-foreground">
-            {t("starter.intro")}
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            {t("starter.subIntro")}
-          </p>
-        </div>
-
+      <div className="max-w-4xl mx-auto px-4 md:px-6 space-y-6 pt-2">
         {/* ── Main card: product.md (+ optional prototype) ───────────────── */}
         <AgentAppCard>
           <div className="flex items-start gap-3 mb-4">

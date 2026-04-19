@@ -49,9 +49,7 @@
   },
   "starter": {
     "title": "Welcome to your Elio scaffold",
-    "description": "Build your first AgentApp from your product.md.",
-    "intro": "Ready to build?",
-    "subIntro": "Drop your product.md to kick off the specification with the PO.",
+    "description": "Drop your product.md to kick off the specification with the PO, then build.",
     "cleanupHint": "Once your app is built, ask the Replit AI: \"Remove the starter page\" to clean up.",
     "cards": {
       "product": {
