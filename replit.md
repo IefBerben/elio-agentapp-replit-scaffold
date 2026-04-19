@@ -19,20 +19,24 @@
 | Backend | FastAPI · Python 3.12 · LangChain · uv |
 | Frontend | React 18 · Vite · TypeScript · Zustand · Tailwind CSS |
 | LLM | Azure OpenAI via `get_llm()` — `back/services/llm_config.py` |
-| Auth | 4 Replit Secrets required: `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_DEPLOYMENT`, `AZURE_OPENAI_API_VERSION` |
+| Auth | 2 Replit Secrets required (see below) |
 
 ### Required secrets on first run
 
-On first run the agent MUST request all 4 Replit Secrets above — they have no defaults that work outside Onepoint's Neo sandbox:
+The scaffold ships with `AZURE_OPENAI_DEPLOYMENT` and `AZURE_OPENAI_API_VERSION` as committed env defaults in `.replit`, so the consultant only needs **2 secrets**:
 
 | Secret | Example | Where to find it |
 |--------|---------|------------------|
 | `AZURE_OPENAI_ENDPOINT` | `https://my-resource.openai.azure.com/` | Azure Portal → your OpenAI resource → Keys and Endpoint |
 | `AZURE_OPENAI_API_KEY` | `sk-…` | Azure Portal → same page |
-| `AZURE_OPENAI_DEPLOYMENT` | `gpt-4o` | Azure Portal → your OpenAI resource → Deployments (name you gave the deployment) |
-| `AZURE_OPENAI_API_VERSION` | `2025-04-01-preview` | API version Azure documents for your deployment |
 
-When `AZURE_OPENAI_DEPLOYMENT` is set, **all** `get_llm()` calls route to that single deployment, regardless of the model name passed.
+**Recommended flow** — set these once in Replit Account Secrets, then link on every remix:
+1. Replit top-right avatar → **Account** → **Account Secrets** → add both.
+2. In this workspace → **🔒 Secrets** pane → **Link Account Secrets** → link both.
+
+If they're missing, the agent MUST request them via the Replit Secrets flow before running any code. Do not hardcode or guess values.
+
+When `AZURE_OPENAI_DEPLOYMENT` is set (it is, via `.replit`), **all** `get_llm()` calls route to that single deployment, regardless of the model name passed. Consultants with a different deployment name override in the Configurations pane.
 
 ---
 

@@ -48,3 +48,11 @@ exposeLocalhost = true
 
 [agent]
 expertMode = true
+
+# Non-secret Azure OpenAI defaults — committed, auto-applied on remix.
+# Override via the Replit Configurations pane if your resource differs.
+# The 2 sensitive values (KEY, ENDPOINT) must still be set in Secrets or
+# linked from your Replit Account Secrets.
+[env]
+AZURE_OPENAI_DEPLOYMENT = "gpt-5-chat"
+AZURE_OPENAI_API_VERSION = "2025-01-01-preview"

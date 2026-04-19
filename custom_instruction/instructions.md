@@ -16,14 +16,12 @@ These rules are non-negotiable. Read `.agents/docs/` before writing any code.
 
 ## First-run setup — request these Replit Secrets
 
-Before running any agent code, the scaffold requires **4 Replit Secrets** (no defaults work outside Onepoint's internal sandbox):
+The scaffold pre-commits `AZURE_OPENAI_DEPLOYMENT` and `AZURE_OPENAI_API_VERSION` in `.replit [env]`, so on remix only **2 secrets** are missing:
 
 - `AZURE_OPENAI_ENDPOINT`
 - `AZURE_OPENAI_API_KEY`
-- `AZURE_OPENAI_DEPLOYMENT` (name of the deployment on the consultant's Azure resource — e.g. `gpt-4o`)
-- `AZURE_OPENAI_API_VERSION` (e.g. `2025-04-01-preview`)
 
-If any is missing when `get_llm()` is called, request all 4 via the Replit Secrets flow. Do **not** hardcode or guess values.
+If either is missing when `get_llm()` is called, request both via the Replit Secrets flow. Encourage linking from the consultant's Account Secrets vault (one-time setup, reusable across all their remixes) rather than pasting raw values each time. Do **not** hardcode or guess values.
 
 ---
 
