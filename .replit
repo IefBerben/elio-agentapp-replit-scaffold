@@ -37,6 +37,14 @@ task = "shell.exec"
 args = "cd front && ([ -f node_modules/.package-lock.json ] && diff -q package-lock.json node_modules/.package-lock.json > /dev/null 2>&1 || npm install) && npm run dev -- --host 0.0.0.0 --port 5173"
 waitForPort = 5173
 
+[[workflows.workflow]]
+name = "Package"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "bash scripts/package.sh"
+
 [[ports]]
 localPort = 5173
 externalPort = 80

@@ -156,8 +156,8 @@ Quand tu es satisfait :
 
 1. Dans le chat Agent : **"Run the platform integration check and update SUBMISSION.md"**
 2. L'Agent vérifie les 23 critères de conformité et corrige les écarts.
-3. Ouvre `SUBMISSION.md` — c'est le dossier complet à partager.
-4. Prends 3 captures d'écran (formulaire, génération en cours, résultat) et envoie le lien de ton Repl à l'équipe Elio.
+3. Dans le chat Agent : **"Package my app"** — l'Agent remplit `manifest.md` puis lance le workflow **Package** (Run ▾ → Package). Le zip apparaît dans `dist/{agent_id}-{version}.zip`.
+4. Prends 3 captures d'écran (formulaire, génération en cours, résultat) et envoie `dist/…zip` + le lien de ton Repl à l'équipe Elio (`elio@groupeonepoint.com`).
 
 ### Tu n'as plus besoin de la Starter Page ?
 
