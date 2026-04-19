@@ -68,7 +68,7 @@ La page de démarrage te propose **3 chemins** :
 | Tu as déjà... | Tu cliques... |
 |---------------|---------------|
 | ✅ Un `product.md` rédigé en amont | **« Lancer le build »** → on te donne l'instruction à coller dans le chat IA |
-| 🎨 Un prototype Google AI Studio dans `Input/` | **« Construire à partir du prototype »** → idem |
+| 🎨 Une maquette Google AI Studio dans `Input/` | **« Construire à partir de la maquette »** → idem |
 | 🤔 Pas encore d'idée | **« Idea Lab »** → réponds à 2 questions, l'IA propose 3 idées concrètes pour ton métier |
 
 > 💡 Onglet **Reference** en haut à droite : une app de démo complète (assistant consulting en 2 étapes) qui montre tous les patterns Elio.
@@ -114,7 +114,7 @@ Si tu as déjà rédigé `product.md` et `backlog.md`, tape simplement :
 
 > **"Build my app from the existing product.md and backlog.md"**
 
-### Tu as un prototype Google AI Studio ?
+### Tu as une maquette Google AI Studio ?
 
 1. Dépose ton export `.tsx` ou `.zip` dans le dossier `Input/`
 2. Tape : **"Build my app from the Google AI Studio prototype in Input/"**

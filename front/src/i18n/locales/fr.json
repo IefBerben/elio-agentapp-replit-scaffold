@@ -67,7 +67,7 @@
       "productStepHint": "Le fichier généré par l'AgentApp Elio - Value Office. Il sera placé à la racine du projet.",
       "specDropHint": "product.md uniquement",
       "prototypeStepTitle": "2. Ajoute une maquette",
-      "prototypeStepHint": "Un prototype Google AI Studio aide l'Agent PO à se caler sur le rendu visuel attendu. Laisser vide si tu n'en as pas.",
+      "prototypeStepHint": "Une maquette Google AI Studio aide l'Agent PO à se caler sur le rendu visuel attendu. Laisser vide si tu n'en as pas.",
       "prototypeDropHint": ".tsx · .jsx · .ts · .js · .zip · .json",
       "optional": "optionnel",
       "thenStep": "3. Lance la spécification avec l'Agent PO"
