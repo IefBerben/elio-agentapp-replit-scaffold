@@ -11,38 +11,42 @@ when_NOT_to_invoke:
 
 # Skill: remove-starter
 
-Permanently delete the disposable starter from the scaffold. This is the **hard delete** — the soft-dismiss (writing `.starter-dismissed`) is already handled automatically by the StarterPage once product.md is dropped.
+Permanently delete the disposable StarterPage from the scaffold and make the consultant's own AgentApp page the default landing.
 
-Use this skill only when the consultant explicitly asks to remove the starter code from their repo.
+Use this skill only when the consultant explicitly asks to remove the starter code from their repo, and has a built AgentApp to land on instead.
+
+---
+
+## Prerequisites
+
+Before running, confirm the consultant has a functional AgentApp page at `front/src/pages/<Something>Page.tsx` (not `_ReferencePage.tsx`, not `ShowcasePage.tsx`, not `StarterPage.tsx`). That page's name is what you'll route to.
+
+If they don't, **stop** — the scaffold would land on the Reference page, which is a tutorial, not their app. Ask them to build their app first.
 
 ---
 
 ## Files to delete
 
-**Frontend:**
 - `front/src/pages/StarterPage.tsx`
-
-**Marker (if present):**
-- `.starter-dismissed` (at repo root)
 
 ---
 
 ## Code to edit
 
 ### `back/main.py`
-1. Remove the five starter routes:
+1. Remove the four starter routes:
    - `GET /agent-apps/scaffold-status`
    - `POST /agent-apps/upload-spec`
    - `POST /agent-apps/upload-prototype`
-   - `POST /agent-apps/dismiss-starter`
-   - `POST /agent-apps/restore-starter`
-2. Remove the helpers `_product_md_status`, `_input_files`, the constants `_ALLOWED_SPEC_NAMES`, `_ALLOWED_PROTOTYPE_SUFFIXES`, and the related path constants `REPO_ROOT`, `STARTER_DISMISSED_MARKER`, `PRODUCT_MD_PATH`, `INPUT_DIR`. Note: if any production agent code relies on `REPO_ROOT`, keep that constant — only remove what the starter introduced.
+2. Remove the helpers `_product_md_status`, `_input_files`, the constants `_ALLOWED_SPEC_NAMES`, `_ALLOWED_PROTOTYPE_SUFFIXES`, and the related path constants `PRODUCT_MD_PATH`, `INPUT_DIR`. Note: keep `REPO_ROOT` if any production agent code relies on it.
 
 ### `front/src/App.tsx`
 1. Remove the import: `import { StarterPage } from "@/pages/StarterPage";`
-2. Remove the "starter" entry from `Page` type, `Nav` items, `readPageFromHash` switch, and the render branch.
-3. Remove the `dismissed` state + the `useEffect` that fetches `/agent-apps/scaffold-status`.
-4. Set the default page to `"reference"`.
+2. Remove `"starter"` from the `Page` type.
+3. Remove the `"starter"` entry from the `items` array in `ScaffoldTopBar`.
+4. Remove the `"starter"` branch in `readPageFromHash` and update the default return to the consultant's page id (e.g. `"my-agent"`).
+5. Remove the `page === "starter" && <StarterPage />` line.
+6. Add an import + render branch for the consultant's page.
 
 ### `front/src/i18n/locales/fr.json` and `en.json`
 - Remove the `"starter"` namespace from both files.
@@ -51,7 +55,7 @@ Use this skill only when the consultant explicitly asks to remove the starter co
 
 ## Procedure
 
-1. **Confirm with the user** before deleting. Show them the file list and ask: *"Tu confirmes la suppression définitive de la starter page ? Tout est récupérable via git si tu changes d'avis."*
+1. **Confirm with the user** before deleting. Show them the file list and ask: *"Tu confirmes la suppression définitive de la starter page ? Tout est récupérable via git si tu changes d'avis. L'app `<MyAgentPage>` deviendra la page par défaut."*
 2. **Make the edits** in this exact order: backend first (`main.py`), then frontend (`App.tsx` + delete `StarterPage.tsx`), then i18n.
 3. **Show the diff** for `back/main.py` and `front/src/App.tsx` (the two files that are *edited* rather than deleted).
 4. **Run the tests** to confirm nothing else depended on the starter:

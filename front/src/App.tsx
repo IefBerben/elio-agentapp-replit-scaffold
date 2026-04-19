@@ -69,39 +69,33 @@ function readPageFromHash(): Page {
 function ScaffoldTopBar({
   current,
   onChange,
-  showStarter,
 }: {
   current: Page;
   onChange: (p: Page) => void;
-  showStarter: boolean;
 }) {
   const items: ReadonlyArray<{
     id: Page;
     label: string;
     icon: ReactNode;
     activeColor: string;
-    visible: boolean;
   }> = [
     {
       id: "starter",
       label: "Start",
       icon: <Home className="w-3.5 h-3.5" />,
       activeColor: "bg-[#009de0] text-white",
-      visible: showStarter,
     },
     {
       id: "reference",
       label: "Reference",
       icon: <Sparkles className="w-3.5 h-3.5" />,
       activeColor: "bg-[#009de0] text-white",
-      visible: true,
     },
     {
       id: "showcase",
       label: "Components",
       icon: <LayoutGrid className="w-3.5 h-3.5" />,
       activeColor: "bg-purple-600 text-white",
-      visible: true,
     },
   ];
 
@@ -114,9 +108,7 @@ function ScaffoldTopBar({
         <span className="hidden sm:inline">Elio Scaffold</span>
       </div>
       <nav className="flex items-center gap-0.5">
-        {items
-          .filter((item) => item.visible)
-          .map((item) => (
+        {items.map((item) => (
             <button
               key={item.id}
               type="button"
@@ -131,7 +123,7 @@ function ScaffoldTopBar({
               {item.icon}
               <span className="hidden sm:inline">{item.label}</span>
             </button>
-          ))}
+        ))}
       </nav>
     </div>
   );
@@ -142,20 +134,6 @@ function ScaffoldTopBar({
 export default function App() {
   const { i18n } = useTranslation();
   const [page, setPage] = useState<Page>(readPageFromHash);
-  const [dismissed, setDismissed] = useState<boolean | null>(null);
-
-  // Auto-route away from the Starter once the consultant has dismissed it
-  useEffect(() => {
-    fetch("/agent-apps/scaffold-status")
-      .then((r) => (r.ok ? r.json() : null))
-      .then((s) => {
-        const isDismissed = !!s?.dismissed;
-        setDismissed(isDismissed);
-        if (isDismissed && page === "starter") setPage("reference");
-      })
-      .catch(() => setDismissed(false));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   useEffect(() => {
     document.documentElement.lang = i18n.language;
@@ -174,15 +152,9 @@ export default function App() {
     return () => window.removeEventListener("hashchange", handler);
   }, []);
 
-  if (dismissed === null) return null;
-
   return (
     <AppErrorBoundary>
-      <ScaffoldTopBar
-        current={page}
-        onChange={setPage}
-        showStarter={!dismissed}
-      />
+      <ScaffoldTopBar current={page} onChange={setPage} />
       <div className="pt-3 md:pt-5">
         {page === "starter" && <StarterPage />}
         {page === "reference" && <ReferencePage />}

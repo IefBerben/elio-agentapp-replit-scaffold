@@ -160,17 +160,16 @@ AGENTS_MAP: dict[str, Any] = {
 
 SSE_MEDIA_TYPE = "text/event-stream"
 
-# ─── Starter dispatcher state ─────────────────────────────────────────────────
-# The StarterPage has one real entry point: the consultant uploads product.md
-# (produced by the Value Office AgentApp) and optionally a Google AI Studio
-# prototype. The PM skill then iterates with them to produce backlog.md before
-# the Builder runs. Consultants without product.md are pointed to Value Office.
+# ─── Starter state ────────────────────────────────────────────────────────────
+# The StarterPage is the default landing until the consultant's own AgentApp
+# replaces it. It lets the consultant upload product.md (from the Value Office
+# AgentApp) and optionally a Google AI Studio prototype. The PM skill then
+# iterates with them to produce backlog.md before the Builder runs.
 #
-# Soft-dismiss: clicking the card writes .starter-dismissed at the repo root.
-# Hard-delete: handled by the `remove-starter` skill (Agent reviews diff first).
+# The page is removed permanently by the `remove-starter` skill, which also
+# flips the default route in App.tsx to the consultant's built AgentApp page.
 
 REPO_ROOT = Path(__file__).parent.parent
-STARTER_DISMISSED_MARKER = REPO_ROOT / ".starter-dismissed"
 PRODUCT_MD_PATH = REPO_ROOT / "product.md"
 INPUT_DIR = REPO_ROOT / "Input"
 
@@ -226,14 +225,13 @@ async def scaffold_status() -> dict[str, Any]:
     StarterPage — never by production agent code.
 
     Returns:
-        Dict with hasProductMd, isProductMdTemplate, inputFiles, dismissed.
+        Dict with hasProductMd, isProductMdTemplate, inputFiles.
     """
     has_product_md, is_template = _product_md_status()
     return {
         "hasProductMd": has_product_md,
         "isProductMdTemplate": is_template,
         "inputFiles": _input_files(),
-        "dismissed": STARTER_DISMISSED_MARKER.is_file(),
     }
 
 
@@ -311,40 +309,6 @@ async def upload_prototype(files: list[UploadFile]) -> dict[str, Any]:
         logger.info(f"Prototype saved: {dest}")
 
     return {"files": saved, "status": await scaffold_status()}
-
-
-@app.post("/agent-apps/dismiss-starter")
-async def dismiss_starter() -> dict[str, Any]:
-    """Soft-dismiss the StarterPage.
-
-    Writes a marker file at the repo root. Subsequent /scaffold-status
-    calls return dismissed=true and the frontend redirects away from /.
-    Hard delete (file removal) is handled by the `remove-starter` skill.
-
-    Returns:
-        Dict with status.
-    """
-    STARTER_DISMISSED_MARKER.write_text(
-        "Starter dismissed by the consultant.\n"
-        "Delete this file to bring back the StarterPage at /.\n"
-        "Run the `remove-starter` skill to permanently delete the starter code.\n",
-        encoding="utf-8",
-    )
-    logger.info("Starter dismissed (marker written)")
-    return {"status": "dismissed"}
-
-
-@app.post("/agent-apps/restore-starter")
-async def restore_starter() -> dict[str, Any]:
-    """Undo a soft-dismiss by removing the marker file.
-
-    Returns:
-        Dict with status.
-    """
-    if STARTER_DISMISSED_MARKER.is_file():
-        STARTER_DISMISSED_MARKER.unlink()
-        logger.info("Starter restored (marker removed)")
-    return {"status": "restored"}
 
 
 @app.post("/agent-apps/execute/{agent_id}/stream")

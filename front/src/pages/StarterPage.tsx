@@ -38,7 +38,6 @@ interface ScaffoldStatus {
   hasProductMd: boolean;
   isProductMdTemplate: boolean;
   inputFiles: string[];
-  dismissed: boolean;
 }
 
 function useScaffoldStatus(): {
@@ -189,18 +188,6 @@ export function StarterPage() {
   const lang = i18n.language;
   const hasProduct = !!(status?.hasProductMd && !status.isProductMdTemplate);
   const hasInput = (status?.inputFiles.length ?? 0) > 0;
-
-  async function dismissAndNotify() {
-    try {
-      await fetch("/agent-apps/dismiss-starter", { method: "POST" });
-    } catch {
-      /* best-effort */
-    }
-  }
-
-  useEffect(() => {
-    if (hasProduct) void dismissAndNotify();
-  }, [hasProduct]);
 
   const prompt = buildPmPrompt({ lang, hasInput, inputFile: status?.inputFiles[0] });
 

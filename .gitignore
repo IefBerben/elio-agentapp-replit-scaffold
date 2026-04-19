@@ -28,9 +28,6 @@ GSD/
 .claude/
 .cursor/
 
-# Starter page dismiss marker (per-environment state)
-.starter-dismissed
-
 # Input specs (only Input/README.md is tracked)
 Input/AI Studio/
 Input/JIRA/
