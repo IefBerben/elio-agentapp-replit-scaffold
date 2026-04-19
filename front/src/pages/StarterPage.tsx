@@ -315,12 +315,12 @@ function buildPmPrompt({
 }): string {
   if (lang === "en") {
     if (hasInput) {
-      return `Invoke the product-owner skill. I dropped my product.md (from the AgentApp Elio - Value Office) + a Google AI Studio prototype in Input/${inputFile}. Propose a backlog using both, iterate with me until I say it's OK, then hand off to the Builder.`;
+      return `Invoke the product-owner skill. I dropped my product.md (from the AgentApp Elio - Value Office) + a Google AI Studio prototype in Input/${inputFile}. Propose a backlog using both, iterate with me until I say it's OK, then hand off to the Agent Builder.`;
     }
-    return "Invoke the product-owner skill. I dropped my product.md (from the AgentApp Elio - Value Office). Propose a backlog, iterate with me until I say it's OK, then hand off to the Builder.";
+    return "Invoke the product-owner skill. I dropped my product.md (from the AgentApp Elio - Value Office). Propose a backlog, iterate with me until I say it's OK, then hand off to the Agent Builder.";
   }
   if (hasInput) {
-    return `Invoque la skill product-owner. J'ai déposé mon product.md (issu de l'AgentApp Elio - Value Office) + un prototype Google AI Studio dans Input/${inputFile}. Propose-moi un backlog en t'appuyant sur les deux, itère avec moi jusqu'à ce que je dise "backlog OK", puis passe la main au Builder.`;
+    return `Invoque la skill product-owner. J'ai déposé mon product.md (issu de l'AgentApp Elio - Value Office) + un prototype Google AI Studio dans Input/${inputFile}. Propose-moi un backlog en t'appuyant sur les deux, itère avec moi jusqu'à ce que je dise "backlog OK", puis passe la main à l'Agent Builder.`;
   }
-  return 'Invoque la skill product-owner. J\'ai déposé mon product.md (issu de l\'AgentApp Elio - Value Office). Propose-moi un backlog, itère avec moi jusqu\'à ce que je dise "backlog OK", puis passe la main au Builder.';
+  return 'Invoque la skill product-owner. J\'ai déposé mon product.md (issu de l\'AgentApp Elio - Value Office). Propose-moi un backlog, itère avec moi jusqu\'à ce que je dise "backlog OK", puis passe la main à l\'Agent Builder.';
 }

@@ -81,7 +81,7 @@ La page de démarrage te propose **3 chemins** :
 C'est ici que la magie opère.
 
 > 💡 **Pas sûr de ce que tu veux construire ?** Demande **"Invoque la skill product-owner"** dans le chat.
-> L'agent PO du scaffold lit ton `product.md` (produit par l'AgentApp Elio - Value Office) et itère avec toi pour rédiger le `backlog.md`, puis passe la main au Builder.
+> L'Agent PO lit ton `product.md` (produit par l'AgentApp Elio - Value Office) et itère avec toi pour rédiger le `backlog.md`, puis passe la main à l'Agent Builder.
 
 1. Ouvre l'onglet **Agent** :
    - Souvent visible en haut de l'écran ou dans le dock

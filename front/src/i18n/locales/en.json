@@ -49,12 +49,12 @@
   },
   "starter": {
     "title": "Welcome to your Elio scaffold",
-    "description": "Drop your product.md to kick off the specification with the scaffold's PO agent, then build.",
+    "description": "Drop your product.md to kick off the specification with the Agent PO, then the Agent Builder.",
     "cleanupHint": "Once your app is built, ask the Replit AI: \"Remove the starter page\" to clean up.",
     "cards": {
       "product": {
         "title": "I have a product.md",
-        "desc": "Produced by the AgentApp Elio - Value Office. The scaffold's PO agent uses it to iterate a backlog with you before the Builder runs."
+        "desc": "Produced by the AgentApp Elio - Value Office. The Agent PO uses it to iterate a backlog with you before the Agent Builder constructs the app."
       },
       "valueOffice": {
         "title": "No product.md yet?",
@@ -67,10 +67,10 @@
       "productStepHint": "The file produced by the AgentApp Elio - Value Office. It will be placed at the project root.",
       "specDropHint": "product.md only",
       "prototypeStepTitle": "2. Add a mockup",
-      "prototypeStepHint": "A Google AI Studio prototype helps the PO agent align on the expected look & feel. Leave empty if you don't have one.",
+      "prototypeStepHint": "A Google AI Studio prototype helps the Agent PO align on the expected look & feel. Leave empty if you don't have one.",
       "prototypeDropHint": ".tsx · .jsx · .ts · .js · .zip · .json",
       "optional": "optional",
-      "thenStep": "3. Launch the specification with the PO agent"
+      "thenStep": "3. Launch the specification with the Agent PO"
     }
   }
 }
