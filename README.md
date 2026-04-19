@@ -129,7 +129,6 @@ Le Builder :
 - Crée les contrats API (`.agents/docs/api-contracts.md` + `packages/shared-types/`).
 - Écrit le backend (`back/agents/{ton_agent}/`) et ses tests.
 - Écrit le frontend (`front/src/pages/` + store Zustand + i18n FR/EN).
-- Vérifie la conformité Elio (B1–B10, F1–F10, I1–I3) et met à jour `SUBMISSION.md`.
 - Te prévient quand c'est prêt : **"Build complete"**.
 
 Clique sur **Run** ▶ à nouveau si nécessaire, puis teste ton app dans la Webview.
@@ -148,20 +147,43 @@ Pour ajouter ou modifier une user story, repasse par l'Agent PO :
 
 > *"Parle au PO. Je veux ajouter une fonctionnalité : ..."*
 
+Optionnel : quand tu n'as plus besoin de la Starter Page, demande **"Supprime la starter page"**. Elle disparaît, ton app devient la page par défaut.
+
 ---
 
-## Étape 7 — Soumets à l'équipe Elio
+## Étape 7 — Valide la conformité Elio
 
-Quand tu es satisfait :
+Avant de soumettre, l'app doit passer 23 contrôles plateforme (modèles LLM autorisés, contrat SSE, store Zustand, dark mode, i18n, etc.).
 
-1. Dans le chat Agent : **"Run the platform integration check and update SUBMISSION.md"**
-2. L'Agent vérifie les 23 critères de conformité et corrige les écarts.
-3. Dans le chat Agent : **"Package my app"** — l'Agent remplit `manifest.md` puis lance le workflow **Package** (Run ▾ → Package). Le zip apparaît dans `dist/{agent_id}-{version}.zip`.
-4. Prends 3 captures d'écran (formulaire, génération en cours, résultat) et envoie `dist/…zip` + le lien de ton Repl à l'équipe Elio (`elio@groupeonepoint.com`).
+Dans le chat Agent : **"Run the platform integration check"**
 
-### Tu n'as plus besoin de la Starter Page ?
+L'Agent :
 
-Demande à l'Agent : **"Supprime la starter page"**. Elle disparaît, ton app devient la page par défaut.
+- Lance la skill `platform-integration-check`.
+- Vérifie chaque règle (B1–B10 backend, F1–F10 frontend, I1–I3 intégration), corrige les écarts.
+- Met à jour `SUBMISSION.md` (sections 4 et 6).
+
+Tu obtiens un rapport ✅/❌ détaillé. Quand tout est ✅, passe à l'étape suivante.
+
+---
+
+## Étape 8 — Package et soumets à l'équipe Elio
+
+Dans le chat Agent : **"Package my app"**
+
+L'Agent :
+
+1. Remplit `manifest.md` à la racine (id de l'agent, endpoints, modèles, features, fichiers à inclure) en lisant ton code.
+2. Exécute le script de packaging — dans l'onglet **Shell** : `bash scripts/package.sh` *(le workflow **Package** dans le menu Run ▾ fait la même chose en mode Workspace classique)*.
+3. Produit le bundle déployable : `dist/{agent_id}-{version}.zip`.
+
+Puis :
+
+- Prends 3 captures d'écran (formulaire, génération en cours, résultat). Sauvegarde-les sous `.agents/submission/`.
+- Envoie le zip + le lien public de ton Repl à `elio@groupeonepoint.com`.
+- L'équipe Elio revoit ton app, te renvoie un feedback, et la déploie sur la marketplace.
+
+> Pour itérer après feedback : reviens à l'**Étape 6**, puis **Étape 7** et **8** à nouveau. Pense à incrémenter `version` dans `manifest.md`.
 
 ---
 
