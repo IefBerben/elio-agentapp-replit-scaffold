@@ -5,7 +5,7 @@ Agent Apps (small reusable LLM apps with 1 or 2 steps).
 
 The consultant below is looking for their first use case:
 - Role: {role}
-- Recurring pain point: {pain}
+- Activity they want to accelerate or augment with AI: {pain}
 
 Propose 3 **concrete, realistic Agent App ideas they can ship in 30 minutes**.
 Each idea must:

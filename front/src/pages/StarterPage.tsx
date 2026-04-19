@@ -267,7 +267,7 @@ function IdeaLabPanel({
   language,
   interfaceLanguage,
 }: {
-  onBack: () => void;
+  onBack?: () => void;
   language: string;
   interfaceLanguage: string;
 }) {
@@ -288,15 +288,17 @@ function IdeaLabPanel({
 
   return (
     <div className="space-y-4">
-      <button
-        type="button"
-        onClick={onBack}
-        className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
-        disabled={isProcessing}
-      >
-        <X className="w-3.5 h-3.5" />
-        {t("starter.idea.back")}
-      </button>
+      {onBack && (
+        <button
+          type="button"
+          onClick={onBack}
+          className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
+          disabled={isProcessing}
+        >
+          <X className="w-3.5 h-3.5" />
+          {t("starter.idea.back")}
+        </button>
+      )}
 
       <AgentAppCard>
         <AgentAppSection title={t("starter.idea.formTitle") as string} />
@@ -462,25 +464,17 @@ export function StarterPage() {
       headerActions={<LanguageToggle />}
     >
       <div className="max-w-5xl mx-auto px-4 md:px-6 space-y-6">
-        {selected === "idea-lab" ? (
-          <IdeaLabPanel
-            onBack={() => setSelected(null)}
-            language={lang}
-            interfaceLanguage={lang}
-          />
-        ) : (
-          <>
-            <div className="text-center space-y-2 pt-2">
-              <h2 className="text-lg md:text-xl font-bold text-foreground">
-                {t("starter.intro")}
-              </h2>
-              <p className="text-sm text-muted-foreground">
-                {t("starter.subIntro")}
-              </p>
-            </div>
+        <div className="text-center space-y-2 pt-2">
+          <h2 className="text-lg md:text-xl font-bold text-foreground">
+            {t("starter.intro")}
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            {t("starter.subIntro")}
+          </p>
+        </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <PathCard
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <PathCard
                 icon={<FileText className="w-5 h-5" />}
                 title={t("starter.cards.product.title")}
                 description={t("starter.cards.product.desc")}
@@ -570,8 +564,10 @@ export function StarterPage() {
                 </p>
               </AgentAppCard>
             )}
-          </>
-        )}
+
+            {selected === "idea-lab" && (
+              <IdeaLabPanel language={lang} interfaceLanguage={lang} />
+            )}
       </div>
     </AgentAppPageShell>
   );

@@ -5,7 +5,7 @@ d'Agent Apps (mini-applications LLM réutilisables, à 1 ou 2 étapes).
 
 Le consultant suivant cherche son premier cas d'usage :
 - Rôle : {role}
-- Tâche pénible récurrente : {pain}
+- Activité qu'il veut accélérer ou augmenter avec une IA : {pain}
 
 Propose-lui 3 idées d'Agent App **concrètes, réalistes, livrables en 30 minutes**.
 Chaque idée doit :

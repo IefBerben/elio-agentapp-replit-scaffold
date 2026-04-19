@@ -56,7 +56,7 @@
     "cards": {
       "product": {
         "title": "J'ai déjà un product.md",
-        "desc": "Tu as rédigé tes specs en amont (seul ou avec le PM).",
+        "desc": "J'ai créé un product.md avec l'AgentApp - Value Office.",
         "cta": "Lancer le build"
       },
       "input": {
@@ -77,9 +77,9 @@
       "roleLabel": "Quel est ton métier ?",
       "roleHint": "Le rôle ou la fonction que tu occupes au quotidien.",
       "rolePlaceholder": "Ex : consultant en transformation digitale, data analyst, chef de projet RH...",
-      "painLabel": "Quelle tâche te prend trop de temps chaque semaine ?",
-      "painHint": "Plus c'est concret, mieux ce sera.",
-      "painPlaceholder": "Ex : je passe 2h chaque vendredi à compiler les feedbacks clients pour les transformer en compte-rendu...",
+      "painLabel": "Quelle activité aimerais-tu accélérer ou augmenter avec une IA ?",
+      "painHint": "Pense à un livrable que tu pourrais produire plus vite, ou à une analyse que tu pourrais pousser plus loin avec un copilote.",
+      "painPlaceholder": "Ex : accélérer la rédaction de mes notes de cadrage, ou enrichir mes analyses concurrentielles avec une recherche web automatisée...",
       "generate": "Générer 3 idées",
       "generating": "L'IA réfléchit...",
       "thinking": "Génération de 3 idées tailored à ton rôle...",
