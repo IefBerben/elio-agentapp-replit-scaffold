@@ -19,7 +19,20 @@
 | Backend | FastAPI · Python 3.12 · LangChain · uv |
 | Frontend | React 18 · Vite · TypeScript · Zustand · Tailwind CSS |
 | LLM | Azure OpenAI via `get_llm()` — `back/services/llm_config.py` |
-| Auth | `AZURE_OPENAI_API_KEY` env var (priority) or `az login` |
+| Auth | 4 Replit Secrets required: `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_DEPLOYMENT`, `AZURE_OPENAI_API_VERSION` |
+
+### Required secrets on first run
+
+On first run the agent MUST request all 4 Replit Secrets above — they have no defaults that work outside Onepoint's Neo sandbox:
+
+| Secret | Example | Where to find it |
+|--------|---------|------------------|
+| `AZURE_OPENAI_ENDPOINT` | `https://my-resource.openai.azure.com/` | Azure Portal → your OpenAI resource → Keys and Endpoint |
+| `AZURE_OPENAI_API_KEY` | `sk-…` | Azure Portal → same page |
+| `AZURE_OPENAI_DEPLOYMENT` | `gpt-4o` | Azure Portal → your OpenAI resource → Deployments (name you gave the deployment) |
+| `AZURE_OPENAI_API_VERSION` | `2025-04-01-preview` | API version Azure documents for your deployment |
+
+When `AZURE_OPENAI_DEPLOYMENT` is set, **all** `get_llm()` calls route to that single deployment, regardless of the model name passed.
 
 ---
 

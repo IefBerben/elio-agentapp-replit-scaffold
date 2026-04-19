@@ -14,6 +14,19 @@ These rules are non-negotiable. Read `.agents/docs/` before writing any code.
 
 ---
 
+## First-run setup — request these Replit Secrets
+
+Before running any agent code, the scaffold requires **4 Replit Secrets** (no defaults work outside Onepoint's internal sandbox):
+
+- `AZURE_OPENAI_ENDPOINT`
+- `AZURE_OPENAI_API_KEY`
+- `AZURE_OPENAI_DEPLOYMENT` (name of the deployment on the consultant's Azure resource — e.g. `gpt-4o`)
+- `AZURE_OPENAI_API_VERSION` (e.g. `2025-04-01-preview`)
+
+If any is missing when `get_llm()` is called, request all 4 via the Replit Secrets flow. Do **not** hardcode or guess values.
+
+---
+
 ## 5 hard rules — always enforced
 
 1. **LLM** — never instantiate directly. Always `from services.llm_config import get_llm`
