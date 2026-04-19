@@ -32,7 +32,7 @@ export function AgentAppHeader({
   return (
     <div
       className={cn(
-        "bg-card border border-border rounded-xl px-4 md:px-8 py-4 shadow-sm md:sticky md:top-0 z-20",
+        "bg-card border border-border rounded-xl px-4 md:px-8 py-4 shadow-sm md:sticky md:top-10 z-20",
         disabled && "pointer-events-none",
         className,
       )}
