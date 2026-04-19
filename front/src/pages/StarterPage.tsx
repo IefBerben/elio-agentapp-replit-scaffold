@@ -202,6 +202,32 @@ export function StarterPage() {
       rootClassName="relative min-h-screen flex flex-col max-w-4xl mx-auto px-4 md:px-6 w-full"
     >
       <div className="space-y-6 pt-2">
+        {/* ── Secondary card: pointer to Value Office ────────────────────── */}
+        <AgentAppCard>
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-lg bg-muted text-muted-foreground flex items-center justify-center shrink-0">
+              <ExternalLink className="w-5 h-5" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-base font-bold text-foreground">
+                {t("starter.cards.valueOffice.title")}
+              </h3>
+              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                {t("starter.cards.valueOffice.desc")}
+              </p>
+              <a
+                href={VALUE_OFFICE_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1.5 mt-3 text-xs font-semibold text-[#009de0] hover:underline"
+              >
+                {t("starter.cards.valueOffice.cta")}
+                <ArrowRight className="w-3.5 h-3.5" />
+              </a>
+            </div>
+          </div>
+        </AgentAppCard>
+
         {/* ── Main card: product.md (+ optional prototype) ───────────────── */}
         <AgentAppCard>
           <div className="flex items-start gap-3 mb-4">
@@ -273,32 +299,6 @@ export function StarterPage() {
           <p className="mt-4 text-xs text-muted-foreground">
             {t("starter.cleanupHint")}
           </p>
-        </AgentAppCard>
-
-        {/* ── Secondary card: pointer to Value Office ────────────────────── */}
-        <AgentAppCard>
-          <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-lg bg-muted text-muted-foreground flex items-center justify-center shrink-0">
-              <ExternalLink className="w-5 h-5" />
-            </div>
-            <div className="flex-1">
-              <h3 className="text-base font-bold text-foreground">
-                {t("starter.cards.valueOffice.title")}
-              </h3>
-              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                {t("starter.cards.valueOffice.desc")}
-              </p>
-              <a
-                href={VALUE_OFFICE_URL}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1.5 mt-3 text-xs font-semibold text-[#009de0] hover:underline"
-              >
-                {t("starter.cards.valueOffice.cta")}
-                <ArrowRight className="w-3.5 h-3.5" />
-              </a>
-            </div>
-          </div>
         </AgentAppCard>
       </div>
     </AgentAppPageShell>
