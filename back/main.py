@@ -21,7 +21,7 @@ from typing import Any
 
 from fastapi import FastAPI, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, HTMLResponse, StreamingResponse
+from fastapi.responses import FileResponse, StreamingResponse
 
 # ─── Temp files directory ─────────────────────────────────────────────────────
 # Files uploaded via /files/upload are stored here during the session.
@@ -203,44 +203,13 @@ def _input_files() -> list[str]:
 
 # ─── Routes ───────────────────────────────────────────────────────────────────
 
-_REDIRECT_HTML = """<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<title>Elio Scaffold — redirecting to the app…</title>
-<style>
-  body { font-family: system-ui, sans-serif; background: #0b1020; color: #e6e9f2;
-         display: flex; align-items: center; justify-content: center;
-         height: 100vh; margin: 0; }
-  .card { text-align: center; }
-  a { color: #7aa2ff; }
-</style>
-</head>
-<body>
-<div class="card">
-  <h1>Elio Scaffold backend</h1>
-  <p>Redirecting to the app…</p>
-  <p><a id="link" href="#">Click here if it doesn't redirect.</a></p>
-</div>
-<script>
-  // Backend runs on a "8000-…" subdomain on Replit; the frontend lives on
-  // the bare host (externalPort 80). Strip the "8000-" prefix to land there.
-  var host = window.location.host.replace(/^8000-/, "");
-  var url = window.location.protocol + "//" + host + "/";
-  document.getElementById("link").href = url;
-  window.location.replace(url);
-</script>
-</body>
-</html>"""
-
-
-@app.get("/", response_class=HTMLResponse)
-async def root() -> HTMLResponse:
-    return HTMLResponse(_REDIRECT_HTML)
-
-
-@app.get("/health")
+@app.get("/")
 async def health() -> dict[str, Any]:
+    """Health check endpoint.
+
+    Returns:
+        Dict with status and available agent IDs.
+    """
     return {
         "status": "ok",
         "scaffold_version": "9.0.0",

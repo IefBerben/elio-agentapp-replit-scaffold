@@ -26,7 +26,6 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "cd back && uv sync --frozen && ([ -f .env ] || cp .env.example .env) && uv run uvicorn main:app --reload --port 8000"
-waitForPort = 8000
 
 [[workflows.workflow]]
 name = "Start Frontend"
