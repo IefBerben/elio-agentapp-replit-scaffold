@@ -9,7 +9,7 @@ sans avoir besoin de coder. Tu décris ton idée à un agent IA, qui écrit le c
 
 **Ce qu'il te faut :**
 - Un compte Replit (gratuit) → [replit.com](https://replit.com)
-- Tes credentials Azure OpenAI → demande à ton référent Onepoint
+- Tes credentials Azure OpenAI (endpoint + clé API) → si tu n'en as pas encore, envoie un mail à [elio@groupeonepoint.com](mailto:elio@groupeonepoint.com)
 - Une idée d'application
 
 **Combien de temps ?**
@@ -37,22 +37,44 @@ Tu as maintenant **ta propre copie privée** du scaffold. Personne ne peut la vo
 
 Sans cette étape, l'IA ne pourra pas répondre aux requêtes de ton app.
 
-**Le plus simple : demande à l'Agent.** Dans le chat Agent, tape :
+### Tu n'as pas encore de credentials Azure ?
 
-> **"I need to enter my Azure credentials"**
+Envoie un mail à [elio@groupeonepoint.com](mailto:elio@groupeonepoint.com) avec ton nom et ton projet. On te renvoie un `AZURE_OPENAI_ENDPOINT` et un `AZURE_OPENAI_API_KEY`.
 
-L'Agent ouvre un formulaire sécurisé directement dans le chat. Renseigne les 4 valeurs :
+### Ce dont tu as besoin
+
+Le scaffold ship avec **2 valeurs déjà pré-configurées** (inutile de les renseigner, sauf si tu veux les changer) :
+
+| Clé | Valeur par défaut | Où c'est défini |
+|-----|-------------------|-----------------|
+| `AZURE_OPENAI_DEPLOYMENT` | `gpt-5-chat` | `.replit` (pré-commit) |
+| `AZURE_OPENAI_API_VERSION` | `2025-01-01-preview` | `.replit` (pré-commit) |
+
+Tu dois seulement renseigner **2 secrets** (ceux que tu as reçus par mail) :
 
 | Clé | Valeur |
 |-----|--------|
-| `AZURE_OPENAI_ENDPOINT` | l'URL fournie par ton référent (commence par `https://`) |
+| `AZURE_OPENAI_ENDPOINT` | l'URL fournie (commence par `https://`) |
 | `AZURE_OPENAI_API_KEY` | ta clé API |
-| `AZURE_OPENAI_DEPLOYMENT` | le nom du déploiement (souvent `gpt-4.1` ou `gpt-5-chat`) |
-| `AZURE_OPENAI_API_VERSION` | `2025-01-01-preview` |
 
-Les secrets sont chiffrés et sauvegardés automatiquement.
+### Comment les renseigner — 2 options
 
-> 💡 Ces secrets restent dans **ta** copie. Personne d'autre n'y a accès.
+**Option A — Rapide (1 projet) :** demande à l'Agent. Dans le chat Agent, tape :
+
+> **"I need to enter my Azure credentials"**
+
+L'Agent ouvre un formulaire sécurisé directement dans le chat. Colle endpoint + clé → Add to Secrets.
+
+**Option B — Recommandé si tu vas remixer plusieurs apps :** sauvegarde-les dans tes **Account Secrets** (coffre-fort personnel Replit, réutilisable sur tous tes remix) :
+
+1. Ouvre l'outil **Secrets** : clique sur **+** dans les onglets d'outils → cherche "Secrets" → ouvre.
+2. Clique sur **Link Account Secrets** en haut à droite du panneau.
+3. Si tu n'en as pas encore, utilise le lien proposé pour ouvrir tes Account Secrets et ajoute `AZURE_OPENAI_ENDPOINT` + `AZURE_OPENAI_API_KEY`.
+4. De retour dans le panneau Secrets du projet → **Link Account Secrets** → lie les deux.
+
+Sur chaque futur remix du scaffold, tu auras juste à refaire l'étape 4 — un clic au lieu d'un copier-coller.
+
+> 💡 Tes Account Secrets restent privés. Chaque projet doit explicitement demander à y accéder via **Link Account Secrets**.
 > ⚠️ Après avoir ajouté/modifié les secrets, **redémarre les serveurs** (Stop ▶ puis Run ▶) — les variables d'environnement ne sont chargées qu'au démarrage.
 
 ---
