@@ -17,6 +17,9 @@ export default defineConfig({
     port: 5173,
     strictPort: true,
     allowedHosts: true,
+    // Replit serves the dev server over HTTPS on port 443; the browser
+    // can't reach localhost:5173 directly, so point HMR at 443/wss.
+    hmr: { clientPort: 443 },
     proxy: {
       "/agent-apps": { target: "http://localhost:8000", changeOrigin: true },
       "/files": { target: "http://localhost:8000", changeOrigin: true },
