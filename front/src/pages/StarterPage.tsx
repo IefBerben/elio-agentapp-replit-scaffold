@@ -1,15 +1,15 @@
 /**
- * StarterPage — the 3-path on-ramp at /.
+ * StarterPage — on-ramp at /.
  *
- * Helps the consultant pick one of three entry points:
- *   1. They already have product.md → coach them to type "Build my app"
- *   2. They have a Google AI Studio export in Input/ → same, different prompt
- *   3. They have nothing → run the idea_lab agent to brainstorm 3 ideas
+ * One entry point: the consultant uploads product.md (from the Value Office
+ * AgentApp) and optionally a Google AI Studio prototype. The suggested prompt
+ * triggers the PM skill in conversational mode — the PM iterates with the
+ * consultant to produce backlog.md, then hands off to the Builder.
  *
- * DISPOSABLE — once the consultant picks a path, this page can be removed by
- * asking the Agent: "Remove the starter page". The `remove-starter` skill
- * deletes this file, the ideaLabStore, the back/agents/idea_lab/ folder, and
- * the matching AGENTS_MAP / route entries.
+ * Consultants without a product.md are pointed to the Value Office AgentApp.
+ *
+ * DISPOSABLE — removed by the `remove-starter` skill once the consultant
+ * no longer needs the on-ramp.
  */
 
 import { useEffect, useState } from "react";
@@ -18,28 +18,21 @@ import {
   ArrowRight,
   CheckCircle2,
   Copy,
+  ExternalLink,
   FileText,
-  Lightbulb,
   Sparkles,
   Upload,
-  X,
 } from "lucide-react";
 import {
   AgentAppCard,
   AgentAppPageShell,
-  AgentAppSection,
   ErrorBanner,
   FileUploadZone,
-  FormField,
-  FormInput,
-  FormTextarea,
-  GenerateButton,
   LanguageToggle,
-  ProgressBanner,
 } from "@/components/agent-apps";
-import { useIdeaLabStore } from "@/stores/agent-apps/ideaLabStore";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// TODO: replace with the real Value Office AgentApp URL once provided.
+const VALUE_OFFICE_URL = "https://elio.onepoint.com/agents/value-office";
 
 interface ScaffoldStatus {
   hasProductMd: boolean;
@@ -47,10 +40,6 @@ interface ScaffoldStatus {
   inputFiles: string[];
   dismissed: boolean;
 }
-
-type Path = "product-md" | "input-file" | "idea-lab";
-
-// ─── Hook: scaffold-status ────────────────────────────────────────────────────
 
 function useScaffoldStatus(): {
   status: ScaffoldStatus | null;
@@ -71,8 +60,6 @@ function useScaffoldStatus(): {
   return { status, refresh };
 }
 
-// ─── Coach card — the prompt to paste into the Agent chat ─────────────────────
-
 function CoachPanel({
   prompt,
   language,
@@ -88,9 +75,10 @@ function CoachPanel({
     setTimeout(() => setCopied(false), 1800);
   }
 
-  const intro = language === "en"
-    ? "Copy the prompt below and paste it into the Replit AI chat:"
-    : "Copie l'instruction ci-dessous et colle-la dans le chat IA Replit :";
+  const intro =
+    language === "en"
+      ? "Copy the prompt below and paste it into the Replit AI chat:"
+      : "Copie l'instruction ci-dessous et colle-la dans le chat IA Replit :";
 
   return (
     <div className="mt-4 space-y-2">
@@ -120,8 +108,6 @@ function CoachPanel({
     </div>
   );
 }
-
-// ─── Upload panel ─────────────────────────────────────────────────────────────
 
 function UploadPanel({
   endpoint,
@@ -196,244 +182,15 @@ function UploadPanel({
   );
 }
 
-// ─── Path card ────────────────────────────────────────────────────────────────
-
-function PathCard({
-  icon,
-  title,
-  description,
-  primary,
-  highlighted,
-  onClick,
-  selected,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  primary: string;
-  highlighted: boolean;
-  selected: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={[
-        "text-left rounded-xl border p-5 transition-all flex flex-col gap-3",
-        "hover:shadow-md hover:-translate-y-0.5",
-        selected
-          ? "border-[#009de0] bg-blue-50 dark:bg-blue-950/30 shadow-md"
-          : highlighted
-            ? "border-[#009de0]/40 bg-card ring-1 ring-[#009de0]/20"
-            : "border-border bg-card",
-      ].join(" ")}
-    >
-      <div className="flex items-center justify-between">
-        <div
-          className={[
-            "w-10 h-10 rounded-lg flex items-center justify-center",
-            highlighted || selected
-              ? "bg-[#009de0] text-white"
-              : "bg-muted text-muted-foreground",
-          ].join(" ")}
-        >
-          {icon}
-        </div>
-        {highlighted && !selected && (
-          <span className="text-[10px] font-bold uppercase tracking-wider text-[#009de0]">
-            ★
-          </span>
-        )}
-      </div>
-      <div>
-        <h3 className="text-base font-bold text-foreground">{title}</h3>
-        <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-          {description}
-        </p>
-      </div>
-      <div className="flex items-center gap-1.5 text-xs font-semibold text-[#009de0] mt-auto">
-        {primary}
-        <ArrowRight className="w-3.5 h-3.5" />
-      </div>
-    </button>
-  );
-}
-
-// ─── Idea Lab form ────────────────────────────────────────────────────────────
-
-function IdeaLabPanel({
-  onBack,
-  language,
-  interfaceLanguage,
-}: {
-  onBack?: () => void;
-  language: string;
-  interfaceLanguage: string;
-}) {
-  const { t } = useTranslation();
-  const role = useIdeaLabStore((s) => s.context.role);
-  const pain = useIdeaLabStore((s) => s.context.pain);
-  const result = useIdeaLabStore((s) => s.result);
-  const isProcessing = useIdeaLabStore((s) => s.isProcessing);
-  const loadingMessage = useIdeaLabStore((s) => s.loadingMessage);
-  const error = useIdeaLabStore((s) => s.error);
-
-  function onGenerate() {
-    useIdeaLabStore.getState().setContext({ language: language as "fr" | "en" });
-    useIdeaLabStore.getState().runIdeaLab(interfaceLanguage);
-  }
-
-  const canGenerate = role.trim().length > 1 && pain.trim().length > 3;
-
-  return (
-    <div className="space-y-4">
-      {onBack && (
-        <button
-          type="button"
-          onClick={onBack}
-          className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
-          disabled={isProcessing}
-        >
-          <X className="w-3.5 h-3.5" />
-          {t("starter.idea.back")}
-        </button>
-      )}
-
-      <AgentAppCard>
-        <AgentAppSection title={t("starter.idea.formTitle") as string} />
-        <div className="space-y-3">
-          <FormField
-            label={t("starter.idea.roleLabel") as string}
-            description={t("starter.idea.roleHint") as string}
-            required
-          >
-            <FormInput
-              value={role}
-              onChange={(e) =>
-                useIdeaLabStore.getState().setContext({ role: e.target.value })
-              }
-              placeholder={t("starter.idea.rolePlaceholder") as string}
-              disabled={isProcessing}
-            />
-          </FormField>
-
-          <FormField
-            label={t("starter.idea.painLabel") as string}
-            description={t("starter.idea.painHint") as string}
-            required
-          >
-            <FormTextarea
-              value={pain}
-              onChange={(e) =>
-                useIdeaLabStore.getState().setContext({ pain: e.target.value })
-              }
-              placeholder={t("starter.idea.painPlaceholder") as string}
-              disabled={isProcessing}
-              rows={3}
-            />
-          </FormField>
-
-          <ErrorBanner error={error} />
-
-          {isProcessing && (
-            <ProgressBanner
-              title={loadingMessage || (t("starter.idea.thinking") as string)}
-              progress={50}
-              onStop={() => useIdeaLabStore.getState().handleStop()}
-            />
-          )}
-
-          <GenerateButton
-            onClick={onGenerate}
-            isLoading={isProcessing}
-            disabled={!canGenerate}
-            label={t("starter.idea.generate") as string}
-            loadingLabel={t("starter.idea.generating") as string}
-          />
-        </div>
-      </AgentAppCard>
-
-      {result && result.ideas.length > 0 && (
-        <AgentAppCard>
-          <AgentAppSection title={t("starter.idea.resultsTitle") as string} />
-          <div className="space-y-3">
-            {result.ideas.map((idea, i) => (
-                <div
-                  key={i}
-                  className="rounded-lg border border-border bg-muted/30 p-4 space-y-2"
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <h4 className="text-sm font-bold text-foreground flex items-center gap-2">
-                      <span className="w-6 h-6 rounded-full bg-[#009de0] text-white text-xs flex items-center justify-center">
-                        {i + 1}
-                      </span>
-                      {idea.title}
-                    </h4>
-                  </div>
-                  <p className="text-xs text-foreground italic">
-                    {idea.problem}
-                  </p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
-                    <div>
-                      <span className="font-semibold text-muted-foreground">
-                        {t("starter.idea.inputs")}:
-                      </span>{" "}
-                      <span className="text-foreground">{idea.inputs}</span>
-                    </div>
-                    <div>
-                      <span className="font-semibold text-muted-foreground">
-                        {t("starter.idea.outputs")}:
-                      </span>{" "}
-                      <span className="text-foreground">{idea.outputs}</span>
-                    </div>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    💡 {idea.why_it_fits}
-                  </p>
-                </div>
-              ))}
-
-              <div className="pt-2 border-t border-border">
-                <p className="text-xs text-muted-foreground mb-2">
-                  {t("starter.idea.nextStep")}
-                </p>
-                <CoachPanel
-                  prompt={
-                    interfaceLanguage === "en"
-                      ? "Talk to the PM — I want to refine idea #2 from the Idea Lab"
-                      : "Parle au PM — je veux affiner l'idée #2 de l'Idea Lab"
-                  }
-                  language={interfaceLanguage}
-                />
-            </div>
-          </div>
-        </AgentAppCard>
-      )}
-    </div>
-  );
-}
-
-// ─── Page ─────────────────────────────────────────────────────────────────────
-
 export function StarterPage() {
   const { t, i18n } = useTranslation();
   const { status, refresh } = useScaffoldStatus();
-  const [selected, setSelected] = useState<Path | null>(null);
 
   const lang = i18n.language;
-
-  // Smart highlight priority: Input file > product.md > Idea Lab
+  const hasProduct = !!(status?.hasProductMd && !status.isProductMdTemplate);
   const hasInput = (status?.inputFiles.length ?? 0) > 0;
-  const hasProduct = status?.hasProductMd && !status.isProductMdTemplate;
 
-  let primary: Path = "idea-lab";
-  if (hasInput) primary = "input-file";
-  else if (hasProduct) primary = "product-md";
-
-  async function dismiss(path: Path) {
-    setSelected(path);
-    if (path === "idea-lab") return; // stay on the page to use Idea Lab
+  async function dismissAndNotify() {
     try {
       await fetch("/agent-apps/dismiss-starter", { method: "POST" });
     } catch {
@@ -441,18 +198,11 @@ export function StarterPage() {
     }
   }
 
-  const productPrompt =
-    lang === "en"
-      ? "Build my app from the existing product.md and backlog.md"
-      : "Construis mon app à partir des product.md et backlog.md existants";
+  useEffect(() => {
+    if (hasProduct) void dismissAndNotify();
+  }, [hasProduct]);
 
-  const inputPrompt = hasInput
-    ? lang === "en"
-      ? `Build my app from the Google AI Studio prototype in Input/${status?.inputFiles[0]}`
-      : `Construis mon app à partir du prototype Google AI Studio dans Input/${status?.inputFiles[0]}`
-    : lang === "en"
-      ? "Build my app from the Google AI Studio prototype in Input/"
-      : "Construis mon app à partir du prototype Google AI Studio dans Input/";
+  const prompt = buildPmPrompt({ lang, hasInput, inputFile: status?.inputFiles[0] });
 
   return (
     <AgentAppPageShell
@@ -463,7 +213,7 @@ export function StarterPage() {
       isProcessing={false}
       headerActions={<LanguageToggle />}
     >
-      <div className="max-w-5xl mx-auto px-4 md:px-6 space-y-6">
+      <div className="max-w-4xl mx-auto px-4 md:px-6 space-y-6">
         <div className="text-center space-y-2 pt-2">
           <h2 className="text-lg md:text-xl font-bold text-foreground">
             {t("starter.intro")}
@@ -473,102 +223,126 @@ export function StarterPage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <PathCard
-                icon={<FileText className="w-5 h-5" />}
-                title={t("starter.cards.product.title")}
-                description={t("starter.cards.product.desc")}
-                primary={t("starter.cards.product.cta")}
-                highlighted={primary === "product-md"}
-                selected={selected === "product-md"}
-                onClick={() => dismiss("product-md")}
-              />
-              <PathCard
-                icon={<Upload className="w-5 h-5" />}
-                title={t("starter.cards.input.title")}
-                description={
-                  hasInput
-                    ? `${t("starter.cards.input.descDetected")} ${status?.inputFiles[0]}`
-                    : t("starter.cards.input.desc")
-                }
-                primary={t("starter.cards.input.cta")}
-                highlighted={primary === "input-file"}
-                selected={selected === "input-file"}
-                onClick={() => dismiss("input-file")}
-              />
-              <PathCard
-                icon={<Lightbulb className="w-5 h-5" />}
-                title={t("starter.cards.idea.title")}
-                description={t("starter.cards.idea.desc")}
-                primary={t("starter.cards.idea.cta")}
-                highlighted={primary === "idea-lab"}
-                selected={selected === "idea-lab"}
-                onClick={() => dismiss("idea-lab")}
+        {/* ── Main card: product.md (+ optional prototype) ───────────────── */}
+        <AgentAppCard>
+          <div className="flex items-start gap-3 mb-4">
+            <div className="w-10 h-10 rounded-lg bg-[#009de0] text-white flex items-center justify-center shrink-0">
+              <FileText className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-base font-bold text-foreground">
+                {t("starter.cards.product.title")}
+              </h3>
+              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                {t("starter.cards.product.desc")}
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-5">
+            {/* product.md upload — always visible */}
+            <div>
+              <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider mb-2">
+                {t("starter.upload.productStepTitle")}
+              </h4>
+              <p className="text-xs text-muted-foreground mb-2">
+                {t("starter.upload.productStepHint")}
+              </p>
+              <UploadPanel
+                endpoint="upload-spec"
+                accept=".md"
+                multiple={false}
+                hint={t("starter.upload.specDropHint") as string}
+                detectedFiles={hasProduct ? ["product.md"] : []}
+                language={lang}
+                onUploaded={refresh}
               />
             </div>
 
-            {selected === "product-md" && (
-              <AgentAppCard>
-                <h3 className="text-sm font-bold text-foreground mb-3">
-                  {t("starter.cards.product.title")}
-                </h3>
-                <p className="text-xs text-muted-foreground mb-3">
-                  {t("starter.upload.specHint")}
-                </p>
-                <UploadPanel
-                  endpoint="upload-spec"
-                  accept=".md"
-                  multiple
-                  hint={t("starter.upload.specDropHint") as string}
-                  detectedFiles={hasProduct ? ["product.md"] : []}
-                  language={lang}
-                  onUploaded={refresh}
-                />
-                <div className="mt-4 pt-4 border-t border-border">
-                  <p className="text-xs font-semibold text-foreground">
-                    {t("starter.upload.thenStep")}
-                  </p>
-                  <CoachPanel prompt={productPrompt} language={lang} />
-                </div>
-                <p className="mt-3 text-xs text-muted-foreground">
-                  {t("starter.cleanupHint")}
-                </p>
-              </AgentAppCard>
-            )}
+            {/* optional prototype upload */}
+            <div className="pt-4 border-t border-border">
+              <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider mb-2 flex items-center gap-2">
+                <Upload className="w-3.5 h-3.5" />
+                {t("starter.upload.prototypeStepTitle")}
+                <span className="text-[10px] font-normal normal-case text-muted-foreground">
+                  ({t("starter.upload.optional")})
+                </span>
+              </h4>
+              <p className="text-xs text-muted-foreground mb-2">
+                {t("starter.upload.prototypeStepHint")}
+              </p>
+              <UploadPanel
+                endpoint="upload-prototype"
+                accept=".tsx,.jsx,.ts,.js,.zip,.json"
+                multiple
+                hint={t("starter.upload.prototypeDropHint") as string}
+                detectedFiles={status?.inputFiles ?? []}
+                language={lang}
+                onUploaded={refresh}
+              />
+            </div>
 
-            {selected === "input-file" && (
-              <AgentAppCard>
-                <h3 className="text-sm font-bold text-foreground mb-3">
-                  {t("starter.cards.input.title")}
-                </h3>
-                <p className="text-xs text-muted-foreground mb-3">
-                  {t("starter.upload.prototypeHint")}
-                </p>
-                <UploadPanel
-                  endpoint="upload-prototype"
-                  accept=".tsx,.jsx,.ts,.js,.zip,.json"
-                  multiple
-                  hint={t("starter.upload.prototypeDropHint") as string}
-                  detectedFiles={status?.inputFiles ?? []}
-                  language={lang}
-                  onUploaded={refresh}
-                />
-                <div className="mt-4 pt-4 border-t border-border">
-                  <p className="text-xs font-semibold text-foreground">
-                    {t("starter.upload.thenStep")}
-                  </p>
-                  <CoachPanel prompt={inputPrompt} language={lang} />
-                </div>
-                <p className="mt-3 text-xs text-muted-foreground">
-                  {t("starter.cleanupHint")}
-                </p>
-              </AgentAppCard>
-            )}
+            {/* next step — PM prompt */}
+            <div className="pt-4 border-t border-border">
+              <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider">
+                {t("starter.upload.thenStep")}
+              </h4>
+              <CoachPanel prompt={prompt} language={lang} />
+            </div>
+          </div>
 
-            {selected === "idea-lab" && (
-              <IdeaLabPanel language={lang} interfaceLanguage={lang} />
-            )}
+          <p className="mt-4 text-xs text-muted-foreground">
+            {t("starter.cleanupHint")}
+          </p>
+        </AgentAppCard>
+
+        {/* ── Secondary card: pointer to Value Office ────────────────────── */}
+        <AgentAppCard>
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-lg bg-muted text-muted-foreground flex items-center justify-center shrink-0">
+              <ExternalLink className="w-5 h-5" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-base font-bold text-foreground">
+                {t("starter.cards.valueOffice.title")}
+              </h3>
+              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                {t("starter.cards.valueOffice.desc")}
+              </p>
+              <a
+                href={VALUE_OFFICE_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1.5 mt-3 text-xs font-semibold text-[#009de0] hover:underline"
+              >
+                {t("starter.cards.valueOffice.cta")}
+                <ArrowRight className="w-3.5 h-3.5" />
+              </a>
+            </div>
+          </div>
+        </AgentAppCard>
       </div>
     </AgentAppPageShell>
   );
+}
+
+function buildPmPrompt({
+  lang,
+  hasInput,
+  inputFile,
+}: {
+  lang: string;
+  hasInput: boolean;
+  inputFile: string | undefined;
+}): string {
+  if (lang === "en") {
+    if (hasInput) {
+      return `Talk to the PM. I dropped my product.md (from the Value Office AgentApp) + a Google AI Studio prototype in Input/${inputFile}. Propose a backlog using both, iterate with me until I say it's OK, then hand off to the Builder.`;
+    }
+    return "Talk to the PM. I dropped my product.md (from the Value Office AgentApp). Propose a backlog, iterate with me until I say it's OK, then hand off to the Builder.";
+  }
+  if (hasInput) {
+    return `Parle au PM. J'ai déposé mon product.md (issu de l'AgentApp Value Office) + un prototype Google AI Studio dans Input/${inputFile}. Propose-moi un backlog en t'appuyant sur les deux, itère avec moi jusqu'à ce que je dise "backlog OK", puis passe la main au Builder.`;
+  }
+  return 'Parle au PM. J\'ai déposé mon product.md (issu de l\'AgentApp Value Office). Propose-moi un backlog, itère avec moi jusqu\'à ce que je dise "backlog OK", puis passe la main au Builder.';
 }

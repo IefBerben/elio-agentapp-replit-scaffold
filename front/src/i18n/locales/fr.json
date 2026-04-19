@@ -49,51 +49,30 @@
   },
   "starter": {
     "title": "Bienvenue sur ton scaffold Elio",
-    "description": "Choisis comment démarrer ta première Agent App.",
-    "intro": "Comment veux-tu commencer ?",
-    "subIntro": "Trois chemins, choisis celui qui correspond à ta situation.",
+    "description": "Construis ta première AgentApp à partir de ton product.md.",
+    "intro": "Prêt à construire ?",
+    "subIntro": "Dépose ton product.md pour lancer la spécification avec le PM.",
     "cleanupHint": "Une fois ton app construite, demande à l'IA Replit : « Supprime la starter page » pour nettoyer.",
     "cards": {
       "product": {
-        "title": "J'ai déjà un product.md",
-        "desc": "J'ai créé un product.md avec l'AgentApp - Value Office.",
-        "cta": "Lancer le build"
+        "title": "J'ai un product.md",
+        "desc": "Issu de l'AgentApp Value Office. Le PM s'appuie dessus pour itérer un backlog avec toi avant de lancer le build."
       },
-      "input": {
-        "title": "J'ai un prototype Google AI Studio",
-        "desc": "Dépose ton export .tsx ou .zip dans le dossier Input/.",
-        "descDetected": "Fichier détecté :",
-        "cta": "Construire à partir du prototype"
-      },
-      "idea": {
-        "title": "Pas encore d'idée",
-        "desc": "Réponds à 2 questions, l'IA te propose 3 idées d'app concrètes.",
-        "cta": "Ouvrir l'Idea Lab"
+      "valueOffice": {
+        "title": "Pas encore de product.md ?",
+        "desc": "Commence par l'AgentApp Value Office : elle t'aide à formaliser ton cas d'usage en un product.md prêt à être vibe-codé ici.",
+        "cta": "Ouvrir Value Office"
       }
     },
-    "idea": {
-      "back": "Revenir aux options",
-      "formTitle": "Trouve ton premier cas d'usage",
-      "roleLabel": "Quel est ton métier ?",
-      "roleHint": "Le rôle ou la fonction que tu occupes au quotidien.",
-      "rolePlaceholder": "Ex : consultant en transformation digitale, data analyst, chef de projet RH...",
-      "painLabel": "Quelle activité aimerais-tu accélérer ou augmenter avec une IA ?",
-      "painHint": "Pense à un livrable que tu pourrais produire plus vite, ou à une analyse que tu pourrais pousser plus loin avec un copilote.",
-      "painPlaceholder": "Ex : accélérer la rédaction de mes notes de cadrage, ou enrichir mes analyses concurrentielles avec une recherche web automatisée...",
-      "generate": "Générer 3 idées",
-      "generating": "L'IA réfléchit...",
-      "thinking": "Génération de 3 idées tailored à ton rôle...",
-      "resultsTitle": "Voici 3 pistes d'Agent App pour toi",
-      "inputs": "Entrée",
-      "outputs": "Sortie",
-      "nextStep": "Une idée te plaît ? Affine-la avec le PM :"
-    },
     "upload": {
-      "specHint": "Glisse ton product.md (et backlog.md si tu en as un) ci-dessous, ou utilise l'instruction si tu les as déjà placés à la racine du projet.",
-      "specDropHint": "product.md ou backlog.md uniquement",
-      "prototypeHint": "Dépose ton export Google AI Studio (.tsx, .zip, .json…) ci-dessous, ou utilise l'instruction si tu l'as déjà placé dans Input/.",
+      "productStepTitle": "1. Dépose ton product.md",
+      "productStepHint": "Le fichier généré par Value Office. Il sera placé à la racine du projet.",
+      "specDropHint": "product.md uniquement",
+      "prototypeStepTitle": "2. Ajoute une maquette",
+      "prototypeStepHint": "Un prototype Google AI Studio aide le PM à se caler sur le rendu visuel attendu. Laisser vide si tu n'en as pas.",
       "prototypeDropHint": ".tsx · .jsx · .ts · .js · .zip · .json",
-      "thenStep": "Ensuite, lance le build :"
+      "optional": "optionnel",
+      "thenStep": "3. Lance la spécification avec le PM"
     }
   }
 }

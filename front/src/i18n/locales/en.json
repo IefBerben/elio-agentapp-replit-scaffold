@@ -49,51 +49,30 @@
   },
   "starter": {
     "title": "Welcome to your Elio scaffold",
-    "description": "Choose how to start your first Agent App.",
-    "intro": "How do you want to begin?",
-    "subIntro": "Three paths — pick the one that matches your situation.",
+    "description": "Build your first AgentApp from your product.md.",
+    "intro": "Ready to build?",
+    "subIntro": "Drop your product.md to kick off the specification with the PM.",
     "cleanupHint": "Once your app is built, ask the Replit AI: \"Remove the starter page\" to clean up.",
     "cards": {
       "product": {
-        "title": "I already have product.md",
-        "desc": "You wrote your specs ahead of time (alone or with the PM).",
-        "cta": "Run the build"
+        "title": "I have a product.md",
+        "desc": "Produced by the Value Office AgentApp. The PM uses it to iterate a backlog with you before the Builder runs."
       },
-      "input": {
-        "title": "I have a Google AI Studio prototype",
-        "desc": "Drop your .tsx or .zip export into the Input/ folder.",
-        "descDetected": "File detected:",
-        "cta": "Build from prototype"
-      },
-      "idea": {
-        "title": "No idea yet",
-        "desc": "Answer 2 questions, the AI suggests 3 concrete app ideas.",
-        "cta": "Open Idea Lab"
+      "valueOffice": {
+        "title": "No product.md yet?",
+        "desc": "Start with the Value Office AgentApp — it helps you turn your use case into a product.md ready to vibe-code here.",
+        "cta": "Open Value Office"
       }
     },
-    "idea": {
-      "back": "Back to options",
-      "formTitle": "Find your first use case",
-      "roleLabel": "What's your role?",
-      "roleHint": "The role or function you hold day-to-day.",
-      "rolePlaceholder": "e.g. digital transformation consultant, data analyst, HR project manager...",
-      "painLabel": "Which activity would you like to accelerate or augment with AI?",
-      "painHint": "Think of a deliverable you could produce faster, or an analysis you could push further with a copilot.",
-      "painPlaceholder": "e.g. accelerate the writing of my framing notes, or enrich my competitive analyses with automated web research...",
-      "generate": "Generate 3 ideas",
-      "generating": "The AI is thinking...",
-      "thinking": "Generating 3 ideas tailored to your role...",
-      "resultsTitle": "Here are 3 Agent App ideas for you",
-      "inputs": "Input",
-      "outputs": "Output",
-      "nextStep": "Like one? Refine it with the PM:"
-    },
     "upload": {
-      "specHint": "Drop your product.md (and backlog.md if you have one) below, or use the prompt if they're already at the project root.",
-      "specDropHint": "product.md or backlog.md only",
-      "prototypeHint": "Drop your Google AI Studio export (.tsx, .zip, .json…) below, or use the prompt if it's already in Input/.",
+      "productStepTitle": "1. Drop your product.md",
+      "productStepHint": "The file produced by Value Office. It will be placed at the project root.",
+      "specDropHint": "product.md only",
+      "prototypeStepTitle": "2. Add a mockup",
+      "prototypeStepHint": "A Google AI Studio prototype helps the PM align on the expected look & feel. Leave empty if you don't have one.",
       "prototypeDropHint": ".tsx · .jsx · .ts · .js · .zip · .json",
-      "thenStep": "Then trigger the build:"
+      "optional": "optional",
+      "thenStep": "3. Launch the specification with the PM"
     }
   }
 }

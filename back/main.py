@@ -35,10 +35,6 @@ from agents._reference import (
     reference_step_2_stream,
 )
 
-# ─── Starter (idea_lab) — wired by the StarterPage on first Run ───────────────
-# Removed by the `remove-starter` skill once the consultant picks a path.
-from _scaffold.idea_lab import idea_lab_step_1_stream
-
 # ─── Vos agents — ajouter vos imports ici ─────────────────────────────────────
 # from agents.{mon_usecase} import (
 #     mon_usecase_step_1_stream,
@@ -158,8 +154,6 @@ AGENTS_MAP: dict[str, Any] = {
     # ── Reference example (wired — shows the scaffold pattern in action) ──────
     "_reference-step-1": reference_step_1_stream,
     "_reference-step-2": reference_step_2_stream,
-    # ── Starter (disposable — removed by `remove-starter` skill) ──────────────
-    "idea-lab-step-1": idea_lab_step_1_stream,
     # ── Your agents — add here ────────────────────────────────────────────────
     # "mon-usecase-step-1": mon_usecase_step_1_stream,
 }
@@ -167,12 +161,12 @@ AGENTS_MAP: dict[str, Any] = {
 SSE_MEDIA_TYPE = "text/event-stream"
 
 # ─── Starter dispatcher state ─────────────────────────────────────────────────
-# The StarterPage is a 3-card landing that helps the consultant choose between:
-#   1. "I have product.md" → coaching panel pointing to the Build skill
-#   2. "I have a Google AI Studio prototype in Input/" → same, different skill
-#   3. "No idea yet" → calls the idea_lab agent
+# The StarterPage has one real entry point: the consultant uploads product.md
+# (produced by the Value Office AgentApp) and optionally a Google AI Studio
+# prototype. The PM skill then iterates with them to produce backlog.md before
+# the Builder runs. Consultants without product.md are pointed to Value Office.
 #
-# Soft-dismiss: clicking a card writes .starter-dismissed at the repo root.
+# Soft-dismiss: clicking the card writes .starter-dismissed at the repo root.
 # Hard-delete: handled by the `remove-starter` skill (Agent reviews diff first).
 
 REPO_ROOT = Path(__file__).parent.parent
@@ -243,23 +237,23 @@ async def scaffold_status() -> dict[str, Any]:
     }
 
 
-_ALLOWED_SPEC_NAMES = {"product.md", "backlog.md"}
+_ALLOWED_SPEC_NAMES = {"product.md"}
 _ALLOWED_PROTOTYPE_SUFFIXES = {".tsx", ".jsx", ".ts", ".js", ".zip", ".json"}
 
 
 @app.post("/agent-apps/upload-spec")
 async def upload_spec(files: list[UploadFile]) -> dict[str, Any]:
-    """Save product.md / backlog.md uploads at the repo root.
+    """Save the consultant's product.md at the repo root.
 
-    Used by the StarterPage so the consultant can drop their pre-written
-    spec without leaving the page. Filenames are whitelisted to prevent
-    overwriting unrelated repo files.
+    Used by the StarterPage so the consultant can drop the product.md
+    produced by the Value Office AgentApp. backlog.md is NOT accepted —
+    it is derived by the PM skill from product.md.
 
     Returns:
         Dict with the saved files and the updated scaffold status.
 
     Raises:
-        HTTPException 400: filename not in {product.md, backlog.md}.
+        HTTPException 400: filename is not product.md.
     """
     saved = []
     for upload in files:
