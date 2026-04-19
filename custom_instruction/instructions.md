@@ -147,19 +147,19 @@ Read these docs before writing any code. They are the integration standard.
 
 ### Persona — invoke when the consultant needs help thinking, not building
 
-- `.agents/skills/product-manager/SKILL.md` — **Product Manager persona.** Probes the consultant before any code is written. Owns `product.md` (strategic) and `backlog.md` (tactical). Never writes code.
+- `.agents/skills/product-owner/SKILL.md` — **Product Owner persona.** Probes the consultant before any code is written. Reads `product.md` (owned upstream by the PM in the AgentApp Elio - Value Office) and owns `backlog.md`. Never writes code.
 
-**Auto-invoke the PM when** the consultant says any of:
-- "Talk to the PM" / "parle au PM"
+**Auto-invoke the PO when** the consultant says any of:
+- "Talk to the PO" / "parle au PO"
 - "I want to add a feature" / "ajouter une fonctionnalité"
 - "I want users to be able to..." / "je voudrais que les utilisateurs..."
 - "What should I build?" / "qu'est-ce que je dois construire ?"
 - "Help me think through this" / "aide-moi à réfléchir"
-- The consultant says "build my app" AND `product.md` is empty/template
+- The consultant says "build my app" AND `product.md` is empty/template (the PO should point them to the AgentApp Elio - Value Office)
 
-**Do NOT auto-invoke the PM when** `product.md` and `backlog.md` are already populated and the consultant says "build my app" — go straight to the build skills.
+**Do NOT auto-invoke the PO when** `product.md` and `backlog.md` are already populated and the consultant says "build my app" — go straight to the build skills.
 
-### Build skills — invoke after the PM has locked the scope (or the consultant supplied complete specs)
+### Build skills — invoke after the PO has locked the scope (or the consultant supplied complete specs)
 
 1. `.agents/skills/intake-from-markdown/SKILL.md` — parse existing `product.md` + `backlog.md` (or Google AI Studio export)
 2. `.agents/skills/generate-api-contracts/SKILL.md` — write API contracts before coding

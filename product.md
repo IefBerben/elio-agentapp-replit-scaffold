@@ -2,11 +2,12 @@
 
 <!--
 How to structure this file:
-- Keep it short (1 page). The Product Manager agent uses this to generate the backlog.
+- Keep it short (1 page). This is the vision deliverable from the AgentApp Elio - Value Office (PM persona).
 - Focus on the WHY and WHAT, not the HOW.
 - Replace every `_À compléter_` below with your own content.
 
-Tip: the Product Manager prompt in `.agents/prompts/` can walk you through filling this in.
+Tip: if you don't have a product.md yet, use the AgentApp Elio - Value Office to produce one.
+Once this file is filled in, the Product Owner (PO) persona in this scaffold will iterate a backlog with you.
 -->
 
 ## Vision

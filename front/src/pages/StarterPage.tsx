@@ -1,12 +1,12 @@
 /**
  * StarterPage — on-ramp at /.
  *
- * One entry point: the consultant uploads product.md (from the Value Office
- * AgentApp) and optionally a Google AI Studio prototype. The suggested prompt
- * triggers the PM skill in conversational mode — the PM iterates with the
- * consultant to produce backlog.md, then hands off to the Builder.
+ * One entry point: the consultant uploads product.md (from the AgentApp Elio -
+ * Value Office) and optionally a Google AI Studio prototype. The suggested
+ * prompt triggers the PO skill in conversational mode — the PO iterates with
+ * the consultant to produce backlog.md, then hands off to the Builder.
  *
- * Consultants without a product.md are pointed to the Value Office AgentApp.
+ * Consultants without a product.md are pointed to the AgentApp Elio - Value Office.
  *
  * DISPOSABLE — removed by the `remove-starter` skill once the consultant
  * no longer needs the on-ramp.
@@ -269,7 +269,7 @@ export function StarterPage() {
               />
             </div>
 
-            {/* next step — PM prompt */}
+            {/* next step — PO prompt */}
             <div className="pt-4 border-t border-border">
               <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider">
                 {t("starter.upload.thenStep")}
@@ -324,12 +324,12 @@ function buildPmPrompt({
 }): string {
   if (lang === "en") {
     if (hasInput) {
-      return `Talk to the PM. I dropped my product.md (from the Value Office AgentApp) + a Google AI Studio prototype in Input/${inputFile}. Propose a backlog using both, iterate with me until I say it's OK, then hand off to the Builder.`;
+      return `Talk to the PO. I dropped my product.md (from the AgentApp Elio - Value Office) + a Google AI Studio prototype in Input/${inputFile}. Propose a backlog using both, iterate with me until I say it's OK, then hand off to the Builder.`;
     }
-    return "Talk to the PM. I dropped my product.md (from the Value Office AgentApp). Propose a backlog, iterate with me until I say it's OK, then hand off to the Builder.";
+    return "Talk to the PO. I dropped my product.md (from the AgentApp Elio - Value Office). Propose a backlog, iterate with me until I say it's OK, then hand off to the Builder.";
   }
   if (hasInput) {
-    return `Parle au PM. J'ai déposé mon product.md (issu de l'AgentApp Value Office) + un prototype Google AI Studio dans Input/${inputFile}. Propose-moi un backlog en t'appuyant sur les deux, itère avec moi jusqu'à ce que je dise "backlog OK", puis passe la main au Builder.`;
+    return `Parle au PO. J'ai déposé mon product.md (issu de l'AgentApp Elio - Value Office) + un prototype Google AI Studio dans Input/${inputFile}. Propose-moi un backlog en t'appuyant sur les deux, itère avec moi jusqu'à ce que je dise "backlog OK", puis passe la main au Builder.`;
   }
-  return 'Parle au PM. J\'ai déposé mon product.md (issu de l\'AgentApp Value Office). Propose-moi un backlog, itère avec moi jusqu\'à ce que je dise "backlog OK", puis passe la main au Builder.';
+  return 'Parle au PO. J\'ai déposé mon product.md (issu de l\'AgentApp Elio - Value Office). Propose-moi un backlog, itère avec moi jusqu\'à ce que je dise "backlog OK", puis passe la main au Builder.';
 }

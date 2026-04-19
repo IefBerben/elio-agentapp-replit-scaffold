@@ -8,7 +8,7 @@ How to structure this file:
 - End with an MVP slice (what's in V1) and non-functional requirements.
 
 Tip: replace every `_À compléter_` below with your own content.
-The Product Manager agent in `.agents/prompts/` can generate this for you from `product.md`.
+The Product Owner (PO) skill in `.agents/skills/product-owner/` can generate this for you from `product.md`.
 -->
 
 ## Epic 1 — Step 1: _À compléter_

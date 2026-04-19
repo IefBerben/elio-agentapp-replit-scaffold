@@ -80,9 +80,8 @@ La page de démarrage te propose **3 chemins** :
 
 C'est ici que la magie opère.
 
-> 💡 **Pas sûr de ce que tu veux construire ?** Demande **"Talk to the PM"** dans le chat.
-> Tu parleras à un Product Manager IA qui te pose les bonnes questions avant qu'une ligne de code soit écrite.
-> Il rédige `product.md` et `backlog.md` à ta place, puis passe la main au Builder.
+> 💡 **Pas sûr de ce que tu veux construire ?** Demande **"Talk to the PO"** dans le chat.
+> Tu parleras à un Product Owner IA qui lit ton `product.md` (produit par l'AgentApp Elio - Value Office) et itère avec toi pour rédiger le `backlog.md`, puis passe la main au Builder.
 
 1. Ouvre l'onglet **Agent** :
    - Souvent visible en haut de l'écran ou dans le dock

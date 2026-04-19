@@ -162,9 +162,9 @@ SSE_MEDIA_TYPE = "text/event-stream"
 
 # ─── Starter state ────────────────────────────────────────────────────────────
 # The StarterPage is the default landing until the consultant's own AgentApp
-# replaces it. It lets the consultant upload product.md (from the Value Office
-# AgentApp) and optionally a Google AI Studio prototype. The PM skill then
-# iterates with them to produce backlog.md before the Builder runs.
+# replaces it. It lets the consultant upload product.md (from the AgentApp
+# Elio - Value Office) and optionally a Google AI Studio prototype. The PO
+# skill then iterates with them to produce backlog.md before the Builder runs.
 #
 # The page is removed permanently by the `remove-starter` skill, which also
 # flips the default route in App.tsx to the consultant's built AgentApp page.
@@ -244,8 +244,8 @@ async def upload_spec(files: list[UploadFile]) -> dict[str, Any]:
     """Save the consultant's product.md at the repo root.
 
     Used by the StarterPage so the consultant can drop the product.md
-    produced by the Value Office AgentApp. backlog.md is NOT accepted —
-    it is derived by the PM skill from product.md.
+    produced by the AgentApp Elio - Value Office. backlog.md is NOT accepted —
+    it is derived by the PO skill from product.md.
 
     Returns:
         Dict with the saved files and the updated scaffold status.
