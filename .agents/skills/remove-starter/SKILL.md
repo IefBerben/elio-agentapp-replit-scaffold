@@ -21,7 +21,7 @@ Use this skill only when the consultant explicitly asks to remove the starter co
 ## Files to delete
 
 **Backend:**
-- `back/agents/idea_lab/` (entire folder, including `tests/`)
+- `back/_scaffold/` (entire folder, including `idea_lab/` and `tests/`)
 
 **Frontend:**
 - `front/src/pages/StarterPage.tsx`
@@ -38,7 +38,7 @@ Use this skill only when the consultant explicitly asks to remove the starter co
 1. Remove the import block:
    ```python
    # ─── Starter (idea_lab) — wired by the StarterPage on first Run ───────────────
-   from agents.idea_lab import idea_lab_step_1_stream
+   from _scaffold.idea_lab import idea_lab_step_1_stream
    ```
 2. Remove the AGENTS_MAP entry:
    ```python
@@ -67,7 +67,7 @@ Use this skill only when the consultant explicitly asks to remove the starter co
 ## Procedure
 
 1. **Confirm with the user** before deleting. Show them the file list and ask: *"Tu confirmes la suppression définitive de la starter page ? Tout est récupérable via git si tu changes d'avis."*
-2. **Make the edits** in this exact order: backend first (`main.py` + delete `back/agents/idea_lab/`), then frontend (`App.tsx` + delete pages/store), then i18n.
+2. **Make the edits** in this exact order: backend first (`main.py` + delete `back/_scaffold/`), then frontend (`App.tsx` + delete pages/store), then i18n.
 3. **Show the diff** for `back/main.py` and `front/src/App.tsx` (the two files that are *edited* rather than deleted).
 4. **Run the tests** to confirm nothing else depended on the starter:
    ```bash

@@ -37,7 +37,7 @@ from agents._reference import (
 
 # ─── Starter (idea_lab) — wired by the StarterPage on first Run ───────────────
 # Removed by the `remove-starter` skill once the consultant picks a path.
-from agents.idea_lab import idea_lab_step_1_stream
+from _scaffold.idea_lab import idea_lab_step_1_stream
 
 # ─── Vos agents — ajouter vos imports ici ─────────────────────────────────────
 # from agents.{mon_usecase} import (
