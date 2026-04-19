@@ -199,8 +199,9 @@ export function StarterPage() {
       iconContainerClassName="bg-gradient-to-br from-[#009de0] to-purple-600 text-white"
       isProcessing={false}
       headerActions={<LanguageToggle />}
+      rootClassName="relative min-h-screen flex flex-col max-w-4xl mx-auto px-4 md:px-6 w-full"
     >
-      <div className="max-w-4xl mx-auto px-4 md:px-6 space-y-6 pt-2">
+      <div className="space-y-6 pt-2">
         {/* ── Main card: product.md (+ optional prototype) ───────────────── */}
         <AgentAppCard>
           <div className="flex items-start gap-3 mb-4">
