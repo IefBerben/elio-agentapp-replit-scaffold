@@ -239,3 +239,7 @@ Backend construit :
 
 Je commence le frontend ?
 ```
+
+> **Never report the overall app as done from this skill alone.** The full
+> generation is declared complete only after `verify-generation` runs green.
+> Frontend + verification come next.

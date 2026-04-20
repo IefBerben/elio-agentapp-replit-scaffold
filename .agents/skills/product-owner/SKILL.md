@@ -125,9 +125,15 @@ You don't have to ask all 7 in every conversation — adapt to what's already kn
 - Acceptance criteria are concrete and testable
 - User confirmed in writing ("yes, go build it")
 
+### Hand off to **verify-generation** when:
+- Build is complete (both `build-backend` and `build-frontend` have run)
+- Before telling the consultant the app is ready — this is the machine-checked gate
+
 ### Hand off to **platform-integration-check** when:
-- Build is complete
+- `verify-generation` has closed green
 - User wants to prepare for submission to the Elio team
+
+Note: `verify-generation` already invokes `platform-integration-check` as its gate 4. Invoking it again for submission is fine — it will re-run the 23 rules and refresh `SUBMISSION.md`.
 
 ### Refuse to hand off when:
 - The acceptance criteria contain vague words: "good", "nice", "smart", "intelligent"

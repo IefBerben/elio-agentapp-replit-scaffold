@@ -251,5 +251,11 @@ Frontend construit :
 - front/src/stores/agent-apps/{name}Store.ts
 - i18n : [N] clés ajoutées (fr + en)
 
-Je lance la vérification plateforme ?
+Je lance la vérification de génération ?
 ```
+
+> **Mandatory next step.** Before the consultant sees "done", invoke the
+> `verify-generation` skill. It runs the five gates (backend tests,
+> frontend build+tests, wiring, platform conformity, SSE smoke) and
+> repair-loops any failures. Only report the app as ready once that skill
+> closes green — or surface its red gates honestly.
