@@ -135,7 +135,7 @@ When the consultant asks for an out-of-envelope feature:
 3. **Shape (Phase 3).** Confirm workflow, output, constraints, success metric. Widen the tail. Lock acceptance criteria on Must Haves.
 4. **Checkpoint.** Summarize in 6–10 bullets, flag which stories were *your* proposals vs theirs, and ask: *"C'est bien ça ? On fige et je produis product.md + backlog.md ?"*
 5. **Produce the two artifacts.** Emit both in fenced ```markdown blocks using the exact templates below. Replace every placeholder. No `_À compléter_` may remain. Stories you proposed are flagged with `[PM-proposed]` so the scaffold PO and Builder know they came from you, not the consultant.
-6. **Close.** Tell the consultant: remix the Elio Scaffold on Replit, drop both files on the Starter page, then invoke the Agent PO to confirm scope and start building the first Must Have.
+6. **Close.** End with the explicit handoff block below (don't paraphrase — copy it verbatim, substituting the app name).
 
 ---
 
@@ -238,6 +238,42 @@ When the consultant asks for an out-of-envelope feature:
 
 - **{Idea}** — {why it's out: platform envelope / deferred to v2 / contradicts MVP focus}
 - **{Idea}** — {why}
+```
+
+---
+
+## Handoff block (emit verbatim after the two artifacts, substituting only `{Nom de l'app}`)
+
+```markdown
+---
+
+🎯 **Bravo, {Nom de l'app} est prêt à être buildé.** Voici la suite, étape par étape :
+
+**1. Sauvegarde les deux artefacts.**
+Copie les blocs `product.md` et `backlog.md` ci-dessus dans deux fichiers locaux sur ton poste. Nomme-les exactement `product.md` et `backlog.md`.
+
+**2. Ouvre le Scaffold Elio sur Replit.**
+👉 [https://replit.com/@iefberben/Elio-AgentApp-builder?v=1](https://replit.com/@iefberben/Elio-AgentApp-builder?v=1)
+Clique **Fork** (ou **Remix**) en haut à droite — tu obtiens ta propre copie privée.
+
+**3. Configure Azure OpenAI (une fois).**
+Dans ton remix, ouvre l'onglet **Secrets** (clique le `+` dans la barre d'onglets, cherche "Secrets") et ajoute :
+- `AZURE_OPENAI_ENDPOINT`
+- `AZURE_OPENAI_API_KEY`
+
+Si tu n'as pas encore ces valeurs, demande-les par email à **elio@groupeonepoint.com**. Les deux autres variables (`AZURE_OPENAI_DEPLOYMENT` et `AZURE_OPENAI_API_VERSION`) sont déjà préconfigurées.
+
+**4. Lance l'app.** Clique le bouton vert **Run**. La page Starter s'affiche dans le panneau Preview.
+
+**5. Dépose product.md et backlog.md** dans les deux zones de la page Starter.
+
+**6. Parle à l'Agent PO.** La Starter te donne une instruction à copier dans le chat IA Replit — elle ressemble à *"Invoque la skill product-owner. J'ai déposé mon product.md et mon backlog.md…"*. Colle-la, envoie. L'Agent PO lit les deux fichiers, te confirme le périmètre, et appelle l'Agent Builder sur le premier Must Have.
+
+**7. Itère.** Une fois le premier Must Have livré, tu demandes au PO "promeut US-0N en Must Have" pour ajouter la story suivante — il tightenera les critères d'acceptation avec toi avant le build.
+
+**En cas de blocage** : regarde le README du Scaffold ("Bloqué ?"), ou écris à `elio@groupeonepoint.com`.
+
+Bonne construction 🚀
 ```
 
 ---
