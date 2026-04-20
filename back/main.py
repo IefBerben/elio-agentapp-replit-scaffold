@@ -171,19 +171,20 @@ SSE_MEDIA_TYPE = "text/event-stream"
 
 REPO_ROOT = Path(__file__).parent.parent
 PRODUCT_MD_PATH = REPO_ROOT / "product.md"
+BACKLOG_MD_PATH = REPO_ROOT / "backlog.md"
 INPUT_DIR = REPO_ROOT / "Input"
 
 
-def _product_md_status() -> tuple[bool, bool]:
-    """Return (exists, is_template) for product.md.
+def _spec_status(path: Path) -> tuple[bool, bool]:
+    """Return (exists, is_template) for a .md spec file.
 
     is_template is True when the file still contains the boilerplate
     "_À compléter" markers — i.e. the consultant has not edited it yet.
     """
-    if not PRODUCT_MD_PATH.is_file():
+    if not path.is_file():
         return False, False
     try:
-        text = PRODUCT_MD_PATH.read_text(encoding="utf-8")
+        text = path.read_text(encoding="utf-8")
     except OSError:
         return True, True
     is_template = "_À compléter" in text or len(text.strip()) < 200
@@ -225,27 +226,31 @@ async def scaffold_status() -> dict[str, Any]:
     StarterPage — never by production agent code.
 
     Returns:
-        Dict with hasProductMd, isProductMdTemplate, inputFiles.
+        Dict with hasProductMd, isProductMdTemplate, hasBacklogMd,
+        isBacklogMdTemplate, inputFiles.
     """
-    has_product_md, is_template = _product_md_status()
+    has_product, is_product_template = _spec_status(PRODUCT_MD_PATH)
+    has_backlog, is_backlog_template = _spec_status(BACKLOG_MD_PATH)
     return {
-        "hasProductMd": has_product_md,
-        "isProductMdTemplate": is_template,
+        "hasProductMd": has_product,
+        "isProductMdTemplate": is_product_template,
+        "hasBacklogMd": has_backlog,
+        "isBacklogMdTemplate": is_backlog_template,
         "inputFiles": _input_files(),
     }
 
 
-_ALLOWED_SPEC_NAMES = {"product.md"}
+_ALLOWED_SPEC_NAMES = {"product.md", "backlog.md"}
 _ALLOWED_PROTOTYPE_SUFFIXES = {".tsx", ".jsx", ".ts", ".js", ".zip", ".json"}
 
 
 @app.post("/agent-apps/upload-spec")
 async def upload_spec(files: list[UploadFile]) -> dict[str, Any]:
-    """Save the consultant's product.md at the repo root.
+    """Save product.md and/or backlog.md at the repo root.
 
-    Used by the StarterPage so the consultant can drop the product.md
-    produced by the AgentApp Elio - Value Office. backlog.md is NOT accepted —
-    it is derived by the PO skill from product.md.
+    Used by the StarterPage so the consultant can drop the specs produced
+    by the AgentApp Elio - Value Office. Accepts either/both files; other
+    names are rejected.
 
     Returns:
         Dict with the saved files and the updated scaffold status.

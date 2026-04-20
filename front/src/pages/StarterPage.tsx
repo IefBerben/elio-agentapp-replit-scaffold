@@ -37,6 +37,8 @@ const VALUE_OFFICE_URL = "https://elio.onepoint.com/agents/value-office";
 interface ScaffoldStatus {
   hasProductMd: boolean;
   isProductMdTemplate: boolean;
+  hasBacklogMd: boolean;
+  isBacklogMdTemplate: boolean;
   inputFiles: string[];
 }
 
@@ -187,9 +189,15 @@ export function StarterPage() {
 
   const lang = i18n.language;
   const hasProduct = !!(status?.hasProductMd && !status.isProductMdTemplate);
+  const hasBacklog = !!(status?.hasBacklogMd && !status.isBacklogMdTemplate);
   const hasInput = (status?.inputFiles.length ?? 0) > 0;
 
-  const prompt = buildPmPrompt({ lang, hasInput, inputFile: status?.inputFiles[0] });
+  const prompt = buildPmPrompt({
+    lang,
+    hasBacklog,
+    hasInput,
+    inputFile: status?.inputFiles[0],
+  });
 
   return (
     <AgentAppPageShell
@@ -264,6 +272,28 @@ export function StarterPage() {
               />
             </div>
 
+            {/* optional backlog.md upload — present when Value Office produced one */}
+            <div className="pt-4 border-t border-border">
+              <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider mb-2 flex items-center gap-2">
+                {t("starter.upload.backlogStepTitle")}
+                <span className="text-[10px] font-normal normal-case text-muted-foreground">
+                  ({t("starter.upload.optional")})
+                </span>
+              </h4>
+              <p className="text-xs text-muted-foreground mb-2">
+                {t("starter.upload.backlogStepHint")}
+              </p>
+              <UploadPanel
+                endpoint="upload-spec"
+                accept=".md"
+                multiple={false}
+                hint={t("starter.upload.backlogDropHint") as string}
+                detectedFiles={hasBacklog ? ["backlog.md"] : []}
+                language={lang}
+                onUploaded={refresh}
+              />
+            </div>
+
             {/* optional prototype upload */}
             <div className="pt-4 border-t border-border">
               <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider mb-2 flex items-center gap-2">
@@ -307,21 +337,32 @@ export function StarterPage() {
 
 function buildPmPrompt({
   lang,
+  hasBacklog,
   hasInput,
   inputFile,
 }: {
   lang: string;
+  hasBacklog: boolean;
   hasInput: boolean;
   inputFile: string | undefined;
 }): string {
+  const prototypeRef = inputFile ? ` + a Google AI Studio prototype in Input/${inputFile}` : "";
+  const prototypeRefFr = inputFile ? ` + une maquette Google AI Studio dans Input/${inputFile}` : "";
+
   if (lang === "en") {
+    if (hasBacklog) {
+      return `Invoke the product-owner skill. I dropped my product.md and backlog.md (both from the AgentApp Elio - Value Office)${prototypeRef}. Read them, confirm the scope with me in one short summary, then hand off to the Agent Builder.`;
+    }
     if (hasInput) {
-      return `Invoke the product-owner skill. I dropped my product.md (from the AgentApp Elio - Value Office) + a Google AI Studio prototype in Input/${inputFile}. Propose a backlog using both, iterate with me until I say it's OK, then hand off to the Agent Builder.`;
+      return `Invoke the product-owner skill. I dropped my product.md (from the AgentApp Elio - Value Office)${prototypeRef}. Propose a backlog using both, iterate with me until I say it's OK, then hand off to the Agent Builder.`;
     }
     return "Invoke the product-owner skill. I dropped my product.md (from the AgentApp Elio - Value Office). Propose a backlog, iterate with me until I say it's OK, then hand off to the Agent Builder.";
   }
+  if (hasBacklog) {
+    return `Invoque la skill product-owner. J'ai déposé mon product.md et mon backlog.md (tous deux issus de l'AgentApp Elio - Value Office)${prototypeRefFr}. Lis-les, confirme le périmètre avec moi en une courte synthèse, puis passe la main à l'Agent Builder.`;
+  }
   if (hasInput) {
-    return `Invoque la skill product-owner. J'ai déposé mon product.md (issu de l'AgentApp Elio - Value Office) + une maquette Google AI Studio dans Input/${inputFile}. Propose-moi un backlog en t'appuyant sur les deux, itère avec moi jusqu'à ce que je dise "backlog OK", puis passe la main à l'Agent Builder.`;
+    return `Invoque la skill product-owner. J'ai déposé mon product.md (issu de l'AgentApp Elio - Value Office)${prototypeRefFr}. Propose-moi un backlog en t'appuyant sur les deux, itère avec moi jusqu'à ce que je dise "backlog OK", puis passe la main à l'Agent Builder.`;
   }
   return 'Invoque la skill product-owner. J\'ai déposé mon product.md (issu de l\'AgentApp Elio - Value Office). Propose-moi un backlog, itère avec moi jusqu\'à ce que je dise "backlog OK", puis passe la main à l\'Agent Builder.';
 }

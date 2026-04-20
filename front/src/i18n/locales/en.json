@@ -66,11 +66,14 @@
       "productStepTitle": "1. Drop your product.md",
       "productStepHint": "The file produced by the AgentApp Elio - Value Office. It will be placed at the project root.",
       "specDropHint": "product.md only",
-      "prototypeStepTitle": "2. Add a mockup",
+      "backlogStepTitle": "2. Drop your backlog.md",
+      "backlogStepHint": "If the AgentApp Elio - Value Office also produced a backlog.md, drop it here. Otherwise leave empty — the Agent PO will build one with you from product.md.",
+      "backlogDropHint": "backlog.md only",
+      "prototypeStepTitle": "3. Add a mockup",
       "prototypeStepHint": "A Google AI Studio prototype helps the Agent PO align on the expected look & feel. Leave empty if you don't have one.",
       "prototypeDropHint": ".tsx · .jsx · .ts · .js · .zip · .json",
       "optional": "optional",
-      "thenStep": "3. Launch the specification with the Agent PO"
+      "thenStep": "4. Launch the specification with the Agent PO"
     }
   }
 }
