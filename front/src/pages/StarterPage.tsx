@@ -32,7 +32,7 @@ import {
 } from "@/components/agent-apps";
 
 // TODO: replace with the real Value Office AgentApp URL once provided.
-const VALUE_OFFICE_URL = "https://elio.onepoint.com/agents/value-office";
+const VALUE_OFFICE_URL = "https://elio.onepoint.cloud/marketplace/item/ab7c6c91-54b9-419d-b751-fbafa7e60bf8";
 
 interface ScaffoldStatus {
   hasProductMd: boolean;
