@@ -4,8 +4,8 @@ Le scaffold officiel pour construire des **AgentApps** destinées à la platefor
 
 **Ce scaffold est le chaînon 2 d'un parcours en 2 temps :**
 
-1. **AgentApp Elio - Value Office** → transforme ton idée en `product.md` (vision, utilisateurs, valeur).
-2. **Ce scaffold** → transforme ton `product.md` en app fonctionnelle grâce à 2 agents : un **Agent PO** qui rédige le backlog avec toi, puis un **Agent Builder** qui écrit le code.
+1. **[AgentApp Elio - Value Office](https://elio.onepoint.cloud/marketplace/item/ab7c6c91-54b9-419d-b751-fbafa7e60bf8)** → transforme ton idée en `product.md` + `backlog.md` (vision, utilisateurs, valeur, user stories priorisées MoSCoW).
+2. **[Ce scaffold (Elio AgentApp builder)](https://replit.com/@iefberben/Elio-AgentApp-builder?v=1)** → transforme tes spécifications en app fonctionnelle grâce à 2 agents : un **Agent PO** qui confirme le périmètre et itère le backlog, puis un **Agent Builder** qui écrit le code.
 
 ---
 
@@ -27,7 +27,7 @@ Le scaffold officiel pour construire des **AgentApps** destinées à la platefor
 
 ## Étape 1 — Récupère le scaffold (2 min)
 
-1. Ouvre la page du scaffold dans ton navigateur (lien fourni par l'équipe Elio).
+1. Ouvre la page du scaffold : **[replit.com/@iefberben/Elio-AgentApp-builder](https://replit.com/@iefberben/Elio-AgentApp-builder?v=1)**.
 2. Connecte-toi à Replit.
 3. Clique sur **Remix this app**.
 4. Donne un nom à ton projet (ex : `cr-reunion-acme`).
