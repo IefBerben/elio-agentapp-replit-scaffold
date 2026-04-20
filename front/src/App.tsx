@@ -69,11 +69,13 @@ function readPageFromHash(): Page {
 function ScaffoldTopBar({
   current,
   onChange,
+  showStarter,
 }: {
   current: Page;
   onChange: (p: Page) => void;
+  showStarter: boolean;
 }) {
-  const items: ReadonlyArray<{
+  const allItems: ReadonlyArray<{
     id: Page;
     label: string;
     icon: ReactNode;
@@ -98,6 +100,8 @@ function ScaffoldTopBar({
       activeColor: "bg-purple-600 text-white",
     },
   ];
+
+  const items = showStarter ? allItems : allItems.filter((i) => i.id !== "starter");
 
   return (
     <div className="sticky top-0 z-40 h-10 bg-card/95 backdrop-blur border-b border-border flex items-center justify-between px-3 md:px-5">
@@ -134,10 +138,34 @@ function ScaffoldTopBar({
 export default function App() {
   const { i18n } = useTranslation();
   const [page, setPage] = useState<Page>(readPageFromHash);
+  const [showStarter, setShowStarter] = useState(true);
 
   useEffect(() => {
     document.documentElement.lang = i18n.language;
   }, [i18n.language]);
+
+  // Hide the Start tab once the consultant has registered their own agent.
+  // The starter is an on-ramp — once the app exists, it's just clutter.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const r = await fetch("/agent-apps/scaffold-status");
+        if (!r.ok) return;
+        const data = (await r.json()) as { hasGeneratedAgent?: boolean };
+        if (cancelled) return;
+        if (data.hasGeneratedAgent) {
+          setShowStarter(false);
+          setPage((p) => (p === "starter" ? "reference" : p));
+        }
+      } catch {
+        /* starter route may be gone post-cleanup — ignore */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // Keep the URL hash in sync with the active page.
   useEffect(() => {
@@ -154,9 +182,9 @@ export default function App() {
 
   return (
     <AppErrorBoundary>
-      <ScaffoldTopBar current={page} onChange={setPage} />
+      <ScaffoldTopBar current={page} onChange={setPage} showStarter={showStarter} />
       <div className="pt-3 md:pt-5">
-        {page === "starter" && <StarterPage />}
+        {page === "starter" && showStarter && <StarterPage />}
         {page === "reference" && <ReferencePage />}
         {page === "showcase" && <ShowcasePage />}
       </div>

@@ -227,16 +227,18 @@ async def scaffold_status() -> dict[str, Any]:
 
     Returns:
         Dict with hasProductMd, isProductMdTemplate, hasBacklogMd,
-        isBacklogMdTemplate, inputFiles.
+        isBacklogMdTemplate, inputFiles, hasGeneratedAgent.
     """
     has_product, is_product_template = _spec_status(PRODUCT_MD_PATH)
     has_backlog, is_backlog_template = _spec_status(BACKLOG_MD_PATH)
+    has_generated_agent = any(not k.startswith("_") for k in AGENTS_MAP)
     return {
         "hasProductMd": has_product,
         "isProductMdTemplate": is_product_template,
         "hasBacklogMd": has_backlog,
         "isBacklogMdTemplate": is_backlog_template,
         "inputFiles": _input_files(),
+        "hasGeneratedAgent": has_generated_agent,
     }
 
 
