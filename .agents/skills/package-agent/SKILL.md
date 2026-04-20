@@ -4,14 +4,14 @@ Produce the deployable artifact for the Elio platform: a filled-in
 `manifest.md` + a zipped bundle of the consultant's delta on top of the
 scaffold.
 
-Invoked **after** `platform-integration-check` has passed.
+Invoked **after** `verify-generation` has closed green (which internally runs `platform-integration-check` as its gate 4).
 
 ---
 
 ## Prerequisites
 
-- `platform-integration-check` returned all ✅
-- `SUBMISSION.md` sections 4 and 6 are filled
+- `verify-generation` returned all five gates green
+- `SUBMISSION.md` sections 4 and 6 are filled (written by `platform-integration-check`)
 - `replit.md` has the agent's kebab id, models used, and feature flags
 
 ---

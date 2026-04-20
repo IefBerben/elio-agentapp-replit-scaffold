@@ -3,6 +3,13 @@
 Analyze the product and backlog inputs. Derive the full scope, data model, and API surface.
 Update `replit.md`. Get user confirmation before any code is written.
 
+> **Scope boundary.** `product-owner` owns *product* scope (`backlog.md` —
+> user stories, acceptance criteria, MoSCoW). This skill owns *technical*
+> scope (data model, step decomposition, API surface) derived from that
+> locked backlog. Invoked by the PO once scope is locked, chains into
+> `generate-api-contracts`. Never re-opens product scope — if the consultant
+> wants to change a story, route them back to the PO.
+
 ---
 
 ## Detect which input mode applies

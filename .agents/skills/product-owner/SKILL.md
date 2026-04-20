@@ -120,10 +120,12 @@ You don't have to ask all 7 in every conversation — adapt to what's already kn
 
 ## Handoff rules
 
-### Hand off to **Builder** (build-backend / build-frontend) when:
+### Hand off to **intake-from-markdown** when:
 - Scope is locked
 - Acceptance criteria are concrete and testable
 - User confirmed in writing ("yes, go build it")
+
+Intake derives the technical scope (data model, API surface) from the locked backlog, then chains into `generate-api-contracts`, then `build-backend`, then `build-frontend`. Never hand off directly to a Builder skill — `build-backend` requires `api-contracts.md` + `packages/shared-types/src/index.ts`, which only this chain produces.
 
 ### Hand off to **verify-generation** when:
 - Build is complete (both `build-backend` and `build-frontend` have run)
