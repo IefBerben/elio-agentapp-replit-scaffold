@@ -15,18 +15,23 @@ Build the React frontend for the agent app.
 
 ---
 
-## Story-by-story build mode
+## Build scope and the backlog ledger
 
-Same discipline as `build-backend`: **one US-N per invocation, not the whole UI.**
+Same discipline as `build-backend`. **Default mode: ship the frontend for every Must Have in one invocation**, ticking each `**Status:**` box as that story's UI + tests land. **Stop at the Must Have / Should Have boundary** — never build Should / Could without an explicit PO promotion.
+
+Single-story mode (`iterate US-N` / `only US-N`) is available when the consultant asks for it.
 
 Procedure:
 
-1. **Read `backlog.md`.** Find the US-N currently in flight (either `[ ] backend done — front pending` set by build-backend, or the first `[ ] not started` Must Have if you're running the full story).
-2. **Scope to that story only.** Don't pre-wire pages, stores, or i18n keys for stories that haven't started. Extend existing files when earlier stories already produced them.
-3. **Build through the file-creation order below**, limited to what US-N needs.
-4. **Run the contract suite and the frontend build+tests.** Both must be green.
-5. **Tick the box.** In `backlog.md`, change `**Status:**` to `[x] done — {short note}`. The tick IS the ledger — do not rely on git (scaffold is zipped, not repo-shared).
-6. **Stop.** Do NOT continue to US-(N+1). Emit the closing checklist (below) and wait for the consultant.
+1. **Read `backlog.md`.** Collect every US-N under `## Must Have` whose `**Status:**` line is still `[ ]` (not started, or backend-done-front-pending).
+2. **For each Must Have, in backlog order:**
+   a. Scope to that story only. Don't pre-wire pages, stores, or i18n keys for stories that haven't started.
+   b. Build through the file-creation order below, limited to what US-N needs. Earlier stories' files get extended rather than rewritten.
+   c. Run the contract suite and the frontend build + tests. All must be green before moving on.
+   d. **Tick the box as soon as that story is green.** Change `**Status:**` to `[x] done — {short note}`. The tick IS the ledger — do not rely on git (scaffold is zipped, not repo-shared).
+3. **Stop at the Must Have boundary.** Emit the closing checklist (below) and wait for the consultant to run `verify-generation` or promote a Should.
+
+If a story fails after the 3-strike repair loop, leave it `[ ] blocked — {reason}`, continue with the next independent Must Have, and flag the blocker in the closing report.
 
 ---
 

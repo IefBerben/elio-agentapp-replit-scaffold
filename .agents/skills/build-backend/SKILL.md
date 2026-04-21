@@ -15,18 +15,23 @@ Build the Python backend agent following the Elio platform conventions.
 
 ---
 
-## Story-by-story build mode
+## Build scope and the backlog ledger
 
-`backlog.md` is both the plan and the progress ledger. **Never build "the whole app" in one shot.** Each invocation of this skill builds **exactly one story** — the first `- [ ]` Must Have in `backlog.md`.
+`backlog.md` is both the plan and the progress ledger. **Default mode: build every unchecked Must Have in one invocation**, ticking each `**Status:**` box as that story's code + tests land. **Stop at the Must Have / Should Have boundary.** Never auto-promote Should or Could items — those require an explicit PO handoff.
+
+The consultant can also invoke this skill in **single-story mode** by saying `iterate US-N` or `only US-N` — in that case build just that story and stop.
 
 Procedure on every invocation:
 
-1. **Read `backlog.md`.** Find the first US-N under `## Must Have` whose `**Status:**` line is `[ ] not started`. If none, stop and tell the consultant all Must Haves are done — they can promote a Should / Could via the PO, or invoke `package-agent`.
-2. **Scope the work to that story only.** Don't create step functions, routes, or fields that belong to later stories. If this is the first story, you may create the shared infrastructure (`models.py` with just the fields US-01 needs, the first step function, its tests). Subsequent stories extend existing files.
-3. **Build through the file-creation order below**, but limit every file to what US-N requires.
-4. **Run the contract suite and the agent's own tests.** Both must be green.
-5. **Tick the box.** In `backlog.md`, change the story's `**Status:** [ ] not started` to `**Status:** [x] done — {short note}`. The tick IS the ledger — do not rely on git (the scaffold is transferred to consultants as a zip, not a repo).
-6. **Stop.** Do NOT continue to US-(N+1). Emit the closing checklist (below) and wait for the consultant to say `next story`, `iterate US-N`, or invoke `build-frontend` for the frontend half of US-N.
+1. **Read `backlog.md`.** Collect every US-N under `## Must Have` whose `**Status:**` line is `[ ] not started`. If none, stop and tell the consultant all Must Haves are done — they can promote a Should / Could via the PO, or invoke `package-agent`.
+2. **For each Must Have, in backlog order:**
+   a. Scope the work to that story only. Don't pull fields, routes, or step functions from later stories.
+   b. Build through the file-creation order below, limited to what this US-N requires. Earlier stories' files get extended rather than rewritten.
+   c. Run the contract suite and the agent's own tests. Both must be green before moving on.
+   d. **Tick the box.** Change `**Status:** [ ] not started` to `**Status:** [x] done — {short note}`. The tick IS the ledger — do not rely on git (the scaffold is transferred to consultants as a zip, not a repo). Tick **as soon as that story is green** — not at the end, so a partial run still leaves an honest ledger.
+3. **Stop at the Must Have boundary.** Do not touch Should / Could stories. Emit the closing checklist (below) and wait for the consultant to invoke `build-frontend`, promote a Should, or run `verify-generation`.
+
+If any story's tests fail and the 3-strike repair loop is exhausted, leave its box unticked with a `**Status:** [ ] blocked — {reason}` note, continue with the next Must Have that doesn't depend on it, and flag the blocker in the closing report.
 
 ---
 
