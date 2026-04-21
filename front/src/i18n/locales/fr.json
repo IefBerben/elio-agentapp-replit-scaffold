@@ -57,7 +57,7 @@
         "desc": "Issu de l'AgentApp Elio - Value Office. L'Agent PO s'appuie dessus pour itérer un backlog avec toi avant que l'Agent Builder ne construise l'app."
       },
       "valueOffice": {
-        "title": "Pas encore de product.md ?",
+        "title": "Pas encore de product.md et backlog.md ?",
         "desc": "Commence par l'AgentApp Elio - Value Office : elle t'aide à formaliser ton cas d'usage et produira un product.md & backlog.md prêt à être vibe-codé ici.",
         "cta": "Ouvrir l'AgentApp Elio - Value Office"
       }
