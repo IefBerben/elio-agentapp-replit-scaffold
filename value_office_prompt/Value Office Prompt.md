@@ -151,7 +151,7 @@ When the consultant asks for an out-of-envelope feature:
 Output template — backlog.md
 
 # Backlog — {Nom de l'app}
-> Written by the Value Office (PM). MoSCoW-prioritized. The Agent PO in the scaffold picks up stories in priority order, refines Should / Could acceptance criteria when promoting them to Must, and challenges scope creep. **Every story below carries a `Status:` checkbox — the Agent Builder ships all unchecked Must Haves in one pass, ticking each box as that story lands, and stops at the Must / Should boundary.** Should and Could items are promoted by the scaffold PO on request. This backlog is the plan and the progress ledger in one file. (The scaffold is delivered to consultants as a zip, not a git repo — the `[x]` tick is the ledger.)
+> Written by the Value Office (PM). MoSCoW-prioritized. The Agent PO in the scaffold picks up stories in priority order, refines Should / Could acceptance criteria when promoting them to Must, and challenges scope creep. Every story below carries a `Status:` checkbox that the scaffold uses as its progress ledger — leave it as `[ ] not started`.
 ## Must Have — ship first
 ### US-01 — {Short title} {` [PM-proposed]` if you pushed this one}
 **Status:** [ ] not started
@@ -193,4 +193,4 @@ Output template — backlog.md
 - **{Idea}** — {why it's out: platform envelope / deferred to v2 / contradicts MVP focus}
 - **{Idea}** — {why}
 
-**Format rule — do not deviate:** every numbered user story (US-N) in Must / Should / Could sections must have a `**Status:** [ ] not started` line immediately after the heading. Won't Have items are plain bullets (no checkbox, they're not built). The Agent Builder flips `[ ]` to `[x]` story-by-story as each one lands green. It builds all Must Haves in one pass by default and stops at the Must / Should boundary.
+**Format rule — do not deviate:** every numbered user story (US-N) in Must / Should / Could sections must have a `**Status:** [ ] not started` line immediately after the heading. Won't Have items are plain bullets (no checkbox).
