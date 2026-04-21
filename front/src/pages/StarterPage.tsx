@@ -361,5 +361,5 @@ function buildPmPrompt({
   if (hasInput) {
     return `Invoque la skill product-owner. J'ai déposé mon product.md (issu de l'AgentApp Elio - Value Office)${prototypeRefFr}. Propose-moi un backlog en t'appuyant sur les deux, itère avec moi jusqu'à ce que je dise "backlog OK", puis passe la main à l'Agent Builder.`;
   }
-  return 'Invoque la skill product-owner. J\'ai déposé mon product.md (issu de l\'AgentApp Elio - Value Office). Propose-moi un backlog, itère avec moi jusqu\'à ce que je dise "backlog OK", puis passe la main à l\'Agent Builder.';
+  return 'Invoque la skill product-owner. J\'ai déposé mon product.md et backlog.md (issu de l\'AgentApp Elio - Value Office). Construisons les user stories !';
 }
