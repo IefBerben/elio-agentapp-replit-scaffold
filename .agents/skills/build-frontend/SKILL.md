@@ -1,7 +1,8 @@
 # Skill: build-frontend
 
 Build the React frontend for the agent app.
-Read `.agents/docs/AGENT_APP_GUIDELINES_FRONT.md` and `.agents/docs/CONVENTIONS.md` before writing any code.
+
+**Your code must pass `back/tests/test_elio_contract.py`.** That file is the concrete rule source — read it before you write any TSX. It encodes every mechanical F-rule (no raw form controls, no store destructuring, `interface_language: i18n.language`, persist/partialize, no hardcoded strings, …) as real assertions. Prose guidelines (`.agents/docs/AGENT_APP_GUIDELINES_FRONT.md` and `CONVENTIONS.md`) give context; the test file gives the truth.
 
 ---
 
@@ -225,11 +226,97 @@ Add a case for the new page in the page switcher (follow the existing pattern).
 
 ---
 
+---
+
+## Banned patterns — learn from the last generation's mistakes
+
+Each of these has been caught in a real consultant app. They are blocked by `back/tests/test_elio_contract.py`; avoiding them up front saves a repair loop.
+
+### ❌ Raw HTML form controls (F5)
+```tsx
+<textarea value={notes} onChange={(e) => setNotes(e.target.value)} />
+<input type="text" />
+<select>…</select>
+```
+### ✅ Use components/agent-apps
+```tsx
+import { FormTextarea, FormInput, FormSelect } from "@/components/agent-apps";
+<FormTextarea value={notes} onChange={setNotes} disabled={isProcessing} />
+```
+
+### ❌ Store destructuring (F2)
+```tsx
+const { step, maxReachedStep, result, setStep, runStep1 } = useMyStore();
+```
+### ✅ Individual selectors + getState() for actions
+```tsx
+const step = useMyStore((s) => s.step);
+const maxReachedStep = useMyStore((s) => s.maxReachedStep);
+const result = useMyStore((s) => s.result);
+// ...
+const handleGenerate = () => useMyStore.getState().runStep1();
+```
+
+### ❌ Sending the output language as interface_language (F8)
+```ts
+executeAgentStreaming(AGENT_STEP_1, {
+  prompt,
+  interface_language: context.outputLanguage,  // wrong — that's the LLM output language
+});
+```
+### ✅ Always i18n.language
+```ts
+import i18n from "@/i18n";
+executeAgentStreaming(AGENT_STEP_1, {
+  prompt,
+  interface_language: i18n.language,
+});
+```
+
+### ❌ Hardcoded user-facing strings (F3)
+```tsx
+<button title="Supprimer cette section">…</button>
+<FormInput placeholder="Entrez votre prompt" />
+```
+### ✅ i18n everywhere
+```tsx
+<button title={t("myApp.removeSection")}>…</button>
+<FormInput placeholder={t("myApp.promptPlaceholder")} />
+```
+
+### ❌ Raw fetch() for SSE (F4)
+```ts
+const res = await fetch("/agents/my-app-step-1/stream", { method: "POST", ... });
+```
+### ✅ The shared helper
+```ts
+import { executeAgentStreaming } from "@/services/agentService";
+const { abort } = executeAgentStreaming(AGENT_STEP_1, payload, onMessage);
+```
+
+### ❌ Persisting transient state (F1)
+```ts
+partialize: (state) => ({ ...state }),  // persists isProcessing, error, etc.
+```
+### ✅ Allowlist the persistent fields only
+```ts
+partialize: (state) => ({
+  step: state.step,
+  maxReachedStep: state.maxReachedStep,
+  inputs: state.inputs,
+  result: state.result,
+  // NEVER: isProcessing, loadingAction, isCancelled, error
+}),
+```
+
+---
+
 ## After build
 
 Run tests:
 ```bash
 cd front && npm run test
+cd back && uv run pytest tests/test_elio_contract.py -v
 ```
 
 Visual smoke test (open Webview):
@@ -244,12 +331,22 @@ Visual smoke test (open Webview):
 
 Update `replit.md` — set Frontend status to ✅.
 
-Report to user:
+Report to user **with this exact checklist** — do not replace with prose. A missing tick is a visible omission, not a silent one:
+
 ```
 Frontend construit :
 - front/src/pages/{Name}AgentAppPage.tsx
 - front/src/stores/agent-apps/{name}Store.ts
 - i18n : [N] clés ajoutées (fr + en)
+
+Contrat Elio — cases cochées au moment de remettre la main :
+[ ] F1 — persist() + partialize en place, runtime state exclu (isProcessing, loadingAction, isCancelled, error)
+[ ] F2 — aucune déstructuration `const { … } = useXStore()`, que des sélecteurs individuels
+[ ] F3 — zéro string user-facing hardcodée (tout via t("..."))
+[ ] F4 — executeAgentStreaming utilisé, aucun fetch() brut
+[ ] F5 — aucun <input>/<textarea>/<select> brut, que des Form* de @/components/agent-apps
+[ ] F8 — interface_language: i18n.language (pas outputLanguage / context.*)
+[ ] F10 — _ReferencePage.tsx et _referenceStore.ts intouchés
 
 Je lance la vérification de génération ?
 ```
