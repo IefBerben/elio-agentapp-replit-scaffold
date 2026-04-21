@@ -37,6 +37,7 @@ SHARED_TYPES = REPO_ROOT / "packages" / "shared-types" / "src" / "index.ts"
 CONFIG_LLMS = BACK / "services" / "config_llms.json"
 MAIN_PY = BACK / "main.py"
 SUBMISSION = REPO_ROOT / "SUBMISSION.md"
+BACKLOG = REPO_ROOT / "backlog.md"
 
 PROTECTED_PAGES = {"_ReferencePage.tsx", "StarterPage.tsx", "ShowcasePage.tsx"}
 PROTECTED_STORES = {"_referenceStore.ts"}
@@ -474,6 +475,52 @@ def test_I2_shared_types_match_pydantic_models(agent_dirs):
                     if not re.search(rf"\b{field}\b\s*[?:]", iface_body):
                         violations.append(f"{SHARED_TYPES.relative_to(REPO_ROOT)} — interface {cls} missing field '{field}' present in {cls} pydantic model")
     assert not violations, "I2 violations:\n  " + "\n  ".join(violations)
+
+
+def test_P1_backlog_stories_have_status_checkbox():
+    """Every `### US-N — …` heading in backlog.md is followed by a **Status:** [ ]/[x] line."""
+    if not BACKLOG.is_file():
+        pytest.skip("backlog.md missing — nothing to check.")
+    text = _read(BACKLOG)
+    # Scan for `### US-...` story headings and check the next ~3 lines for a Status: checkbox.
+    heading_pattern = re.compile(r"^###\s+US-\d+[^\n]*$", re.MULTILINE)
+    status_pattern = re.compile(r"\*\*Status:\*\*\s*\[( |x)\]")
+    violations = []
+    lines = text.splitlines()
+    for match in heading_pattern.finditer(text):
+        heading_line_idx = text[: match.start()].count("\n")
+        # Look at heading + next 3 lines for a Status checkbox.
+        window = "\n".join(lines[heading_line_idx : heading_line_idx + 4])
+        if not status_pattern.search(window):
+            violations.append(f"backlog.md:{heading_line_idx + 1} — '{match.group(0)}' missing `**Status:** [ ]` line")
+    assert not violations, "P1 violations:\n  " + "\n  ".join(violations)
+
+
+def test_P2_ticked_stories_have_matching_commit():
+    """Every `**Status:** [x]` story in backlog.md has at least one `[US-N]` commit in git log."""
+    if not BACKLOG.is_file():
+        pytest.skip("backlog.md missing.")
+    import subprocess
+    try:
+        log = subprocess.check_output(
+            ["git", "log", "--oneline", "--no-decorate"],
+            cwd=REPO_ROOT, text=True, stderr=subprocess.DEVNULL,
+        )
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        pytest.skip("git not available or repo not initialized.")
+    text = _read(BACKLOG)
+    # Pair ### US-N headings with their Status line.
+    pairs = re.findall(
+        r"###\s+US-(\d+)[^\n]*\n(?:[^\n]*\n){0,3}?\*\*Status:\*\*\s*\[(x| )\]",
+        text,
+    )
+    violations = []
+    for us_num, state in pairs:
+        if state == "x":
+            marker = f"[US-{us_num}]"
+            if marker not in log:
+                violations.append(f"backlog.md — US-{us_num} is ticked [x] but no commit with {marker} prefix found in git log")
+    assert not violations, "P2 violations:\n  " + "\n  ".join(violations)
 
 
 def test_I3_submission_md_has_real_content():

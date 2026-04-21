@@ -11,6 +11,23 @@ Build the Python backend agent following the Elio platform conventions.
 - `.agents/docs/api-contracts.md` is approved
 - `packages/shared-types/src/index.ts` exists
 - `replit.md` "App being built" section is filled
+- `backlog.md` exists with at least one Must Have story carrying `**Status:** [ ] not started`
+
+---
+
+## Story-by-story build mode
+
+`backlog.md` is both the plan and the progress ledger. **Never build "the whole app" in one shot.** Each invocation of this skill builds **exactly one story** — the first `- [ ]` Must Have in `backlog.md`.
+
+Procedure on every invocation:
+
+1. **Read `backlog.md`.** Find the first US-N under `## Must Have` whose `**Status:**` line is `[ ] not started`. If none, stop and tell the consultant all Must Haves are done — they can promote a Should / Could via the PO, or invoke `package-agent`.
+2. **Scope the work to that story only.** Don't create step functions, routes, or fields that belong to later stories. If this is the first story, you may create the shared infrastructure (`models.py` with just the fields US-01 needs, the first step function, its tests). Subsequent stories extend existing files.
+3. **Build through the file-creation order below**, but limit every file to what US-N requires.
+4. **Run the contract suite and the agent's own tests.** Both must be green.
+5. **Tick the box.** In `backlog.md`, change the story's `**Status:** [ ] not started` to `**Status:** [x] done — {short note}`.
+6. **Commit with `[US-N]` prefix.** Example: `git commit -m "[US-01] backend: draft generation step + tests"`. Don't push; the consultant controls push cadence.
+7. **Stop.** Do NOT continue to US-(N+1). Emit the closing checklist (below) and wait for the consultant to say `next story`, `iterate US-N`, or invoke `build-frontend` for the frontend half of US-N.
 
 ---
 

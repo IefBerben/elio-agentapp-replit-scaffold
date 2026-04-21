@@ -8,9 +8,26 @@ Build the React frontend for the agent app.
 
 ## Prerequisites
 
-- `build-backend` completed and tests pass
+- `build-backend` has run for the same US-N this skill is building
 - `packages/shared-types/src/index.ts` exists
 - `.agents/docs/api-contracts.md` exists
+- `backlog.md` exists with at least one Must Have story carrying `**Status:** [ ] not started` OR a story currently marked `[ ] backend done — front pending`
+
+---
+
+## Story-by-story build mode
+
+Same discipline as `build-backend`: **one US-N per invocation, not the whole UI.**
+
+Procedure:
+
+1. **Read `backlog.md`.** Find the US-N currently in flight (either `[ ] backend done — front pending` set by build-backend, or the first `[ ] not started` Must Have if you're running the full story).
+2. **Scope to that story only.** Don't pre-wire pages, stores, or i18n keys for stories that haven't started. Extend existing files when earlier stories already produced them.
+3. **Build through the file-creation order below**, limited to what US-N needs.
+4. **Run the contract suite and the frontend build+tests.** Both must be green.
+5. **Tick the box.** In `backlog.md`, change `**Status:**` to `[x] done — {short note}`.
+6. **Commit with `[US-N]` prefix.** Example: `git commit -m "[US-01] frontend: draft input page + store + i18n"`.
+7. **Stop.** Do NOT continue to US-(N+1). Emit the closing checklist (below) and wait for the consultant.
 
 ---
 
