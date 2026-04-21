@@ -49,7 +49,7 @@
   },
   "starter": {
     "title": "Bienvenue sur ton scaffold Elio",
-    "description": "Dépose ton product.md pour lancer la spécification avec l'Agent PO, puis l'Agent Builder.",
+    "description": "Dépose ton product.md (et backlog.md si le Value Office t'en a produit un). L'Agent PO itère le backlog avec toi, puis l'Agent Builder construit les user stories une par une.",
     "cleanupHint": "Une fois ton app construite, demande à l'IA Replit : « Supprime la starter page » pour nettoyer.",
     "cards": {
       "product": {

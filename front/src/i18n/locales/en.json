@@ -49,7 +49,7 @@
   },
   "starter": {
     "title": "Welcome to your Elio scaffold",
-    "description": "Drop your product.md to kick off the specification with the Agent PO, then the Agent Builder.",
+    "description": "Drop your product.md (and backlog.md if the Value Office produced one). The Agent PO iterates the backlog with you, then the Agent Builder ships user stories one at a time.",
     "cleanupHint": "Once your app is built, ask the Replit AI: \"Remove the starter page\" to clean up.",
     "cards": {
       "product": {
