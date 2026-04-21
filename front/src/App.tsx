@@ -1,9 +1,8 @@
 import { Component, useState, useEffect } from "react";
 import type { ErrorInfo, ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { LayoutGrid, Sparkles, Home } from "lucide-react";
+import { LayoutGrid, Home } from "lucide-react";
 import { StarterPage } from "@/pages/StarterPage";
-import { ReferencePage } from "@/pages/_ReferencePage";
 import { ShowcasePage } from "@/pages/ShowcasePage";
 
 // ─── Error Boundary ──────────────────────────────────────────────────────────
@@ -57,11 +56,10 @@ class AppErrorBoundary extends Component<
 
 // ─── Top app bar (scaffold chrome — sits above each page's header) ───────────
 
-type Page = "starter" | "reference" | "showcase";
+type Page = "starter" | "showcase";
 
 function readPageFromHash(): Page {
   const h = window.location.hash;
-  if (h === "#reference") return "reference";
   if (h === "#showcase") return "showcase";
   return "starter";
 }
@@ -85,12 +83,6 @@ function ScaffoldTopBar({
       id: "starter",
       label: "Start",
       icon: <Home className="w-3.5 h-3.5" />,
-      activeColor: "bg-[#009de0] text-white",
-    },
-    {
-      id: "reference",
-      label: "Reference",
-      icon: <Sparkles className="w-3.5 h-3.5" />,
       activeColor: "bg-[#009de0] text-white",
     },
     {
@@ -156,7 +148,7 @@ export default function App() {
         if (cancelled) return;
         if (data.hasGeneratedAgent) {
           setShowStarter(false);
-          setPage((p) => (p === "starter" ? "reference" : p));
+          setPage((p) => (p === "starter" ? "showcase" : p));
         }
       } catch {
         /* starter route may be gone post-cleanup — ignore */
@@ -185,7 +177,6 @@ export default function App() {
       <ScaffoldTopBar current={page} onChange={setPage} showStarter={showStarter} />
       <div className="pt-3 md:pt-5">
         {page === "starter" && showStarter && <StarterPage />}
-        {page === "reference" && <ReferencePage />}
         {page === "showcase" && <ShowcasePage />}
       </div>
     </AppErrorBoundary>
