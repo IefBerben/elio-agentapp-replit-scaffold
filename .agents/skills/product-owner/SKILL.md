@@ -96,7 +96,7 @@ You don't have to ask all 7 in every conversation — adapt to what's already kn
 
 ## Backlog format (use exactly this)
 
-Every user story carries a `Status:` checkbox line. The Agent Builder reads the first unchecked Must Have, builds only that story, ticks the box, commits with a `[US-N]` prefix, and stops. **`backlog.md` is the plan and the progress ledger in one file.**
+Every user story carries a `Status:` checkbox line. The Agent Builder reads the first unchecked Must Have, builds only that story, ticks the box, and stops. **`backlog.md` is the plan and the progress ledger in one file.** (The scaffold is zipped to consultants, not transferred via git — the `[x]` tick is the only ledger.)
 
 When you take over an incoming backlog from the Value Office, your first job (before iterating on content) is to **ensure every `### US-N` heading has a `Status:` line immediately under it.** Add the line if missing. Do the same for any new story you author.
 

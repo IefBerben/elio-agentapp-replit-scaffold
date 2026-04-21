@@ -25,9 +25,8 @@ Procedure on every invocation:
 2. **Scope the work to that story only.** Don't create step functions, routes, or fields that belong to later stories. If this is the first story, you may create the shared infrastructure (`models.py` with just the fields US-01 needs, the first step function, its tests). Subsequent stories extend existing files.
 3. **Build through the file-creation order below**, but limit every file to what US-N requires.
 4. **Run the contract suite and the agent's own tests.** Both must be green.
-5. **Tick the box.** In `backlog.md`, change the story's `**Status:** [ ] not started` to `**Status:** [x] done — {short note}`.
-6. **Commit with `[US-N]` prefix.** Example: `git commit -m "[US-01] backend: draft generation step + tests"`. Don't push; the consultant controls push cadence.
-7. **Stop.** Do NOT continue to US-(N+1). Emit the closing checklist (below) and wait for the consultant to say `next story`, `iterate US-N`, or invoke `build-frontend` for the frontend half of US-N.
+5. **Tick the box.** In `backlog.md`, change the story's `**Status:** [ ] not started` to `**Status:** [x] done — {short note}`. The tick IS the ledger — do not rely on git (the scaffold is transferred to consultants as a zip, not a repo).
+6. **Stop.** Do NOT continue to US-(N+1). Emit the closing checklist (below) and wait for the consultant to say `next story`, `iterate US-N`, or invoke `build-frontend` for the frontend half of US-N.
 
 ---
 

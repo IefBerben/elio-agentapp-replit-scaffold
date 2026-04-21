@@ -496,33 +496,6 @@ def test_P1_backlog_stories_have_status_checkbox():
     assert not violations, "P1 violations:\n  " + "\n  ".join(violations)
 
 
-def test_P2_ticked_stories_have_matching_commit():
-    """Every `**Status:** [x]` story in backlog.md has at least one `[US-N]` commit in git log."""
-    if not BACKLOG.is_file():
-        pytest.skip("backlog.md missing.")
-    import subprocess
-    try:
-        log = subprocess.check_output(
-            ["git", "log", "--oneline", "--no-decorate"],
-            cwd=REPO_ROOT, text=True, stderr=subprocess.DEVNULL,
-        )
-    except (subprocess.CalledProcessError, FileNotFoundError):
-        pytest.skip("git not available or repo not initialized.")
-    text = _read(BACKLOG)
-    # Pair ### US-N headings with their Status line.
-    pairs = re.findall(
-        r"###\s+US-(\d+)[^\n]*\n(?:[^\n]*\n){0,3}?\*\*Status:\*\*\s*\[(x| )\]",
-        text,
-    )
-    violations = []
-    for us_num, state in pairs:
-        if state == "x":
-            marker = f"[US-{us_num}]"
-            if marker not in log:
-                violations.append(f"backlog.md — US-{us_num} is ticked [x] but no commit with {marker} prefix found in git log")
-    assert not violations, "P2 violations:\n  " + "\n  ".join(violations)
-
-
 def test_I3_submission_md_has_real_content():
     """SUBMISSION.md sections 1, 2, 3 contain no `_À compléter` placeholders."""
     if not _consultant_agent_dirs():

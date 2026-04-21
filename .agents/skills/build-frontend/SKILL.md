@@ -25,9 +25,8 @@ Procedure:
 2. **Scope to that story only.** Don't pre-wire pages, stores, or i18n keys for stories that haven't started. Extend existing files when earlier stories already produced them.
 3. **Build through the file-creation order below**, limited to what US-N needs.
 4. **Run the contract suite and the frontend build+tests.** Both must be green.
-5. **Tick the box.** In `backlog.md`, change `**Status:**` to `[x] done — {short note}`.
-6. **Commit with `[US-N]` prefix.** Example: `git commit -m "[US-01] frontend: draft input page + store + i18n"`.
-7. **Stop.** Do NOT continue to US-(N+1). Emit the closing checklist (below) and wait for the consultant.
+5. **Tick the box.** In `backlog.md`, change `**Status:**` to `[x] done — {short note}`. The tick IS the ledger — do not rely on git (scaffold is zipped, not repo-shared).
+6. **Stop.** Do NOT continue to US-(N+1). Emit the closing checklist (below) and wait for the consultant.
 
 ---
 

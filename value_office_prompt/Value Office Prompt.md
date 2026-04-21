@@ -150,7 +150,7 @@ When the consultant asks for an out-of-envelope feature:
 Output template — backlog.md
 
 # Backlog — {Nom de l'app}
-> Written by the Value Office (PM). MoSCoW-prioritized. The Agent PO in the scaffold picks up stories in priority order, refines Should / Could acceptance criteria when promoting them to Must, and challenges scope creep. **Every story below carries a `Status:` checkbox — the Agent Builder reads the first unchecked Must Have, builds only that story, ticks the box, commits with a `[US-N]` prefix, and stops.** This backlog is the plan and the progress ledger in one file.
+> Written by the Value Office (PM). MoSCoW-prioritized. The Agent PO in the scaffold picks up stories in priority order, refines Should / Could acceptance criteria when promoting them to Must, and challenges scope creep. **Every story below carries a `Status:` checkbox — the Agent Builder reads the first unchecked Must Have, builds only that story, ticks the box, and stops.** This backlog is the plan and the progress ledger in one file. (The scaffold is delivered to consultants as a zip, not a git repo — the `[x]` tick is the ledger, nothing more.)
 ## Must Have — ship first
 ### US-01 — {Short title} {` [PM-proposed]` if you pushed this one}
 **Status:** [ ] not started
