@@ -49,7 +49,7 @@
   },
   "starter": {
     "title": "Bienvenue sur ton scaffold Elio",
-    "description": "Dépose ton product.md (et backlog.md si le Value Office t'en a produit un). L'Agent PO itère le backlog avec toi, puis l'Agent Builder construit les user stories une par une.",
+    "description": "Dépose ton product.md et ton backlog.md (les deux artefacts du Value Office). L'Agent PO itère le backlog avec toi, puis l'Agent Builder construit les user stories une par une.",
     "cleanupHint": "Une fois ton app construite, demande à l'IA Replit : « Supprime la starter page » pour nettoyer.",
     "cards": {
       "product": {
@@ -67,7 +67,7 @@
       "productStepHint": "Le fichier généré par l'AgentApp Elio - Value Office. Il sera placé à la racine du projet.",
       "specDropHint": "product.md uniquement",
       "backlogStepTitle": "2. Dépose ton backlog.md",
-      "backlogStepHint": "Si l'AgentApp Elio - Value Office t'a aussi produit un backlog.md, dépose-le ici. Sinon laisse vide : l'Agent PO le construira avec toi à partir du product.md.",
+      "backlogStepHint": "Le second fichier produit par l'AgentApp Elio - Value Office. Contient les user stories MoSCoW avec leur Status checkbox — l'Agent Builder s'en sert pour construire une story à la fois.",
       "backlogDropHint": "backlog.md uniquement",
       "prototypeStepTitle": "3. Ajoute une maquette",
       "prototypeStepHint": "Une maquette Google AI Studio aide l'Agent PO à se caler sur le rendu visuel attendu. Laisser vide si tu n'en as pas.",

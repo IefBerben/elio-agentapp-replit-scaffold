@@ -272,13 +272,10 @@ export function StarterPage() {
               />
             </div>
 
-            {/* optional backlog.md upload — present when Value Office produced one */}
+            {/* backlog.md upload — the second artifact from the Value Office */}
             <div className="pt-4 border-t border-border">
               <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider mb-2 flex items-center gap-2">
                 {t("starter.upload.backlogStepTitle")}
-                <span className="text-[10px] font-normal normal-case text-muted-foreground">
-                  ({t("starter.upload.optional")})
-                </span>
               </h4>
               <p className="text-xs text-muted-foreground mb-2">
                 {t("starter.upload.backlogStepHint")}
