@@ -28,6 +28,9 @@ GSD/
 .claude/
 .cursor/
 
+# Local scaffold testing — generated apps used to exercise the contract suite
+test/
+
 # Input specs (only Input/README.md is tracked)
 Input/AI Studio/
 Input/JIRA/
