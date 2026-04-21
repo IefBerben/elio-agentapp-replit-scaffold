@@ -4,6 +4,16 @@ Validate the built app against all Elio platform requirements.
 Fix every violation before reporting the app as ready.
 Update SUBMISSION.md when all checks pass.
 
+> **Run the contract test suite first.** `back/tests/test_elio_contract.py`
+> encodes ~18 of the 23 rules as real pytest assertions (all the
+> mechanical ones — import banlists, decorator presence, regex
+> anti-patterns, shared-types field parity, placeholders in
+> SUBMISSION.md, etc.). This skill owns only the rules that genuinely
+> need LLM judgment: B3 SSE payload shape, B9 docstring completeness,
+> F6 dark-mode pairs, F7 disabled={isProcessing}, F9 editable results.
+> Invoke the suite with `cd back && uv run pytest tests/test_elio_contract.py -v`
+> and fix every red line before this skill is worth running.
+
 ---
 
 ## Prerequisites

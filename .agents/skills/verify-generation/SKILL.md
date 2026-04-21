@@ -72,11 +72,23 @@ On failure: add the missing import + registration. No retry loop — this is a o
 
 ### Gate 4 — Platform conformity
 
-Invoke the `platform-integration-check` skill. It runs the 23 B/F/I rules.
+Two sub-gates, in order. The first is mechanical and cheap; only run the second if the first is green.
 
-Pass criteria: all 23 checks are ✅.
+**4a — Contract test suite (machine-graded):**
 
-On failure: fix per the skill's own retry policy (max 2 attempts per rule). If a rule still fails, carry it into the final report as a red line.
+```bash
+cd back && uv run pytest tests/test_elio_contract.py -v
+```
+
+This encodes ~18 of the 23 B/F/I rules as real pytest assertions (the mechanically checkable ones — import banlists, AST decorator presence, file existence, regex-based anti-patterns, shared-types field parity, etc.). Failures cite file:line and the exact rule ID (e.g. `B7 violations: back/agents/my-app/step1.py:120 — hardcoded UI string "Terminé !"; move to prompt_fr/en.py`). Feed failures back to the Builder for repair, max 3 attempts per failing test.
+
+**4b — LLM-judged rules (platform-integration-check skill):**
+
+Invoke the `platform-integration-check` skill. It covers the remaining rules that need judgment: B3 (SSE payload shape across all yields), B9 (docstring completeness), F6 (dark-mode color pairs), F7 (disabled={isProcessing} on every control), F9 (intermediate results are editable). The skill also owns `SUBMISSION.md` sections 4 and 6.
+
+Pass criteria: 4a exits 0 AND 4b reports all 23 checks ✅.
+
+On failure in 4b: fix per the skill's own retry policy (max 2 attempts per rule). Remaining red lines propagate to the final report.
 
 ### Gate 5 — SSE smoke
 
