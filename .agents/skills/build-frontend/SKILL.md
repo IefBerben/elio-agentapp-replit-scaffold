@@ -12,7 +12,7 @@ Build the React frontend for the agent app.
 - `build-backend` has run for the same US-N this skill is building
 - `packages/shared-types/src/index.ts` exists
 - `.agents/docs/api-contracts.md` exists
-- `backlog.md` exists with at least one Must Have story carrying `**Status:** [ ] not started` OR a story currently marked `[ ] backend done — front pending`
+- `backlog.md` exists with at least one Must Have story carrying `**Status:** [ ] not started`
 
 ---
 

@@ -34,11 +34,12 @@ If they don't, **stop** — the scaffold would land on the Reference page, which
 ## Code to edit
 
 ### `back/main.py`
-1. Remove the four starter routes:
+1. Remove the five starter routes:
    - `GET /agent-apps/scaffold-status`
    - `POST /agent-apps/upload-spec`
    - `POST /agent-apps/upload-prototype`
-2. Remove the helpers `_product_md_status`, `_input_files`, the constants `_ALLOWED_SPEC_NAMES`, `_ALLOWED_PROTOTYPE_SUFFIXES`, and the related path constants `PRODUCT_MD_PATH`, `INPUT_DIR`. Note: keep `REPO_ROOT` if any production agent code relies on it.
+   - `POST /agent-apps/save-spec-text`
+2. Remove the helpers `_spec_status`, `_validate_spec_content`, `_input_files`, the model `SaveSpecTextRequest`, the constants `_ALLOWED_SPEC_NAMES`, `_ALLOWED_PROTOTYPE_SUFFIXES`, `_PRODUCT_REQUIRED_SECTIONS`, `_BACKLOG_REQUIRED_SECTIONS`, the startup helper `_check_spec_files`, and the path constants `PRODUCT_MD_PATH`, `BACKLOG_MD_PATH`, `INPUT_DIR`. Note: keep `REPO_ROOT` if any production agent code relies on it.
 
 ### `front/src/App.tsx`
 1. Remove the import: `import { StarterPage } from "@/pages/StarterPage";`

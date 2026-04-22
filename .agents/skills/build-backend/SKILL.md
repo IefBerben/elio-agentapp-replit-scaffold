@@ -211,7 +211,7 @@ async def {name}_step_1_stream(
 
     yield {
         "step": "completed",
-        "message": "Terminé !" if (interface_language or "fr") == "fr" else "Done!",
+        "message": prompts.MSG_COMPLETED,
         "status": "completed",
         "progress": 100,
         "result": result_data,

@@ -42,6 +42,7 @@ interface ScaffoldStatus {
   isBacklogMdTemplate: boolean;
   backlogMdIssues: string[];
   inputFiles: string[];
+  hasGeneratedAgent: boolean;
 }
 
 function useScaffoldStatus(): {

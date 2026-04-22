@@ -385,6 +385,9 @@ async def save_spec_text(body: SaveSpecTextRequest) -> dict[str, Any]:
     dest.write_text(body.content, encoding="utf-8")
     logger.info(f"Spec saved via paste: {dest} ({len(body.content)} chars)")
     return {"file": name, "size": dest.stat().st_size, "status": await scaffold_status()}
+
+
+@app.post("/agent-apps/upload-prototype")
 async def upload_prototype(files: list[UploadFile]) -> dict[str, Any]:
     """Save a Google AI Studio export to Input/.
 

@@ -201,7 +201,9 @@ Read these docs before writing any code. They are the integration standard.
 2. `.agents/skills/generate-api-contracts/SKILL.md` — write API contracts before coding
 3. `.agents/skills/build-backend/SKILL.md` — build the Python backend
 4. `.agents/skills/build-frontend/SKILL.md` — build the React frontend
-5. `.agents/skills/platform-integration-check/SKILL.md` — validate and update SUBMISSION.md
+5. `.agents/skills/verify-generation/SKILL.md` — run all five quality gates before sign-off
+6. `.agents/skills/platform-integration-check/SKILL.md` — validate and update SUBMISSION.md
+7. `.agents/skills/package-agent/SKILL.md` — produce the final deliverable zip
 
 ### Cleanup skills — invoke when the consultant explicitly asks
 

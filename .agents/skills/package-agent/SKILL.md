@@ -76,6 +76,8 @@ Prochaines étapes :
 2. Envoie le zip + le lien du Repl à l'équipe Elio (elio@groupeonepoint.com)
 ```
 
+**Update `replit.md` Build Checkpoints:** set row #7 (`package-agent`) to ✅ and fill the Date column with today's date.
+
 ---
 
 ## Notes for the tech team reviewing this proposal

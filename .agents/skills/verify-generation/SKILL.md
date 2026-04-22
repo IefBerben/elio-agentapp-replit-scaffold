@@ -96,7 +96,7 @@ For each new agent in `AGENTS_MAP` (keys not starting with `_`):
    cd back && uv run uvicorn main:app --port 8001 &
    ```
    Wait up to 10 seconds for `http://localhost:8001/` to respond, then use it.
-3. POST a minimal payload to `/agents/{agent_id}/stream` with:
+3. POST a minimal payload to `/agent-apps/execute/{agent_id}/stream` with:
    ```json
    {"username": "verify", "prompt": "smoke test", "interface_language": "fr"}
    ```
