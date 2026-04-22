@@ -259,6 +259,9 @@ function PastePanel({
 
 function SpecIssues({ issues, exists }: { issues: string[]; exists: boolean }) {
   const { t } = useTranslation();
+  // Filter out the placeholder issue — it's implied by the empty upload zone,
+  // not useful to show explicitly. Only surface structural issues.
+  const displayIssues = issues.filter((i) => !i.startsWith("contains unfilled"));
   if (!exists) return null;
   if (issues.length === 0) {
     return (
@@ -268,13 +271,18 @@ function SpecIssues({ issues, exists }: { issues: string[]; exists: boolean }) {
       </p>
     );
   }
+  if (displayIssues.length === 0) {
+    // Only the placeholder issue remains — file is still the default template.
+    // The upload/paste zone is already the prompt to act; no error needed.
+    return null;
+  }
   return (
     <div className="mt-1 space-y-0.5">
       <p className="text-xs font-medium text-amber-600 dark:text-amber-400">
         {t("starter.upload.specIssuesLabel")}
       </p>
       <ul className="list-disc list-inside space-y-0.5">
-        {issues.map((issue) => (
+        {displayIssues.map((issue) => (
           <li key={issue} className="text-xs text-amber-600 dark:text-amber-400">
             {issue}
           </li>
