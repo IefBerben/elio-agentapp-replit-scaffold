@@ -218,7 +218,6 @@ _PRODUCT_REQUIRED_SECTIONS = [
 _BACKLOG_REQUIRED_SECTIONS = [
     "## Must Have",
     "### US-",
-    "**Status:** [ ]",
     "Acceptance criteria:",
     "## Won't Have",
 ]
