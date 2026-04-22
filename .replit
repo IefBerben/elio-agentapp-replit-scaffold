@@ -44,6 +44,22 @@ author = "agent"
 task = "shell.exec"
 args = "bash scripts/package.sh"
 
+[[workflows.workflow]]
+name = "Test Backend"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd back && uv run pytest -v"
+
+[[workflows.workflow]]
+name = "Check Contract"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd back && uv run pytest back/tests/test_elio_contract.py -v"
+
 [[ports]]
 localPort = 5173
 externalPort = 80

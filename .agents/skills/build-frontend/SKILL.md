@@ -8,6 +8,7 @@ Build the React frontend for the agent app.
 
 ## Prerequisites
 
+- `replit.md` Build Checkpoints row #3 (`build-backend`) is ✅ — if ⬜, stop and tell the consultant to run `build-backend` first
 - `build-backend` has run for the same US-N this skill is building
 - `packages/shared-types/src/index.ts` exists
 - `.agents/docs/api-contracts.md` exists
@@ -334,11 +335,9 @@ partialize: (state) => ({
 
 ## After build
 
-Run tests:
-```bash
-cd front && npm run test
-cd back && uv run pytest tests/test_elio_contract.py -v
-```
+Run tests using the Replit workflow panel:
+- **Check Contract** workflow — must be green before reporting done
+- `cd front && npm run test` — vitest suite
 
 Visual smoke test (open Webview):
 - [ ] Page loads without errors
@@ -350,7 +349,7 @@ Visual smoke test (open Webview):
 - [ ] Reset clears everything
 - [ ] Dark mode: toggle and check all colors
 
-Update `replit.md` — set Frontend status to ✅.
+Update `replit.md` — set Build Checkpoint row #4 (`build-frontend`) to ✅ with today's date.
 
 Report to user **with this exact checklist** — do not replace with prose. A missing tick is a visible omission, not a silent one:
 

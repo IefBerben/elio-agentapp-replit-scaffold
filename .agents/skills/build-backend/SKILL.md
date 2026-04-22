@@ -8,6 +8,7 @@ Build the Python backend agent following the Elio platform conventions.
 
 ## Prerequisites
 
+- `replit.md` Build Checkpoints row #2 (`generate-api-contracts`) is ✅ — if ⬜, stop and tell the consultant to run `generate-api-contracts` first
 - `.agents/docs/api-contracts.md` is approved
 - `packages/shared-types/src/index.ts` exists
 - `replit.md` "App being built" section is filled
@@ -342,15 +343,13 @@ async def my_step_1_stream(
 
 ## After build
 
-Run tests:
-```bash
-cd back && uv run pytest agents/{name}/tests/ -v
-cd back && uv run pytest tests/test_elio_contract.py -v
-```
+Run tests using the Replit workflow panel:
+- **Test Backend** workflow — runs the full pytest suite
+- **Check Contract** workflow — runs only the 23-rule contract test
 
-If any test fails: fix it before reporting done. Apply fix-retry cap: max 2 attempts per failure, then escalate.
+Both must be green. If a test fails: fix it before reporting done. Apply fix-retry cap: max 2 attempts per failure, then escalate.
 
-Update `replit.md` — set Backend status to ✅.
+Update `replit.md` — set Build Checkpoint row #3 (`build-backend`) to ✅ with today's date.
 
 Report to user **with this exact checklist** — do not replace with prose. A missing tick is a visible omission, not a silent one:
 

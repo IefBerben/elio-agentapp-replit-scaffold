@@ -7,6 +7,7 @@ This is the single source of truth that both build skills will follow.
 
 ## Prerequisites
 
+- `replit.md` Build Checkpoints row #1 (`intake-from-markdown`) is ✅ — if ⬜, stop and tell the consultant to run `intake-from-markdown` first
 - `intake-from-markdown` has been confirmed by the user
 - `replit.md` "App being built" section is filled in
 
@@ -117,7 +118,7 @@ Rules:
 
 ## Step 3 — Update `replit.md`
 
-Set "API contracts" status to ✅ in the build progress table.
+Set Build Checkpoints row #2 (`generate-api-contracts`) to ✅ and fill the Date column.
 Fill the "API surface" field in "App being built".
 
 ---

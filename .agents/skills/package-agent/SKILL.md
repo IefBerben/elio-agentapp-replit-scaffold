@@ -10,6 +10,7 @@ Invoked **after** `verify-generation` has closed green (which internally runs `p
 
 ## Prerequisites
 
+- `replit.md` Build Checkpoints rows #5 (`verify-generation`) and #6 (`platform-integration-check`) are both ✅ — if either is ⬜, stop and tell the consultant to run that skill first
 - `verify-generation` returned all five gates green
 - `SUBMISSION.md` sections 4 and 6 are filled (written by `platform-integration-check`)
 - `replit.md` has the agent's kebab id, models used, and feature flags
@@ -45,9 +46,7 @@ placeholders in `package_includes` to concrete paths before packaging.
 
 ## Step 2 — Run the package script
 
-```bash
-bash scripts/package.sh
-```
+Use the **Package** Replit workflow (workflow panel), or run `bash scripts/package.sh`.
 
 The script:
 1. Parses `manifest.md` YAML front-matter

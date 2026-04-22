@@ -33,9 +33,7 @@ Run in this exact order. A failing gate blocks the rest.
 
 ### Gate 1 — Backend tests
 
-```bash
-cd back && uv run pytest -v
-```
+Use the **Test Backend** Replit workflow (workflow panel), or run `cd back && uv run pytest -v`.
 
 Pass criteria: every test passes and the new agent's `tests/` folder has at least 5 tests (B6 of the coding contract).
 
@@ -76,9 +74,7 @@ Two sub-gates, in order. The first is mechanical and cheap; only run the second 
 
 **4a — Contract test suite (machine-graded):**
 
-```bash
-cd back && uv run pytest tests/test_elio_contract.py -v
-```
+Use the **Check Contract** Replit workflow (workflow panel), or run `cd back && uv run pytest tests/test_elio_contract.py -v`.
 
 This encodes ~18 of the 23 B/F/I rules as real pytest assertions (the mechanically checkable ones — import banlists, AST decorator presence, file existence, regex-based anti-patterns, shared-types field parity, etc.). Failures cite file:line and the exact rule ID (e.g. `B7 violations: back/agents/my-app/step1.py:120 — hardcoded UI string "Terminé !"; move to prompt_fr/en.py`). Feed failures back to the Builder for repair, max 3 attempts per failing test.
 
@@ -124,6 +120,8 @@ On failure: read the backend logs, fix the crash (missing import, wrong field, b
 ---
 
 ## Final report
+
+When all five gates are green, update `replit.md` Build Checkpoint row #5 (`verify-generation`) to ✅ with today's date before reporting to the consultant.
 
 Template:
 

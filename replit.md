@@ -108,16 +108,20 @@ Status: not yet generated
 
 ---
 
-## Build progress
+## Build Checkpoints
 
-*Agent updates this table after each skill completes.*
+> Each skill writes its row when done. The next skill reads its prerequisite row — a ⬜ blocks it from starting.
+> Use the **Test Backend** and **Check Contract** Replit workflows (workflow panel) for gate runs.
 
-| Feature | Skill | Status |
-|---------|-------|--------|
-| API contracts | generate-api-contracts | ⬜ pending |
-| Backend | build-backend | ⬜ pending |
-| Frontend | build-frontend | ⬜ pending |
-| Platform check | platform-integration-check | ⬜ pending |
+| # | Skill | Artifact produced | Status | Date |
+|---|-------|-------------------|--------|------|
+| 1 | intake-from-markdown | `replit.md` "App being built" filled, `product.md` + `backlog.md` confirmed | ⬜ pending | — |
+| 2 | generate-api-contracts | `.agents/docs/api-contracts.md` + `packages/shared-types/src/index.ts` | ⬜ pending | — |
+| 3 | build-backend | `back/agents/{name}/` + **Test Backend** ✅ | ⬜ pending | — |
+| 4 | build-frontend | `front/src/pages/` + `front/src/stores/` + i18n keys | ⬜ pending | — |
+| 5 | verify-generation | All 5 gates green (**Test Backend** + **Check Contract** + wiring + smoke) | ⬜ pending | — |
+| 6 | platform-integration-check | `SUBMISSION.md` sections 4+6 filled, **Check Contract** ✅ | ⬜ pending | — |
+| 7 | package-agent | `dist/{agent_id}-{version}.zip` ready | ⬜ pending | — |
 
 ---
 

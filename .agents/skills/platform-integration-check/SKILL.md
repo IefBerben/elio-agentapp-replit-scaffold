@@ -11,8 +11,9 @@ Update SUBMISSION.md when all checks pass.
 > SUBMISSION.md, etc.). This skill owns only the rules that genuinely
 > need LLM judgment: B3 SSE payload shape, B9 docstring completeness,
 > F6 dark-mode pairs, F7 disabled={isProcessing}, F9 editable results.
-> Invoke the suite with `cd back && uv run pytest tests/test_elio_contract.py -v`
-> and fix every red line before this skill is worth running.
+> Use the **Check Contract** Replit workflow (workflow panel), or run
+> `cd back && uv run pytest tests/test_elio_contract.py -v`.
+> Fix every red line before this skill is worth running.
 
 ---
 
@@ -79,7 +80,7 @@ Fill in:
 - **Section 4** (acceptance criteria) — from `backlog.md` acceptance criteria
 - **Section 6** (conformity table) — the B1–B10, F1–F10, I1–I3 results
 
-Update `replit.md` — set platform-integration-check status to ✅.
+Update `replit.md` — set Build Checkpoint row #6 (`platform-integration-check`) to ✅ with today's date.
 
 ---
 
