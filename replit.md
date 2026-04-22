@@ -91,12 +91,18 @@ A working consulting assistant demonstrating all platform patterns:
 
 **Use case:** —
 **Actors:** —
+**User context:** —
 **Core workflow:** —
 **Steps:** —
+**Output format:** —
+**Constraints:** —
+**Success criteria:** —
 **API surface:** —
 **File upload:** —
 **Document generation:** —
 **Bilingual:** —
+**Risks:** —
+**Assumptions:** —
 
 ---
 

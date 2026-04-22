@@ -348,18 +348,18 @@ function buildPmPrompt({
 
   if (lang === "en") {
     if (hasBacklog) {
-      return `Invoke the product-owner skill. I dropped my product.md and backlog.md (both from the AgentApp Elio - Value Office)${prototypeRef}. Read them, confirm the scope with me in one short summary, then hand off to the Agent Builder.`;
+      return `Invoke the product-owner skill. I have product.md and backlog.md (from AgentApp Elio - Value Office)${prototypeRef}. Review the user stories with me, confirm the backlog is correct, then invoke intake-from-markdown.`;
     }
     if (hasInput) {
-      return `Invoke the product-owner skill. I dropped my product.md (from the AgentApp Elio - Value Office)${prototypeRef}. Propose a backlog using both, iterate with me until I say it's OK, then hand off to the Agent Builder.`;
+      return `Invoke the product-owner skill. I have product.md (from AgentApp Elio - Value Office)${prototypeRef}. Propose a backlog using both, iterate with me until I say it's OK, then invoke intake-from-markdown.`;
     }
-    return "Invoke the product-owner skill. I dropped my product.md (from the AgentApp Elio - Value Office). Propose a backlog, iterate with me until I say it's OK, then hand off to the Agent Builder.";
+    return "Invoke the product-owner skill. I have product.md (from AgentApp Elio - Value Office). Propose a backlog, iterate with me until I say it's OK, then invoke intake-from-markdown.";
   }
   if (hasBacklog) {
-    return `Invoque la skill product-owner. J'ai déposé mon product.md et mon backlog.md (tous deux issus de l'AgentApp Elio - Value Office)${prototypeRefFr}. Lis-les, confirme le périmètre avec moi en une courte synthèse, puis passe la main à l'Agent Builder.`;
+    return `Invoque la skill product-owner. J'ai product.md et backlog.md (tous deux issus de l'AgentApp Elio - Value Office)${prototypeRefFr}. Relis les US avec moi, confirme que le backlog est correct, puis invoque intake-from-markdown.`;
   }
   if (hasInput) {
-    return `Invoque la skill product-owner. J'ai déposé mon product.md (issu de l'AgentApp Elio - Value Office)${prototypeRefFr}. Propose-moi un backlog en t'appuyant sur les deux, itère avec moi jusqu'à ce que je dise "backlog OK", puis passe la main à l'Agent Builder.`;
+    return `Invoque la skill product-owner. J'ai product.md (issu de l'AgentApp Elio - Value Office)${prototypeRefFr}. Propose-moi un backlog en t'appuyant sur les deux, itère avec moi jusqu'à "backlog OK", puis invoque intake-from-markdown.`;
   }
-  return 'Invoque la skill product-owner. J\'ai déposé mon product.md et backlog.md (issu de l\'AgentApp Elio - Value Office). Construisons les user stories !';
+  return 'Invoque la skill product-owner. J\'ai product.md (issu de l\'AgentApp Elio - Value Office). Propose-moi un backlog, itère jusqu\'à "backlog OK", puis invoque intake-from-markdown.';
 }

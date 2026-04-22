@@ -42,12 +42,17 @@ Read both files. Extract:
 use_case_name:    (kebab-case identifier for folder + route naming)
 display_name:     (human-readable name)
 actors:           (list of user types)
+user_context:     (when/why they use the app — from product.md Users section)
+user_frequency:   (how often — from product.md Users section)
 core_workflow:    (numbered steps from user's perspective)
 steps:            (list of backend steps with input/output per step)
 data_model:
   per step:
     inputs:  [field_name: type, ...]
     outputs: [field_name: type, ...]
+output_format:    (what the result looks like: cards, list, downloadable file, etc.)
+constraints:      (language, data sensitivity, integrations, performance — from product.md)
+success_criteria: (measurable criteria — from product.md)
 bilingual:        yes/no
 file_upload:      yes/no
 document_generation: yes/no
@@ -76,16 +81,21 @@ assumptions:      (list)
 Voici ce que j'ai compris :
 
 App : [display_name]
-Acteurs : [actors]
+Acteurs : [actors] — [user_context], [user_frequency]
 Workflow :
   1. [step 1]
   2. [step 2]
 Étapes agent : [N step(s)]
   Step 1 — inputs: [...] → outputs: [...]
   Step 2 — inputs: [...] → outputs: [...] (if applicable)
+Format de sortie : [output_format]
+Contraintes : [constraints]
+Critères de succès : [success_criteria]
 Upload de fichiers : oui/non
 Génération de documents : oui/non
 Bilingue : oui/non
+Risques : [risks]
+Hypothèses : [assumptions]
 
 C'est correct ? Je génère les contrats API et je commence à coder.
 ```

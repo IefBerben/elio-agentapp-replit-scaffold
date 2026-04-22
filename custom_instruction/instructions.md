@@ -5,6 +5,16 @@ These rules are non-negotiable. Read `.agents/docs/` before writing any code.
 
 ---
 
+## Session start — read before anything else
+
+At the start of every session:
+1. Read `replit.md` — project memory and build state
+2. If `product.md` exists and is not a template (no `_À compléter` markers, content > 200 chars), **read it in full** — it contains the user personas, constraints, success criteria, and output format that should inform every build decision, prompt, and component you write
+
+Never act on a consultant request without first knowing the app's purpose, actors, and constraints from these two files.
+
+---
+
 ## Tech stack
 
 - **Backend:** Python 3.12 · FastAPI · LangChain · uv (`back/`)
