@@ -81,6 +81,43 @@ async def _check_required_secrets() -> None:
         logger.info("✓ Azure OpenAI secrets detected — agents are ready to call the LLM.")
 
 
+@app.on_event("startup")
+async def _check_spec_files() -> None:
+    """Warn when product.md or backlog.md are missing or still templates.
+
+    The entire build workflow depends on these two files. Without them the
+    Replit Agent has nothing to work from and will produce generic code.
+    This banner surfaces the problem at boot rather than mid-build.
+    """
+    bar = "─" * 70
+    _repo_root = Path(__file__).parent.parent
+    issues = []
+    for name, path in [
+        ("product.md", _repo_root / "product.md"),
+        ("backlog.md", _repo_root / "backlog.md"),
+    ]:
+        if not path.is_file():
+            issues.append(f"{name} — not found")
+        else:
+            try:
+                text = path.read_text(encoding="utf-8")
+                if "_À compléter" in text or len(text.strip()) < 200:
+                    issues.append(f"{name} — still a template (unfilled)")
+            except OSError:
+                issues.append(f"{name} — unreadable")
+    if issues:
+        logger.warning(
+            "\n%s\n⚠️  Spec files missing or unfilled:\n"
+            "    %s\n"
+            "    Open the app in the browser and upload both files via the Starter page,\n"
+            "    or paste your product.md / backlog.md content directly into these files.\n"
+            "    The Agent Builder cannot produce a correct app without them.\n%s",
+            bar, "\n    ".join(issues), bar,
+        )
+    else:
+        logger.info("✓ product.md and backlog.md detected — specs are ready.")
+
+
 SCAFFOLD_VERSION_URL = (
     "https://raw.githubusercontent.com/IefBerben/elio-agentapp-replit-scaffold/main/SCAFFOLD_VERSION"
 )
