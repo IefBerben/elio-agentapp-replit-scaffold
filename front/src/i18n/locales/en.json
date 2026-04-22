@@ -81,7 +81,8 @@
       "pasteSaving": "Saving...",
       "pasteSaved": "Saved!",
       "specIssuesLabel": "Issues found:",
-      "specValid": "Structure valid"
+      "specValid": "Structure valid",
+      "thenStepNoProduct": "Drop your product.md first (step 1) to receive the prompt to paste into the Replit chat."
     }
   }
 }

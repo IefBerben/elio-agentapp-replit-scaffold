@@ -295,6 +295,7 @@ export function StarterPage() {
 
   const prompt = buildPmPrompt({
     lang,
+    hasProduct,
     hasBacklog,
     hasInput,
     inputFile: status?.inputFiles[0],
@@ -438,7 +439,13 @@ export function StarterPage() {
               <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider">
                 {t("starter.upload.thenStep")}
               </h4>
-              <CoachPanel prompt={prompt} language={lang} />
+              {prompt !== null ? (
+                <CoachPanel prompt={prompt} language={lang} />
+              ) : (
+                <p className="mt-2 text-xs text-muted-foreground">
+                  {t("starter.upload.thenStepNoProduct")}
+                </p>
+              )}
             </div>
           </div>
 
@@ -453,15 +460,19 @@ export function StarterPage() {
 
 function buildPmPrompt({
   lang,
+  hasProduct,
   hasBacklog,
   hasInput,
   inputFile,
 }: {
   lang: string;
+  hasProduct: boolean;
   hasBacklog: boolean;
   hasInput: boolean;
   inputFile: string | undefined;
-}): string {
+}): string | null {
+  if (!hasProduct) return null;
+
   const prototypeRef = inputFile ? ` + a Google AI Studio prototype in Input/${inputFile}` : "";
   const prototypeRefFr = inputFile ? ` + une maquette Google AI Studio dans Input/${inputFile}` : "";
 

@@ -81,7 +81,8 @@
       "pasteSaving": "Enregistrement...",
       "pasteSaved": "Enregistré !",
       "specIssuesLabel": "Problèmes détectés :",
-      "specValid": "Structure valide"
+      "specValid": "Structure valide",
+      "thenStepNoProduct": "Dépose d'abord ton product.md (étape 1) pour recevoir le prompt à coller dans le chat Replit."
     }
   }
 }
