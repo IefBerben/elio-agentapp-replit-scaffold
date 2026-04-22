@@ -73,7 +73,13 @@
       "prototypeStepHint": "Une maquette Google AI Studio aide l'Agent PO à se caler sur le rendu visuel attendu. Laisser vide si tu n'en as pas.",
       "prototypeDropHint": ".tsx · .jsx · .ts · .js · .zip · .json",
       "optional": "optionnel",
-      "thenStep": "4. Valide avec le PO et lance le build"
+      "thenStep": "4. Valide avec le PO et lance le build",
+      "pasteOr": "ou colle le contenu directement",
+      "productPastePlaceholder": "Colle ici le contenu de ton product.md...",
+      "backlogPastePlaceholder": "Colle ici le contenu de ton backlog.md...",
+      "pasteSave": "Enregistrer",
+      "pasteSaving": "Enregistrement...",
+      "pasteSaved": "Enregistré !"
     }
   }
 }

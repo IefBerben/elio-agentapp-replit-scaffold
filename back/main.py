@@ -22,6 +22,7 @@ from typing import Any
 from fastapi import FastAPI, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse
+from pydantic import BaseModel
 
 # ─── Temp files directory ─────────────────────────────────────────────────────
 # Files uploaded via /files/upload are stored here during the session.
@@ -275,6 +276,11 @@ _ALLOWED_SPEC_NAMES = {"product.md", "backlog.md"}
 _ALLOWED_PROTOTYPE_SUFFIXES = {".tsx", ".jsx", ".ts", ".js", ".zip", ".json"}
 
 
+class SaveSpecTextRequest(BaseModel):
+    filename: str
+    content: str
+
+
 @app.post("/agent-apps/upload-spec")
 async def upload_spec(files: list[UploadFile]) -> dict[str, Any]:
     """Save product.md and/or backlog.md at the repo root.
@@ -310,7 +316,31 @@ async def upload_spec(files: list[UploadFile]) -> dict[str, Any]:
     return {"files": saved, "status": await scaffold_status()}
 
 
-@app.post("/agent-apps/upload-prototype")
+@app.post("/agent-apps/save-spec-text")
+async def save_spec_text(body: SaveSpecTextRequest) -> dict[str, Any]:
+    """Save spec content pasted as plain text (alternative to file upload).
+
+    Accepts raw markdown text for product.md or backlog.md and writes it to
+    the repo root, exactly like upload_spec does for file uploads.
+
+    Returns:
+        Dict with the saved filename and the updated scaffold status.
+
+    Raises:
+        HTTPException 400: filename is not product.md or backlog.md, or content is empty.
+    """
+    name = Path(body.filename).name.lower()
+    if name not in _ALLOWED_SPEC_NAMES:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Only {sorted(_ALLOWED_SPEC_NAMES)} can be saved here.",
+        )
+    if not body.content.strip():
+        raise HTTPException(status_code=400, detail="Content must not be empty.")
+    dest = REPO_ROOT / name
+    dest.write_text(body.content, encoding="utf-8")
+    logger.info(f"Spec saved via paste: {dest} ({len(body.content)} chars)")
+    return {"file": name, "size": dest.stat().st_size, "status": await scaffold_status()}
 async def upload_prototype(files: list[UploadFile]) -> dict[str, Any]:
     """Save a Google AI Studio export to Input/.
 

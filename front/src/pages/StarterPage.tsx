@@ -183,7 +183,77 @@ function UploadPanel({
   );
 }
 
-export function StarterPage() {
+function PastePanel({
+  filename,
+  placeholder,
+  onSaved,
+}: {
+  filename: "product.md" | "backlog.md";
+  placeholder: string;
+  onSaved: () => Promise<void> | void;
+}) {
+  const { t } = useTranslation();
+  const [content, setContent] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function save() {
+    if (!content.trim()) return;
+    setIsSaving(true);
+    setError(null);
+    try {
+      const r = await fetch("/agent-apps/save-spec-text", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filename, content }),
+      });
+      if (!r.ok) {
+        const detail = await r.text().catch(() => "");
+        throw new Error(`Save failed (${r.status}) ${detail}`);
+      }
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+      await onSaved();
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  const label = isSaving
+    ? t("starter.upload.pasteSaving")
+    : saved
+      ? t("starter.upload.pasteSaved")
+      : t("starter.upload.pasteSave");
+
+  return (
+    <div className="space-y-2">
+      <p className="text-xs text-muted-foreground">{t("starter.upload.pasteOr")}</p>
+      <textarea
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        placeholder={placeholder}
+        rows={5}
+        disabled={isSaving}
+        className="w-full px-3 py-2 rounded-lg border border-border bg-muted text-foreground text-xs font-mono resize-y focus:outline-none focus:ring-2 focus:ring-[#009de0] disabled:opacity-50"
+      />
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={save}
+          disabled={isSaving || !content.trim()}
+          className="px-3 py-1.5 rounded-lg bg-[#009de0] hover:bg-[#0088c4] text-white text-xs font-medium flex items-center gap-1.5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {saved && <CheckCircle2 className="w-3.5 h-3.5" />}
+          {label}
+        </button>
+        {error && <span className="text-xs text-red-500">{error}</span>}
+      </div>
+    </div>
+  );
+}
   const { t, i18n } = useTranslation();
   const { status, refresh } = useScaffoldStatus();
 
@@ -270,6 +340,11 @@ export function StarterPage() {
                 language={lang}
                 onUploaded={refresh}
               />
+              <PastePanel
+                filename="product.md"
+                placeholder={t("starter.upload.productPastePlaceholder") as string}
+                onSaved={refresh}
+              />
             </div>
 
             {/* backlog.md upload — the second artifact from the Value Office */}
@@ -288,6 +363,11 @@ export function StarterPage() {
                 detectedFiles={hasBacklog ? ["backlog.md"] : []}
                 language={lang}
                 onUploaded={refresh}
+              />
+              <PastePanel
+                filename="backlog.md"
+                placeholder={t("starter.upload.backlogPastePlaceholder") as string}
+                onSaved={refresh}
               />
             </div>
 

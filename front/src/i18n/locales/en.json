@@ -73,7 +73,13 @@
       "prototypeStepHint": "A Google AI Studio prototype helps the Agent PO align on the expected look & feel. Leave empty if you don't have one.",
       "prototypeDropHint": ".tsx · .jsx · .ts · .js · .zip · .json",
       "optional": "optional",
-      "thenStep": "4. Launch the specification with the Agent PO"
+      "thenStep": "4. Validate with the PO and launch the build",
+      "pasteOr": "or paste the content directly",
+      "productPastePlaceholder": "Paste your product.md content here...",
+      "backlogPastePlaceholder": "Paste your backlog.md content here...",
+      "pasteSave": "Save",
+      "pasteSaving": "Saving...",
+      "pasteSaved": "Saved!"
     }
   }
 }
