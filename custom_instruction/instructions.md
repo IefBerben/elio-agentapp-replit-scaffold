@@ -8,16 +8,23 @@ These rules are non-negotiable. Read `.agents/docs/` before writing any code.
 ## Session start — read before anything else
 
 At the start of every session:
-1. Read `replit.md` — project memory and build state
-2. If `product.md` exists and is structurally valid (no `_À compléter` markers, all required sections present: Vision, Users, Problem solved, Core workflow, Output format, Constraints, Success criteria), **read it in full** — it contains the user personas, constraints, success criteria, and output format that should inform every build decision, prompt, and component you write
+1. Call `GET /agent-apps/scaffold-status` to check spec validity
+2. If `isProductMdTemplate: true` or `productMdIssues` non-empty, or `isBacklogMdTemplate: true` or `backlogMdIssues` non-empty — **stop immediately**. List every issue from `productMdIssues` and `backlogMdIssues` and tell the consultant exactly what needs to be fixed before anything can be built. Do not proceed with any other work until the next session starts with valid files.
+3. If both files are valid: read `replit.md`, then read `product.md` in full.
 
-**Hard gate — do not invoke any build skill** (`intake-from-markdown`, `generate-api-contracts`, `build-backend`, `build-frontend`, or later) if either of these is true:
-- `product.md` is missing, still a template, or structurally incomplete (call `GET /agent-apps/scaffold-status` — `isProductMdTemplate: true` or `productMdIssues` non-empty)
-- `backlog.md` is missing, still a template, or structurally incomplete (`isBacklogMdTemplate: true` or `backlogMdIssues` non-empty)
+**Hard gate — refuse ALL of the following** until both spec files pass structural validation:
+- Any code writing (backend, frontend, tests, config)
+- Any architecture or data model discussion oriented toward implementation
+- Any skill invocation: `intake-from-markdown`, `generate-api-contracts`, `build-backend`, `build-frontend`, `platform-integration-check`, `package-agent`
 
-In that case, stop and tell the consultant: *"Pour commencer le build, tu as besoin d'un `product.md` et d'un `backlog.md` complétés. Dépose-les via la Starter page, ou utilise l'AgentApp Elio - Value Office pour les produire."*
+**The only actions allowed when specs are invalid:**
+- Explaining what product.md and backlog.md should contain
+- Invoking the `product-owner` skill to help the consultant write or fix the backlog
+- Answering questions about how to use the Value Office or the scaffold Starter page
 
-Never act on a consultant request without first knowing the app's purpose, actors, and constraints from these two files.
+When specs are invalid, tell the consultant in French exactly which issues were found, then say: *"Je ne peux rien construire tant que ces fichiers ne sont pas conformes. Dépose-les via la Starter page ou utilise l'AgentApp Elio - Value Office pour les produire. Je peux invoquer la skill product-owner pour t'aider à construire ton backlog.md."*
+
+Never write a single line of code, never discuss architecture or API design, and never invoke any build skill until `scaffold-status` confirms both files are valid.
 
 ---
 

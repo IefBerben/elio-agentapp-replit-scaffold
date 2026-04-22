@@ -448,6 +448,39 @@ async def execute_agent_stream(
             detail=f"Agent '{agent_id}' not found. Available: {list(AGENTS_MAP.keys())}",
         )
 
+    # ── Spec gate — block real agents when specs are missing or invalid ────────
+    # Reference agents (prefixed with _) are exempt: they run as demos regardless.
+    if not agent_id.startswith("_"):
+        _, _, product_issues = _spec_status(PRODUCT_MD_PATH)
+        _, _, backlog_issues = _spec_status(BACKLOG_MD_PATH)
+        all_issues = (
+            [f"product.md — {i}" for i in product_issues]
+            + [f"backlog.md — {i}" for i in backlog_issues]
+        )
+        if not product_issues and not PRODUCT_MD_PATH.is_file():
+            all_issues.insert(0, "product.md — not found")
+        if not backlog_issues and not BACKLOG_MD_PATH.is_file():
+            all_issues.append("backlog.md — not found")
+        if all_issues:
+            detail = "Spec files are missing or invalid: " + "; ".join(all_issues)
+            logger.warning(f"Spec gate blocked agent '{agent_id}': {detail}")
+
+            async def _spec_error() -> AsyncGenerator[str, None]:
+                event = {
+                    "step": "error",
+                    "message": detail,
+                    "status": "error",
+                    "progress": 0,
+                    "error": "spec_invalid",
+                }
+                yield f"data: {json.dumps(event, ensure_ascii=False)}\n\n"
+
+            return StreamingResponse(
+                _spec_error(),
+                media_type=SSE_MEDIA_TYPE,
+                headers={"Cache-Control": "no-cache", "Connection": "keep-alive", "X-Accel-Buffering": "no"},
+            )
+
     try:
         inputs = await request.json()
     except Exception as e:
