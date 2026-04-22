@@ -48,11 +48,14 @@ logging.basicConfig(
 )
 logger = logging.getLogger("elio_scaffold")
 
+# ─── Scaffold version (single source of truth: SCAFFOLD_VERSION at repo root) ─
+_SCAFFOLD_VERSION = (Path(__file__).parent.parent / "SCAFFOLD_VERSION").read_text(encoding="utf-8").strip()
+
 # ─── FastAPI App ──────────────────────────────────────────────────────────────
 app = FastAPI(
     title="Elio Scaffold — Agent App Server",
     description="Scaffold conforme au toolkit Elio pour le développement d'Agent Apps.",
-    version="9.0.0",
+    version=_SCAFFOLD_VERSION,
 )
 
 
@@ -83,14 +86,6 @@ SCAFFOLD_VERSION_URL = (
 )
 
 
-def _read_local_scaffold_version() -> str | None:
-    version_file = Path(__file__).parent.parent / "SCAFFOLD_VERSION"
-    try:
-        return version_file.read_text(encoding="utf-8").strip()
-    except OSError:
-        return None
-
-
 def _fetch_remote_scaffold_version() -> str | None:
     try:
         req = urllib.request.Request(SCAFFOLD_VERSION_URL, headers={"User-Agent": "elio-scaffold"})
@@ -112,11 +107,8 @@ async def _check_scaffold_version() -> None:
         return
 
     async def _run() -> None:
-        local = _read_local_scaffold_version()
-        if not local:
-            return
         remote = await asyncio.to_thread(_fetch_remote_scaffold_version)
-        if not remote or remote == local:
+        if not remote or remote == _SCAFFOLD_VERSION:
             return
         bar = "─" * 70
         logger.warning(
@@ -125,7 +117,7 @@ async def _check_scaffold_version() -> None:
             "      git remote add upstream https://github.com/IefBerben/elio-agentapp-replit-scaffold.git  # once\n"
             "      git pull upstream main\n"
             "    Set ELIO_SKIP_VERSION_CHECK=1 in Secrets to silence this.\n%s",
-            bar, local, remote, bar,
+            bar, _SCAFFOLD_VERSION, remote, bar,
         )
 
     asyncio.create_task(_run())
@@ -213,7 +205,7 @@ async def health() -> dict[str, Any]:
     """
     return {
         "status": "ok",
-        "scaffold_version": "9.0.0",
+        "scaffold_version": _SCAFFOLD_VERSION,
         "agents": list(AGENTS_MAP.keys()),
     }
 

@@ -1,6 +1,6 @@
 [project]
 name = "elio-scaffold"
-version = "7.0.1"
+version = "9.9.0"
 description = "Elio Scaffold — Agent App development backend"
 requires-python = ">=3.12"
 
