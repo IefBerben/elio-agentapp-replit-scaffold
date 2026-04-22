@@ -79,7 +79,9 @@
       "backlogPastePlaceholder": "Colle ici le contenu de ton backlog.md...",
       "pasteSave": "Enregistrer",
       "pasteSaving": "Enregistrement...",
-      "pasteSaved": "Enregistré !"
+      "pasteSaved": "Enregistré !",
+      "specIssuesLabel": "Problèmes détectés :",
+      "specValid": "Structure valide"
     }
   }
 }

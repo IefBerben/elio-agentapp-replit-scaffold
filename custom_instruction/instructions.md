@@ -9,11 +9,11 @@ These rules are non-negotiable. Read `.agents/docs/` before writing any code.
 
 At the start of every session:
 1. Read `replit.md` — project memory and build state
-2. If `product.md` exists and is not a template (no `_À compléter` markers, content > 200 chars), **read it in full** — it contains the user personas, constraints, success criteria, and output format that should inform every build decision, prompt, and component you write
+2. If `product.md` exists and is structurally valid (no `_À compléter` markers, all required sections present: Vision, Users, Problem solved, Core workflow, Output format, Constraints, Success criteria), **read it in full** — it contains the user personas, constraints, success criteria, and output format that should inform every build decision, prompt, and component you write
 
 **Hard gate — do not invoke any build skill** (`intake-from-markdown`, `generate-api-contracts`, `build-backend`, `build-frontend`, or later) if either of these is true:
-- `product.md` is missing or still a template
-- `backlog.md` is missing or still a template
+- `product.md` is missing, still a template, or structurally incomplete (call `GET /agent-apps/scaffold-status` — `isProductMdTemplate: true` or `productMdIssues` non-empty)
+- `backlog.md` is missing, still a template, or structurally incomplete (`isBacklogMdTemplate: true` or `backlogMdIssues` non-empty)
 
 In that case, stop and tell the consultant: *"Pour commencer le build, tu as besoin d'un `product.md` et d'un `backlog.md` complétés. Dépose-les via la Starter page, ou utilise l'AgentApp Elio - Value Office pour les produire."*
 

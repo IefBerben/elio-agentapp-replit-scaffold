@@ -92,31 +92,30 @@ async def _check_spec_files() -> None:
     """
     bar = "─" * 70
     _repo_root = Path(__file__).parent.parent
-    issues = []
+    issues_log = []
     for name, path in [
         ("product.md", _repo_root / "product.md"),
         ("backlog.md", _repo_root / "backlog.md"),
     ]:
         if not path.is_file():
-            issues.append(f"{name} — not found")
+            issues_log.append(f"{name} — not found")
         else:
             try:
                 text = path.read_text(encoding="utf-8")
-                if "_À compléter" in text or len(text.strip()) < 200:
-                    issues.append(f"{name} — still a template (unfilled)")
+                for issue in _validate_spec_content(text, name):
+                    issues_log.append(f"{name} — {issue}")
             except OSError:
-                issues.append(f"{name} — unreadable")
-    if issues:
+                issues_log.append(f"{name} — unreadable")
+    if issues_log:
         logger.warning(
-            "\n%s\n⚠️  Spec files missing or unfilled:\n"
+            "\n%s\n⚠️  Spec files missing or invalid:\n"
             "    %s\n"
-            "    Open the app in the browser and upload both files via the Starter page,\n"
-            "    or paste your product.md / backlog.md content directly into these files.\n"
+            "    Open the app in the browser and upload / paste both files via the Starter page.\n"
             "    The Agent Builder cannot produce a correct app without them.\n%s",
-            bar, "\n    ".join(issues), bar,
+            bar, "\n    ".join(issues_log), bar,
         )
     else:
-        logger.info("✓ product.md and backlog.md detected — specs are ready.")
+        logger.info("✓ product.md and backlog.md detected and structurally valid — specs are ready.")
 
 
 SCAFFOLD_VERSION_URL = (
@@ -204,21 +203,64 @@ PRODUCT_MD_PATH = REPO_ROOT / "product.md"
 BACKLOG_MD_PATH = REPO_ROOT / "backlog.md"
 INPUT_DIR = REPO_ROOT / "Input"
 
+# ─── Spec validation ──────────────────────────────────────────────────────────
 
-def _spec_status(path: Path) -> tuple[bool, bool]:
-    """Return (exists, is_template) for a .md spec file.
+_PRODUCT_REQUIRED_SECTIONS = [
+    "## Vision",
+    "## Users",
+    "## Problem solved",
+    "## Core workflow",
+    "## Output format",
+    "## Constraints",
+    "## Success criteria",
+]
 
-    is_template is True when the file still contains the boilerplate
-    "_À compléter" markers — i.e. the consultant has not edited it yet.
+_BACKLOG_REQUIRED_SECTIONS = [
+    "## Epic",
+    "### Feature",
+    "Acceptance criteria:",
+    "## Non-functional requirements",
+]
+
+
+def _validate_spec_content(text: str, filename: str) -> list[str]:
+    """Return a list of structural issues found in a spec file.
+
+    Checks for unfilled placeholders, minimum length, and required sections.
+    An empty list means the file is structurally valid.
+    """
+    issues: list[str] = []
+    if "_À compléter" in text:
+        issues.append("contains unfilled _À compléter_ placeholders")
+    if len(text.strip()) < 200:
+        issues.append("too short (< 200 chars) — likely still a template")
+        return issues  # no point checking sections on a near-empty file
+    required = (
+        _PRODUCT_REQUIRED_SECTIONS if filename == "product.md"
+        else _BACKLOG_REQUIRED_SECTIONS if filename == "backlog.md"
+        else []
+    )
+    for section in required:
+        if section not in text:
+            issues.append(f"missing section '{section}'")
+    return issues
+
+
+def _spec_status(path: Path) -> tuple[bool, bool, list[str]]:
+    """Return (exists, is_template, issues) for a .md spec file.
+
+    is_template is True when the file still contains boilerplate markers or
+    is too short. issues lists all structural problems found in the content.
     """
     if not path.is_file():
-        return False, False
+        return False, False, []
     try:
         text = path.read_text(encoding="utf-8")
     except OSError:
-        return True, True
-    is_template = "_À compléter" in text or len(text.strip()) < 200
-    return True, is_template
+        return True, True, ["file unreadable"]
+    issues = _validate_spec_content(text, path.name)
+    is_template = bool(issues)
+    return True, is_template, issues
 
 
 def _input_files() -> list[str]:
@@ -259,14 +301,16 @@ async def scaffold_status() -> dict[str, Any]:
         Dict with hasProductMd, isProductMdTemplate, hasBacklogMd,
         isBacklogMdTemplate, inputFiles, hasGeneratedAgent.
     """
-    has_product, is_product_template = _spec_status(PRODUCT_MD_PATH)
-    has_backlog, is_backlog_template = _spec_status(BACKLOG_MD_PATH)
+    has_product, is_product_template, product_issues = _spec_status(PRODUCT_MD_PATH)
+    has_backlog, is_backlog_template, backlog_issues = _spec_status(BACKLOG_MD_PATH)
     has_generated_agent = any(not k.startswith("_") for k in AGENTS_MAP)
     return {
         "hasProductMd": has_product,
         "isProductMdTemplate": is_product_template,
+        "productMdIssues": product_issues,
         "hasBacklogMd": has_backlog,
         "isBacklogMdTemplate": is_backlog_template,
+        "backlogMdIssues": backlog_issues,
         "inputFiles": _input_files(),
         "hasGeneratedAgent": has_generated_agent,
     }

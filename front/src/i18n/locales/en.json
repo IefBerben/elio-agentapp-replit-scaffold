@@ -79,7 +79,9 @@
       "backlogPastePlaceholder": "Paste your backlog.md content here...",
       "pasteSave": "Save",
       "pasteSaving": "Saving...",
-      "pasteSaved": "Saved!"
+      "pasteSaved": "Saved!",
+      "specIssuesLabel": "Issues found:",
+      "specValid": "Structure valid"
     }
   }
 }

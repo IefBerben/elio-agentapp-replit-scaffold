@@ -37,8 +37,10 @@ const VALUE_OFFICE_URL = "https://elio.onepoint.cloud/marketplace/item/ab7c6c91-
 interface ScaffoldStatus {
   hasProductMd: boolean;
   isProductMdTemplate: boolean;
+  productMdIssues: string[];
   hasBacklogMd: boolean;
   isBacklogMdTemplate: boolean;
+  backlogMdIssues: string[];
   inputFiles: string[];
 }
 
@@ -255,6 +257,33 @@ function PastePanel({
   );
 }
 
+function SpecIssues({ issues, exists }: { issues: string[]; exists: boolean }) {
+  const { t } = useTranslation();
+  if (!exists) return null;
+  if (issues.length === 0) {
+    return (
+      <p className="flex items-center gap-1.5 text-xs text-green-600 dark:text-green-400 mt-1">
+        <CheckCircle2 className="w-3.5 h-3.5" />
+        {t("starter.upload.specValid")}
+      </p>
+    );
+  }
+  return (
+    <div className="mt-1 space-y-0.5">
+      <p className="text-xs font-medium text-amber-600 dark:text-amber-400">
+        {t("starter.upload.specIssuesLabel")}
+      </p>
+      <ul className="list-disc list-inside space-y-0.5">
+        {issues.map((issue) => (
+          <li key={issue} className="text-xs text-amber-600 dark:text-amber-400">
+            {issue}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 export function StarterPage() {
   const { t, i18n } = useTranslation();
   const { status, refresh } = useScaffoldStatus();
@@ -347,6 +376,10 @@ export function StarterPage() {
                 placeholder={t("starter.upload.productPastePlaceholder") as string}
                 onSaved={refresh}
               />
+              <SpecIssues
+                issues={status?.productMdIssues ?? []}
+                exists={!!(status?.hasProductMd)}
+              />
             </div>
 
             {/* backlog.md upload — the second artifact from the Value Office */}
@@ -370,6 +403,10 @@ export function StarterPage() {
                 filename="backlog.md"
                 placeholder={t("starter.upload.backlogPastePlaceholder") as string}
                 onSaved={refresh}
+              />
+              <SpecIssues
+                issues={status?.backlogMdIssues ?? []}
+                exists={!!(status?.hasBacklogMd)}
               />
             </div>
 
