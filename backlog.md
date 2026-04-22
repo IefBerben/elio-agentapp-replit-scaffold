@@ -1,71 +1,69 @@
 # Backlog — _À compléter_
 
 <!--
-How to structure this file:
-- One Epic per step of your agent (typically Step 1, Step 2).
-- Each Epic contains Features written as user stories.
-- Each Feature has acceptance criteria — the concrete, testable rules the Builder agent will implement.
-- End with an MVP slice (what's in V1) and non-functional requirements.
+Format MoSCoW aligné avec l'AgentApp Elio - Value Office.
+- Remplace chaque `_À compléter_` par ton contenu.
+- Chaque US dans Must / Should / Could doit avoir une ligne `**Status:** [ ] not started` — le Builder lit cette ligne pour savoir quoi construire.
+- Won't Have = liste de bullets simples, pas de checkbox.
 
-Tip: replace every `_À compléter_` below with your own content.
-The Product Owner (PO) skill in `.agents/skills/product-owner/` can generate this for you from `product.md`.
+Tip: utilise l'AgentApp Elio - Value Office pour générer ce fichier automatiquement.
 -->
 
-## Epic 1 — Step 1: _À compléter_
+## Must Have — ship first
 
-### Feature: _À compléter_ (e.g. Input form)
+### US-01 — _À compléter_
 
-**As a** _À compléter_ (who)
-**I want to** _À compléter_ (action)
+**Status:** [ ] not started
+**Priority:** Must Have
+**As a** _À compléter_ (role)
+**I want** _À compléter_ (capability)
 **So that** _À compléter_ (outcome)
+**Acceptance criteria:**
+- _À compléter_ (concrete, testable)
+- _À compléter_
+**Out of scope:**
+- _À compléter_
 
-Acceptance criteria:
-- _À compléter_ (e.g. required fields, validation rules)
-- _À compléter_ (e.g. button states — enabled / disabled / loading)
-- _À compléter_ (e.g. error handling)
+### US-02 — _À compléter_
 
-### Feature: _À compléter_ (e.g. Streaming generation)
-
+**Status:** [ ] not started
+**Priority:** Must Have
 **As a** _À compléter_
-**I want to** _À compléter_
+**I want** _À compléter_
 **So that** _À compléter_
-
-Acceptance criteria:
-- _À compléter_ (e.g. progress banner visible during generation)
-- _À compléter_ (e.g. stop button cancels in-flight request)
-- _À compléter_ (e.g. results displayed on success, error banner on failure)
-
----
-
-## Epic 2 — Step 2: _À compléter_
-
-### Feature: _À compléter_
-
-**As a** _À compléter_
-**I want to** _À compléter_
-**So that** _À compléter_
-
-Acceptance criteria:
+**Acceptance criteria:**
 - _À compléter_
 - _À compléter_
 
-### Feature: Reset
+---
 
-**As a** consultant
-**I want to** reset the app to its initial state
-**So that** I can start a new analysis without refreshing the page
+## Should Have — next, if time allows
 
-Acceptance criteria:
-- Reset button always visible in the page header
-- Clears all results, inputs, and step state
-- Returns to Step 1
-- Button is disabled while processing
+### US-03 — _À compléter_
+
+**Status:** [ ] not started
+**Priority:** Should Have
+**As a** _À compléter_
+**I want** _À compléter_
+**So that** _À compléter_
+**Hint on acceptance criteria:**
+- _À compléter_ (the PO will tighten this when the story is promoted)
 
 ---
 
-## Non-functional requirements
+## Could Have — nice if easy
 
-- **Bilingual:** all UI text in `fr.json` + `en.json` — zero hardcoded strings
-- **Streaming:** all agents return progress updates (0 → 100%) and support stop
-- **Persistence:** user inputs and results survive page refresh (Zustand + persist)
-- _À compléter_ (add project-specific constraints)
+### US-04 — _À compléter_
+
+**Status:** [ ] not started
+**Priority:** Could Have
+**As a** _À compléter_
+**I want** _À compléter_
+**So that** _À compléter_
+
+---
+
+## Won't Have (this version) — explicitly out
+
+- **_À compléter_** — _À compléter_ (reason: platform envelope / deferred to v2)
+- **_À compléter_** — _À compléter_

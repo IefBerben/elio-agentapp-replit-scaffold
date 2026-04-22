@@ -216,10 +216,11 @@ _PRODUCT_REQUIRED_SECTIONS = [
 ]
 
 _BACKLOG_REQUIRED_SECTIONS = [
-    "## Epic",
-    "### Feature",
+    "## Must Have",
+    "### US-",
+    "**Status:** [ ]",
     "Acceptance criteria:",
-    "## Non-functional requirements",
+    "## Won't Have",
 ]
 
 

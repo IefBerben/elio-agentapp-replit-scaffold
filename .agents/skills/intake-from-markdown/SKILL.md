@@ -28,7 +28,7 @@ Ask the user these questions **one at a time**. Wait for each answer before aski
 
 After all 5 answers:
 - Write `product.md` using the template structure below, filled in from the answers
-- Write `backlog.md` with epics and acceptance criteria derived from the answers
+- Write `backlog.md` in MoSCoW format (Must Have / Should Have / Could Have / Won't Have) with US-N user stories, each carrying `**Status:** [ ] not started`
 - Confirm with the user: "Voici product.md et backlog.md. C'est bien ce que tu voulais ?"
 - Then proceed as Mode B
 
@@ -148,35 +148,52 @@ If the user corrects something, update `product.md` / `backlog.md` / `replit.md`
 ```markdown
 # Backlog — [App Name]
 
-## Epic 1 — [Step 1 feature name]
+## Must Have — ship first
 
-### Feature: [Input form]
+### US-01 — [Short title]
+**Status:** [ ] not started
+**Priority:** Must Have
 **As a** [actor]
-**I want to** [action]
+**I want** [capability]
+**So that** [outcome]
+**Acceptance criteria:**
+- [Concrete, testable]
+- [Concrete, testable]
+**Out of scope:**
+- [What this story explicitly does NOT cover]
+
+### US-02 — [Short title]
+**Status:** [ ] not started
+**Priority:** Must Have
+...
+
+---
+
+## Should Have — next, if time allows
+
+### US-03 — [Short title]
+**Status:** [ ] not started
+**Priority:** Should Have
+**As a** [actor]
+**I want** [capability]
+**So that** [outcome]
+**Hint on acceptance criteria:**
+- [The PO will tighten this when the story is promoted]
+
+---
+
+## Could Have — nice if easy
+
+### US-04 — [Short title]
+**Status:** [ ] not started
+**Priority:** Could Have
+**As a** [actor]
+**I want** [capability]
 **So that** [outcome]
 
-Acceptance criteria:
-- [criterion]
-
-### Feature: [Streaming generation]
-...
-
-### Feature: [Editable results] (if intermediate results need editing)
-...
-
 ---
 
-## Epic 2 — [Step 2 feature name] (if multi-step)
-...
+## Won't Have (this version) — explicitly out
 
----
-
-## MVP slice
-[What is the minimum that delivers value]
-
-## Non-functional
-- Bilingual: fr.json + en.json
-- Dark mode: all color classes with dark: pair
-- Mobile-responsive: 375px minimum
-- Tests: minimum 5 unit tests per backend step
+- **[Idea]** — [reason: platform envelope / deferred to v2]
 ```
