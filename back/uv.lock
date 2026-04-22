@@ -655,7 +655,7 @@ wheels = [
 
 [[package]]
 name = "elio-scaffold"
-version = "7.0.1"
+version = "9.9.0"
 source = { virtual = "." }
 dependencies = [
     { name = "aiofiles" },
