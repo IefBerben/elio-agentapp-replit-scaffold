@@ -254,6 +254,8 @@ function PastePanel({
     </div>
   );
 }
+
+export function StarterPage() {
   const { t, i18n } = useTranslation();
   const { status, refresh } = useScaffoldStatus();
 
