@@ -4,6 +4,30 @@ Ce document décrit les conventions et la structure à respecter pour le dévelo
 
 ---
 
+## First-run setup
+
+1. **Copier `.env.example` → `back/.env`** et renseigner les deux variables obligatoires :
+   ```bash
+   AZURE_OPENAI_ENDPOINT=https://<votre-ressource>.openai.azure.com/
+   AZURE_OPENAI_API_KEY=<votre-clé>          # laisser vide pour utiliser az login
+   ```
+   Ou, si vous utilisez l'authentification Azure CLI :
+   ```bash
+   az login
+   # Laisser AZURE_OPENAI_API_KEY vide dans back/.env — DefaultAzureCredential prend le relais
+   ```
+
+2. **Installer les dépendances** et démarrer le serveur :
+   ```bash
+   cd back
+   uv sync
+   uv run uvicorn main:app --reload --port 8000
+   ```
+
+3. **Si Azure n'est pas configuré**, le décorateur `@stream_safe` intercepte l'erreur d'authentification et renvoie un message d'erreur en SSE à la place d'un HTTP 500.
+
+---
+
 ## Structure d'un service backend
 
 Chaque Agent App est un dossier dans `back/agents/` contenant :
@@ -98,22 +122,62 @@ async def stream_my_agent(
 
 ### Gestion des erreurs
 
-```python
-try:
-    # ... votre logique
-    yield {"step": "completed", "status": "completed", "progress": 100}
-except Exception as e:
-    logger.error(f"Error: {e}")
-    yield {
-        "step": "error",
-        "message": f"Error: {str(e)}",
-        "status": "error",
-        "progress": 0,
-        "error": str(e),
-    }
-```
+> **Ne pas écrire de try/except manuels dans les fonctions de streaming.** Utilise `@stream_safe` à la place (voir section suivante) — le décorateur gère l'ensemble des exceptions et produit un événement SSE d'erreur lisible.
 
 ---
+
+## Error handling — @stream_safe
+
+`@stream_safe` est un décorateur **obligatoire** sur toute fonction `*_stream`. Il enveloppe le générateur asynchrone dans un try/except et yield un événement SSE d'erreur si une exception se produit, au lieu de crasher le serveur (contrat rule B2).
+
+### Import
+
+```python
+from utils.stream_error_handler import stream_safe
+```
+
+### Usage
+
+```python
+from utils.stream_error_handler import stream_safe
+
+@stream_safe
+async def step1_generate_stream(
+    username: str,
+    topic: str,
+    **kwargs: Any,
+) -> AsyncGenerator[dict[str, Any], None]:
+    # Pas besoin de try/except — @stream_safe gère tout
+    yield {"step": "beginning", "message": "...", "status": "in_progress", "progress": 0}
+    result = await call_llm(topic)
+    yield {"step": "completed", "message": "Done!", "status": "completed", "progress": 100, "result": result}
+```
+
+### Format de l'événement d'erreur produit
+
+```json
+{
+  "step": "error",
+  "message": "❌ Message lisible en français",
+  "status": "error",
+  "progress": 0,
+  "error": "texte brut de l'exception",
+  "error_type": "NomDeLaClasseException"
+}
+```
+
+### Erreurs couvertes
+
+| Classe d'exception | Message affiché |
+|---|---|
+| `AuthenticationError`, `ClientAuthenticationError`, `CredentialUnavailableError` | Connexion Azure échouée — `az login` |
+| `ResourceNotFoundError`, `DeploymentNotFound`, `NotFoundError` | Ressource/déploiement introuvable — vérifier `config_llms.json` |
+| `RateLimitError` | Quota dépassé — réessayer |
+| `InvalidRequestError`, `BadRequestError` | Contenu trop long / dépassement de tokens |
+| `ConnectionError`, `ConnectError` | Réseau inaccessible |
+| `FileNotFoundError` | Fichier temporaire introuvable |
+| `ValueError` | Format de fichier non supporté |
+| (tout autre) | Erreur inattendue — voir logs backend |
 
 ## Enregistrement dans le routeur
 
@@ -154,7 +218,7 @@ def get_llm():
 - **Type hints** : Obligatoires pour toutes les fonctions
 - **Docstrings** : Format Google avec Args/Returns/Yields
 - **Logging** : Utilisez le logger Python (`logging.getLogger`)
-- **Erreurs** : Encapsulez la logique dans un try/except et yield les erreurs
+- **Erreurs** : Décore chaque fonction `*_stream` avec `@stream_safe` — pas besoin de try/except manuel
 - **Nommage** : `snake_case` pour fichiers et fonctions, `PascalCase` pour classes
 
 ---
