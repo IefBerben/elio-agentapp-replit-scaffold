@@ -51,12 +51,12 @@ Use the **Package** Replit workflow (workflow panel), or run `bash scripts/packa
 The script:
 1. Parses `manifest.md` YAML front-matter
 2. Validates required fields are non-empty
-3. Copies the **full workspace** into `dist/{agent_id}-{version}/` using rsync, excluding:
+3. Copies the **full workspace** into `dist/{agent_id}-{version}/` using `shutil` (Python), excluding:
    - `.git/`, `.claude/`, `dist/`
    - `node_modules/`, `front/dist/`, `front/.vite/`
    - `back/.venv/`, `back/tempfiles/`, `back/.env`
    - `__pycache__/`, `*.pyc`
-4. Zips the result to `dist/{agent_id}-{version}.zip`
+4. Zips the result to `dist/{agent_id}-{version}.zip` using Python `zipfile`
 
 The bundle is **standalone** — no scaffold baseline required on the target.
 

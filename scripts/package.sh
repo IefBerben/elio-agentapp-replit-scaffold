@@ -6,8 +6,7 @@
 # runnable zip at dist/{agent_id}-{version}.zip containing the complete
 # workspace (no scaffold baseline required on the target).
 #
-# Deliberately dependency-light: bash + rsync + python3 for YAML parsing
-# (python3 and rsync are in the Replit Nix env already).
+# Uses Python shutil + zipfile throughout — no rsync or zip dependency.
 # ─────────────────────────────────────────────────────────────────────────
 
 set -euo pipefail
@@ -20,19 +19,21 @@ if [ ! -f "$MANIFEST" ]; then
   exit 1
 fi
 
-# ─── Parse YAML front-matter with python (pyyaml comes from back/ deps) ──
-PY_RUN=(uv run --project "$ROOT/back" python)
+uv run --project "$ROOT/back" python - "$ROOT" "$MANIFEST" <<'PY'
+import sys, re, json, os, shutil, zipfile
+from pathlib import Path
 
-read_manifest() {
-"${PY_RUN[@]}" - "$MANIFEST" <<'PY'
-import sys, re, json
 try:
     import yaml
 except ImportError:
     print("::ERROR::pyyaml not installed — run: pip install pyyaml", file=sys.stderr)
     sys.exit(2)
 
-raw = open(sys.argv[1], encoding="utf-8").read()
+root = Path(sys.argv[1])
+manifest_path = Path(sys.argv[2])
+
+# ── Parse + validate manifest front-matter ────────────────────────────────
+raw = manifest_path.read_text(encoding="utf-8")
 m = re.match(r"^---\n(.*?)\n---", raw, re.S)
 if not m:
     print("::ERROR::no YAML front-matter in manifest.md", file=sys.stderr)
@@ -46,46 +47,54 @@ if missing:
     print(f"::ERROR::missing required fields: {', '.join(missing)}", file=sys.stderr)
     sys.exit(2)
 
-print(json.dumps(data))
+agent_id = data["agent_id"]
+version  = data["version"]
+bundle_dir = root / "dist" / f"{agent_id}-{version}"
+zip_path   = root / "dist" / f"{agent_id}-{version}.zip"
+
+print(f"→ packaging {agent_id} v{version} (full workspace)")
+
+if bundle_dir.exists():
+    shutil.rmtree(bundle_dir)
+if zip_path.exists():
+    zip_path.unlink()
+bundle_dir.mkdir(parents=True)
+
+# ── Exclusions ────────────────────────────────────────────────────────────
+EXCLUDE_DIRS  = {".git", ".claude", "dist", "node_modules", "__pycache__",
+                 ".venv", "tempfiles", ".vite"}
+EXCLUDE_FILES = {".env"}
+EXCLUDE_EXTS  = {".pyc", ".pyo"}
+
+def ignored(path: Path) -> bool:
+    parts = path.relative_to(root).parts
+    if any(p in EXCLUDE_DIRS for p in parts):
+        return True
+    if path.is_file():
+        if path.name in EXCLUDE_FILES:
+            return True
+        if path.suffix in EXCLUDE_EXTS:
+            return True
+    return False
+
+# ── Copy ──────────────────────────────────────────────────────────────────
+for src in root.rglob("*"):
+    if ignored(src):
+        continue
+    rel = src.relative_to(root)
+    dst = bundle_dir / rel
+    if src.is_dir():
+        dst.mkdir(parents=True, exist_ok=True)
+    else:
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(src, dst)
+
+# ── Zip via Python zipfile ─────────────────────────────────────────────────
+with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
+    for f in bundle_dir.rglob("*"):
+        if f.is_file():
+            zf.write(f, f.relative_to(bundle_dir.parent))
+
+size_kb = zip_path.stat().st_size // 1024
+print(f"\n✅ {zip_path}  ({size_kb} KB)")
 PY
-}
-
-META="$(read_manifest)"
-AGENT_ID=$(echo "$META" | python3 -c "import json,sys;print(json.load(sys.stdin)['agent_id'])" 2>/dev/null || "${PY_RUN[@]}" -c "import json,sys;print(json.load(sys.stdin)['agent_id'])" <<<"$META")
-VERSION=$(echo "$META"  | python3 -c "import json,sys;print(json.load(sys.stdin)['version'])"  2>/dev/null || "${PY_RUN[@]}" -c "import json,sys;print(json.load(sys.stdin)['version'])"  <<<"$META")
-
-if [ -z "$AGENT_ID" ] || [ -z "$VERSION" ]; then
-  echo "❌ agent_id or version empty in manifest.md" >&2
-  exit 1
-fi
-
-BUNDLE_DIR="$ROOT/dist/${AGENT_ID}-${VERSION}"
-ZIP_PATH="$ROOT/dist/${AGENT_ID}-${VERSION}.zip"
-
-echo "→ packaging ${AGENT_ID} v${VERSION} (full workspace)"
-rm -rf "$BUNDLE_DIR" "$ZIP_PATH"
-mkdir -p "$BUNDLE_DIR"
-
-# ─── Copy full workspace, excluding build artifacts and secrets ────────────
-rsync -a \
-  --exclude='.git/' \
-  --exclude='.claude/' \
-  --exclude='dist/' \
-  --exclude='node_modules/' \
-  --exclude='front/dist/' \
-  --exclude='front/.vite/' \
-  --exclude='back/.venv/' \
-  --exclude='back/tempfiles/' \
-  --exclude='back/.env' \
-  --exclude='__pycache__/' \
-  --exclude='*.pyc' \
-  --exclude='*.pyo' \
-  --exclude='.env' \
-  "$ROOT/" "$BUNDLE_DIR/"
-
-# ─── Zip ──────────────────────────────────────────────────────────────────
-(cd "$ROOT/dist" && zip -rq "${AGENT_ID}-${VERSION}.zip" "${AGENT_ID}-${VERSION}")
-
-echo ""
-echo "✅ $ZIP_PATH"
-echo "   ($(du -h "$ZIP_PATH" | cut -f1))"
