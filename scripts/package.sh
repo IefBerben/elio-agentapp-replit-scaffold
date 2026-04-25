@@ -62,20 +62,24 @@ bundle_dir.mkdir(parents=True)
 
 # ── Exclusions ────────────────────────────────────────────────────────────
 EXCLUDE_DIRS  = {".git", ".claude", "dist", "node_modules", "__pycache__",
-                 ".venv", "tempfiles", ".vite"}
+                 ".venv", "tempfiles", ".vite", ".agents", ".local",
+                 ".pythonlibs", ".cache", ".uv", ".npm", ".config",
+                 "attached_assets"}
 EXCLUDE_FILES = {".env"}
 EXCLUDE_EXTS  = {".pyc", ".pyo"}
 
 # ── Copy via os.walk — prune excluded dirs before descending ──────────────
-for dirpath_str, dirnames, filenames in os.walk(root):
+for dirpath_str, dirnames, filenames in os.walk(root, topdown=True):
     dirpath = Path(dirpath_str)
     rel_dir = dirpath.relative_to(root)
 
     # Prune excluded dirs in-place so os.walk never descends into them
-    dirnames[:] = [
-        d for d in dirnames
-        if d not in EXCLUDE_DIRS and not str(rel_dir / d).startswith("dist")
-    ]
+    dirnames[:] = [d for d in dirnames if d not in EXCLUDE_DIRS]
+
+    # Skip if any ancestor ended up excluded (safety net)
+    if any(p in EXCLUDE_DIRS for p in rel_dir.parts):
+        dirnames[:] = []
+        continue
 
     for filename in filenames:
         src = dirpath / filename
@@ -87,7 +91,7 @@ for dirpath_str, dirnames, filenames in os.walk(root):
         shutil.copy2(src, dst)
 
 # ── Zip via Python zipfile ─────────────────────────────────────────────────
-with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
+with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED, strict_timestamps=False) as zf:
     for f in bundle_dir.rglob("*"):
         if f.is_file():
             zf.write(f, f.relative_to(bundle_dir.parent))
