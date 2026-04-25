@@ -66,26 +66,23 @@ EXCLUDE_DIRS  = {".git", ".claude", "dist", "node_modules", "__pycache__",
 EXCLUDE_FILES = {".env"}
 EXCLUDE_EXTS  = {".pyc", ".pyo"}
 
-def ignored(path: Path) -> bool:
-    parts = path.relative_to(root).parts
-    if any(p in EXCLUDE_DIRS for p in parts):
-        return True
-    if path.is_file():
-        if path.name in EXCLUDE_FILES:
-            return True
-        if path.suffix in EXCLUDE_EXTS:
-            return True
-    return False
+# ── Copy via os.walk — prune excluded dirs before descending ──────────────
+for dirpath_str, dirnames, filenames in os.walk(root):
+    dirpath = Path(dirpath_str)
+    rel_dir = dirpath.relative_to(root)
 
-# ── Copy ──────────────────────────────────────────────────────────────────
-for src in root.rglob("*"):
-    if ignored(src):
-        continue
-    rel = src.relative_to(root)
-    dst = bundle_dir / rel
-    if src.is_dir():
-        dst.mkdir(parents=True, exist_ok=True)
-    else:
+    # Prune excluded dirs in-place so os.walk never descends into them
+    dirnames[:] = [
+        d for d in dirnames
+        if d not in EXCLUDE_DIRS and not str(rel_dir / d).startswith("dist")
+    ]
+
+    for filename in filenames:
+        src = dirpath / filename
+        if filename in EXCLUDE_FILES or Path(filename).suffix in EXCLUDE_EXTS:
+            continue
+        rel = src.relative_to(root)
+        dst = bundle_dir / rel
         dst.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(src, dst)
 
