@@ -51,11 +51,14 @@ Use the **Package** Replit workflow (workflow panel), or run `bash scripts/packa
 The script:
 1. Parses `manifest.md` YAML front-matter
 2. Validates required fields are non-empty
-3. Copies files listed in `package_includes` into `dist/{agent_id}-{version}/`
-4. Computes i18n + AGENTS_MAP + shared-types diffs vs the pristine
-   scaffold baseline, writes them to `dist/{agent_id}-{version}/patches/`
-5. Copies `manifest.md` and `SUBMISSION.md` into the bundle root
-6. Zips the result to `dist/{agent_id}-{version}.zip`
+3. Copies the **full workspace** into `dist/{agent_id}-{version}/` using rsync, excluding:
+   - `.git/`, `.claude/`, `dist/`
+   - `node_modules/`, `front/dist/`, `front/.vite/`
+   - `back/.venv/`, `back/tempfiles/`, `back/.env`
+   - `__pycache__/`, `*.pyc`
+4. Zips the result to `dist/{agent_id}-{version}.zip`
+
+The bundle is **standalone** — no scaffold baseline required on the target.
 
 ---
 
@@ -65,11 +68,12 @@ The script:
 ✅ Package prêt : dist/{agent_id}-{version}.zip
 
 Contenu :
-- manifest.md              (contrat de déploiement)
-- SUBMISSION.md            (dossier de revue)
-- back/agents/{name}/      (code backend)
-- front/ …                 (page, store, i18n)
-- patches/                 (diffs AGENTS_MAP + shared-types + locales)
+- manifest.md + SUBMISSION.md
+- back/               (backend complet)
+- front/              (frontend complet)
+- packages/           (shared types)
+- .replit + replit.nix (config Replit)
+- product.md + backlog.md
 
 Prochaines étapes :
 1. Vérifie le manifest : cat dist/{agent_id}-{version}/manifest.md
@@ -83,11 +87,6 @@ Prochaines étapes :
 ## Notes for the tech team reviewing this proposal
 
 - `manifest.md` is the contract; the bundle is a view of it.
-- Diff-based packaging avoids shipping the full scaffold on every submission.
-  The deployment target already has the scaffold baseline; it only needs the
-  delta + the patch fragments for the three shared files.
-- If the platform prefers a full-workspace bundle instead, flip
-  `package.sh` to copy `back/`, `front/`, `packages/` verbatim and drop the
-  `patches/` step.
-- The manifest schema is intentionally minimal. Add fields (rate limits,
-  required roles, cost tier, SLA) as the platform grows.
+- Full-workspace bundling means the zip is self-contained — unzip on any machine with Replit or a compatible Node/Python env and it runs without a pre-installed scaffold baseline.
+- If the platform later moves to a delta-based deployment (baseline already present on target), flip `package.sh` back to copying only `package_includes` and computing patches for the three shared files (`AGENTS_MAP`, `shared-types`, `locales`).
+- The manifest schema is intentionally minimal. Add fields (rate limits, required roles, cost tier, SLA) as the platform grows.

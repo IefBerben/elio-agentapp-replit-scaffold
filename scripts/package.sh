@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # ─────────────────────────────────────────────────────────────────────────
-# Elio agent packaging script — proposal / v0
+# Elio agent packaging script — full-workspace bundle
 #
-# Reads manifest.md, validates required fields, and produces a deployable
-# zip at dist/{agent_id}-{version}.zip containing the consultant's delta
-# on top of the scaffold baseline.
+# Reads manifest.md, validates required fields, and produces a standalone
+# runnable zip at dist/{agent_id}-{version}.zip containing the complete
+# workspace (no scaffold baseline required on the target).
 #
-# Deliberately dependency-light: bash + standard unix tools + python3 for
-# YAML parsing (python3 is in the Replit Nix env already).
+# Deliberately dependency-light: bash + rsync + python3 for YAML parsing
+# (python3 and rsync are in the Replit Nix env already).
 # ─────────────────────────────────────────────────────────────────────────
 
 set -euo pipefail
@@ -52,7 +52,7 @@ PY
 
 META="$(read_manifest)"
 AGENT_ID=$(echo "$META" | python3 -c "import json,sys;print(json.load(sys.stdin)['agent_id'])" 2>/dev/null || "${PY_RUN[@]}" -c "import json,sys;print(json.load(sys.stdin)['agent_id'])" <<<"$META")
-VERSION=$(echo "$META" | python3 -c "import json,sys;print(json.load(sys.stdin)['version'])" 2>/dev/null || "${PY_RUN[@]}" -c "import json,sys;print(json.load(sys.stdin)['version'])" <<<"$META")
+VERSION=$(echo "$META"  | python3 -c "import json,sys;print(json.load(sys.stdin)['version'])"  2>/dev/null || "${PY_RUN[@]}" -c "import json,sys;print(json.load(sys.stdin)['version'])"  <<<"$META")
 
 if [ -z "$AGENT_ID" ] || [ -z "$VERSION" ]; then
   echo "❌ agent_id or version empty in manifest.md" >&2
@@ -62,36 +62,26 @@ fi
 BUNDLE_DIR="$ROOT/dist/${AGENT_ID}-${VERSION}"
 ZIP_PATH="$ROOT/dist/${AGENT_ID}-${VERSION}.zip"
 
-echo "→ packaging ${AGENT_ID} v${VERSION}"
+echo "→ packaging ${AGENT_ID} v${VERSION} (full workspace)"
 rm -rf "$BUNDLE_DIR" "$ZIP_PATH"
-mkdir -p "$BUNDLE_DIR/patches"
+mkdir -p "$BUNDLE_DIR"
 
-# ─── Copy files listed in manifest.package_includes ───────────────────────
-# Globs with {agent_id_snake} etc. must be resolved by the skill before
-# running this script; this script treats them as literal paths.
-"${PY_RUN[@]}" - "$MANIFEST" "$BUNDLE_DIR" "$ROOT" <<'PY'
-import sys, re, yaml, shutil, glob, os
-manifest, bundle, root = sys.argv[1], sys.argv[2], sys.argv[3]
-data = yaml.safe_load(re.match(r"^---\n(.*?)\n---", open(manifest, encoding="utf-8").read(), re.S).group(1))
-for pattern in data.get("package_includes", []):
-    if "{" in pattern:
-        print(f"  ⚠ unresolved placeholder, skipping: {pattern}")
-        continue
-    for src in glob.glob(os.path.join(root, pattern), recursive=True):
-        if not os.path.isfile(src):
-            continue
-        rel = os.path.relpath(src, root)
-        dst = os.path.join(bundle, rel)
-        os.makedirs(os.path.dirname(dst), exist_ok=True)
-        shutil.copy2(src, dst)
-        print(f"  + {rel}")
-PY
-
-# ─── Copy manifest + SUBMISSION.md into bundle root ───────────────────────
-cp "$MANIFEST" "$BUNDLE_DIR/manifest.md"
-if [ -f "$ROOT/SUBMISSION.md" ]; then
-  cp "$ROOT/SUBMISSION.md" "$BUNDLE_DIR/SUBMISSION.md"
-fi
+# ─── Copy full workspace, excluding build artifacts and secrets ────────────
+rsync -a \
+  --exclude='.git/' \
+  --exclude='.claude/' \
+  --exclude='dist/' \
+  --exclude='node_modules/' \
+  --exclude='front/dist/' \
+  --exclude='front/.vite/' \
+  --exclude='back/.venv/' \
+  --exclude='back/tempfiles/' \
+  --exclude='back/.env' \
+  --exclude='__pycache__/' \
+  --exclude='*.pyc' \
+  --exclude='*.pyo' \
+  --exclude='.env' \
+  "$ROOT/" "$BUNDLE_DIR/"
 
 # ─── Zip ──────────────────────────────────────────────────────────────────
 (cd "$ROOT/dist" && zip -rq "${AGENT_ID}-${VERSION}.zip" "${AGENT_ID}-${VERSION}")
