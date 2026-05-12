@@ -1,102 +1,128 @@
 # Conventions de code
 
-Ce document résume les conventions à respecter pour que votre code soit intégrable dans l'application Ellio.
+Ce document résume les conventions à respecter pour que votre code soit intégrable dans l'application Neo/Elio.
 
 ---
 
 ## Architecture
 
-### Séparation logique mêtier / UI
+### Séparation logique métier / UI
 
-Comme l'exemple donnée dans ce toolkit, votre application doit être séparé en 2:
+Votre application doit être séparée en 2 couches :
 
-- le back: pour la logique mêtier (en python)
-- le front: pour l'UI de l'application (en React) - CELUI-CI NE DOIT CONTENIR AUCUNE LOGIQUE MÊTIER -
+- **Back** : logique métier en Python — LangChain, streaming SSE, traitement de fichiers
+- **Front** : UI en React — **aucune logique métier ne doit y figurer**
+
+### Pattern backend obligatoire : `DeclarativeAgentApp`
+
+⚠️ **Tout agent doit utiliser `DeclarativeAgentApp`**. Les fonctions standalone `async def stream_xxx(...)` sont interdites dans le toolkit v3.
+
+```python
+# ✅ CORRECT
+
+from framework import DeclarativeAgentApp, TabSchema, StepContext, step
+
+class MyInputTab(TabSchema):
+    topic: str = Field("", description="...")   # ← valeur par défaut obligatoire
+    lang: str = Field("fr", description="...")
+
+class MyApp(DeclarativeAgentApp):
+    class Meta:
+        tabs = [MyInputTab, MyOutputTab]
+
+    @step(id="generate", persist_progress=True)  # stream_safe est appliqué automatiquement
+    async def generate(self, ctx: StepContext, inputs: MyInputTab, **kwargs):
+        yield self.in_progress(step_id="generate", message="...", progress=5)
+        yield self.completed(step_id="generate", data={"result": "..."})
+
+# ❌ INTERDIT — fonction standalone
+async def my_app_stream(username: str, **kwargs): ...
+```
+
+### Règles `TabSchema`
+
+- **Tous les champs ont des valeurs par défaut** (`Field("")`, `Field("fr")`, `Field(default_factory=list)`)
+- Les champs `str` non fournis → `""` (jamais `None`)
+- Les noms de champs doivent être **uniques** sur tous les tabs d'un même agent (l'état est un flat dict)
+
+### Règle `@stream_safe`
+
+`@stream_safe` est appliqué **automatiquement** par `@step` et `@action`.
+Ne pas l'ajouter explicitement.
+
+`@stream_safe` intercepte toute exception et yield automatiquement un message d'erreur compréhensible en français (compatible Azure : credentials, quota, réseau).
 
 ### Mutualisation frontend attendue dans le repo cible
 
-Quand votre Agent App est portée dans le monorepo Neo/Elio, la mutualisation frontend doit suivre **deux niveaux distincts** :
+Quand votre Agent App est portée dans le monorepo Neo/Elio, la mutualisation frontend suit **deux niveaux distincts** :
 
-1. **Commun à toutes les Agent Apps**
-    - composants génériques de shell, progression, fichiers, stepper, erreurs
-    - hooks utilitaires génériques comme `useAgentFiles`
-    - stores et utilitaires réellement transverses
+1. **Commun à toutes les Agent Apps** → `front/shared`
+    - composants génériques : shell, progression, fichiers, stepper, erreurs
+    - hooks utilitaires génériques (`useAgentFiles`, etc.)
 
-2. **Commun à une Agent App entre Elio et Neo**
+2. **Commun à une Agent App entre Elio et Neo** → `front/shared`
     - hook de page partagé
     - orchestration des étapes
     - composants d'étapes non spécifiques au design runtime
-    - types, utils, mapping de handover, logique de génération
 
-Le principe cible est donc :
+Exemples de référence dans le monorepo :
 
-- `front/shared` pour le code commun
-- `front/elio` pour l'UI Elio
-- `front/neo` pour l'UI Neo
+- `useDynamicPersonaPage`, `useUserJourneyPage`
+- `front/shared/src/components/agent-apps`
+- `front/neo/src/components/PageHeader.tsx`
 
-Exemples de référence actuellement utilisés dans le repo principal :
+### Dual-platform (clarification)
 
-- `useDynamicPersonaPage` pour `Dynamic Persona`
-- `useUserJourneyPage` pour `User Journey`
-- composants partagés génériques dans `front/shared/src/components/agent-apps`
-- composant structurel Neo mutualisé `PageHeader` dans `front/neo/src/components/PageHeader.tsx`
+Dans le toolkit, **une seule page frontend** est requise (`front/src/pages/`).
+La séparation Elio/Neo se fait lors de l'intégration dans le monorepo cible.
+Le composant page doit être générique et sans dépendances à un design system spécifique.
 
 ### Modèle LLM
 
-Votre définition du client LLM doit être fait avec Langchain, et être une héritance de **BaseChatModel**,
-vous devez définir votre appel dans [llm_config.py](../back/llm_config.py) où un exemple pour openAI est donné.
+Le client LLM est toujours `get_llm()` depuis `services/llm_config.py` (héritage LangChain `BaseChatModel`).
 
-Pour permettre la reproducibilité de vos résultats, vous devez utilisez uniquement les modèles qui sont inclus dans Ellio. Soit:
+Modèles autorisés dans la plateforme Neo/Elio :
 
-OpenAI:
+**OpenAI :** gpt-5.1, gpt-5, gpt-5-mini, gpt-5-chat, gpt-4.1, gpt-4.1-mini, o3, o4-mini  
+**Google :** Gemini 2.5 Pro, Gemini 2.5 Flash  
+**Mistral :** Mistral-large-3
 
-- gpt-5.1
-- gpt-5
-- gpt-5-mini
-- gpt-5-chat
-- gpt-4.1
-- gpt-4.1-mini
-- o3
-- o4-mini
-
-Google:
-
-- Gemini 2.5 pro
-- Gemini 2.5 flash
-
-Mistral:
-
-- Mistral-large-3
+---
 
 ## Backend
 
 Votre application doit respecter strictement les guidelines back :
 
--> voir [AGENT_APP_GUIDELINES_BACK.md](AGENT_APP_GUIDELINES_BACK.md)
+→ voir [AGENT_APP_GUIDELINES_BACK.md](AGENT_APP_GUIDELINES_BACK.md)
 
-Dans les grandes lignes:
+Points clés :
 
-- l'utilisation de fonction asynchrones,
-- Utilisation d'un naming correct et compréhensible
-- Respect de la structure globale d'exemple
-- Présence des docstring
+- `DeclarativeAgentApp` + `@step` + `@stream_safe` obligatoires
+- `TabSchema` avec valeurs par défaut sur tous les champs
+- Fonctions async, type hints, docstrings Google (Args/Yields)
+- Enregistrement dans `registered_apps.py`
 
-Remarque: [AGENT_APP_GUIDELINES_BACK.md](AGENT_APP_GUIDELINES_BACK.md) sert aussi de prompt agentique pour guider un assistant Ia au code ou une technologie de vibe-coding
+> [AGENT_APP_GUIDELINES_BACK.md](AGENT_APP_GUIDELINES_BACK.md) sert aussi de prompt agentique pour guider un assistant IA.
+
+---
 
 ## Frontend
 
 Votre application doit respecter strictement les guidelines front :
 
--> voir [AGENT_APP_GUIDELINES_FRONT.md](AGENT_APP_GUIDELINES_FRONT.md)
+→ voir [AGENT_APP_GUIDELINES_FRONT.md](AGENT_APP_GUIDELINES_FRONT.md)
 
-Globalement:
+Points clés :
 
-- utilisation strict des composants mise à disposition décrits dans [AGENT_APP_GUIDELINES_FRONT.md](AGENT_APP_GUIDELINES_FRONT.md)
-- séparation stricte entre le socle partagé, la logique commune par Agent App, et la couche UI spécifique à chaque runtime
-- si une Agent App existe dans Elio et Neo, la logique de page et les étapes communes doivent être extraites dans `front/shared`
-- les composants communs à toutes les Agent Apps doivent être factorisés dans la bibliothèque partagée des agent-apps
+- Composants standards fournis dans `front/src/components/agent-apps`
+- Store Zustand avec `persist` + `partialize` (exclure isProcessing, etc.)
+- `streamStep` pour appeler les routes SSE V2
+- Séparation logique partagée / UI Elio / UI Neo
+- **Dual-platform obligatoire**
 
-Remarque: [AGENT_APP_GUIDELINES_FRONT.md](AGENT_APP_GUIDELINES_FRONT.md) sert aussi de prompt agentique pour guider un assistant Ia au code ou une technologie de vibe-coding
+> [AGENT_APP_GUIDELINES_FRONT.md](AGENT_APP_GUIDELINES_FRONT.md) sert aussi de prompt agentique pour guider un assistant IA.
+
+---
 
 ## Langue
 
@@ -106,7 +132,9 @@ Remarque: [AGENT_APP_GUIDELINES_FRONT.md](AGENT_APP_GUIDELINES_FRONT.md) sert au
 | Code source                        | **Anglais**        |
 | Commentaires dans le code          | **Anglais**        |
 | Noms de fichiers / composants      | **Anglais**        |
-| Messages utilisateur (UI)          | **i18n** (fr + gb) |
+| Messages utilisateur (UI)          | **i18n** (fr + en) |
+
+---
 
 ## Sécurité
 

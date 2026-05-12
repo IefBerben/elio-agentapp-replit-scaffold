@@ -54,7 +54,7 @@ On first run, request the 2 missing Secrets via the Replit Secrets flow. Encoura
 
 1. **LLM** — never instantiate directly. Always `from services.llm_config import get_llm`
 2. **State** — never `useState` for results, loading, or errors. Zustand store only (`front/src/stores/agent-apps/`)
-3. **Step functions** — every `async def *_stream(...)` must be decorated with `@stream_safe` from `utils.stream_error_handler`
+3. **Agent pattern** — every agent is a `class XxxApp(DeclarativeAgentApp)` in `back/agents/{name}/app.py` with `@step`-decorated async methods. Never write standalone `async def *_stream` functions.
 4. **Dark mode** — every Tailwind color class needs its pair: `bg-blue-100 dark:bg-blue-900/30`, `text-blue-700 dark:text-blue-300`
 5. **Protected** — never modify `back/agents/_reference/`, `front/src/pages/_ReferencePage.tsx`, or `front/src/stores/agent-apps/_referenceStore.ts`
 
@@ -69,19 +69,21 @@ Only use models listed in `back/services/config_llms.json`:
 
 ## SSE contract
 
-Every step function must yield this exact shape:
+Every step method must use these helpers (not raw dict yields):
 
 ```python
 # Progress events (0–99)
-yield {"step": "beginning", "message": "...", "status": "in_progress", "progress": 0}
-yield {"step": "generating", "message": "...", "status": "in_progress", "progress": 50}
+yield self.in_progress(step_id="step1", message=get_ui_message(lang, "init"), progress=5)
+yield self.in_progress(step_id="step1", message=get_ui_message(lang, "generating"), progress=30)
 
 # Final event — result payload goes here only
-yield {"step": "completed", "message": "...", "status": "completed", "progress": 100, "result": {...}}
+yield self.completed(step_id="step1", message=get_ui_message(lang, "completed"), data=result.model_dump())
 
 # Error event
-yield {"step": "error", "message": "...", "status": "error", "progress": 0, "error": str(e)}
+yield self.error(step_id="step1", message=get_ui_message(lang, "error"))
 ```
+
+The V2 SSE route: `POST /agent-apps/execute/{app_id}/{step_id}/stream`
 
 ---
 
@@ -91,33 +93,30 @@ Each agent lives in `back/agents/{name}/`:
 
 ```
 back/agents/{name}/
-├── __init__.py          # exports stream functions
-├── models.py            # Pydantic input/output models
-├── prompt_fr.py         # French prompts (constants only)
-├── prompt_en.py         # English prompts (constants only)
-├── step1_{name}.py      # step function with @stream_safe
-├── step2_{name}.py      # optional second step
+├── __init__.py          # exports XxxApp class
+├── app.py               # DeclarativeAgentApp subclass with @step methods
+├── schemas.py           # TabSchema subclasses + typed output models
+├── prompts.py           # bilingual prompt functions (get_step1_prompt, get_ui_message)
 └── tests/
-    └── test_step1.py    # minimum 5 tests
+    └── test_app.py      # minimum 5 tests
 ```
 
-Every step function signature:
+Every step method signature:
 
 ```python
-@stream_safe
-async def {name}_step_1_stream(
-    username: str,
-    prompt: str,
-    interface_language: str = "fr",
-    **kwargs: Any,
-) -> AsyncGenerator[dict[str, Any], None]:
+@step(id="step1", persist_progress=True)
+async def step1(self, ctx: StepContext, inputs: {Name}InputTab, **kwargs):
+    lang = inputs.lang or kwargs.get("lang", "fr")
+    ...
 ```
 
-Always use `_get_prompts(interface_language)` to select the prompt file. Never inline prompts.
-
-AGENTS_MAP registration in `back/main.py`:
-- Key format: `"{kebab-name}-step-1"` (kebab-case)
-- Python folder: `back/agents/{snake_name}/` (snake_case)
+Registration in `back/registered_apps.py` (not in `main.py`):
+```python
+REGISTERED_APPS = {
+    "_reference": ReferenceApp,
+    "{kebab-name}": {Name}App,   # kebab-case key
+}
+```
 
 ---
 
@@ -151,7 +150,7 @@ front/src/
 
 TypeScript interfaces live in `packages/shared-types/src/index.ts`.
 Import in frontend via the `@shared-types` path alias.
-Interfaces must match the Pydantic models in `back/agents/{name}/models.py`.
+Interfaces must match the Pydantic models in `back/agents/{name}/schemas.py`.
 
 ---
 
@@ -162,7 +161,7 @@ Interfaces must match the Pydantic models in `back/agents/{name}/models.py`.
 | Code + comments | English |
 | UI text | i18n — fr.json + en.json |
 | Communication with user | French |
-| Prompt constants | Match language: prompt_fr.py → French, prompt_en.py → English |
+| Prompt constants | Bilingual in `prompts.py` via lang parameter |
 
 ---
 
@@ -172,10 +171,11 @@ Read these docs before writing any code. They are the integration standard.
 
 | Document | What it covers |
 |----------|----------------|
-| `.agents/docs/AGENT_APP_GUIDELINES_BACK.md` | SSE patterns, bilingual prompts, file processing, doc generation |
+| `.agents/docs/AGENT_APP_GUIDELINES_BACK.md` | DeclarativeAgentApp pattern, @step, TabSchema, SSE helpers, bilingual prompts |
 | `.agents/docs/AGENT_APP_GUIDELINES_FRONT.md` | Components, Zustand patterns, dark mode, full creation checklist |
 | `.agents/docs/CONVENTIONS.md` | Architecture, naming, allowed models, security |
 | `.agents/docs/INTEGRATION_GUIDE.md` | How your POC integrates into the Elio platform |
+| `.agents/docs/ARCHITECTURE.md` | Framework subsystem overview (framework/, registered_apps.py) |
 
 ---
 
@@ -199,7 +199,7 @@ Read these docs before writing any code. They are the integration standard.
 
 1. `.agents/skills/intake-from-markdown/SKILL.md` — parse existing `product.md` + `backlog.md` (or Google AI Studio export)
 2. `.agents/skills/generate-api-contracts/SKILL.md` — write API contracts before coding
-3. `.agents/skills/build-backend/SKILL.md` — build the Python backend
+3. `.agents/skills/build-backend/SKILL.md` — build the Python backend (DeclarativeAgentApp pattern)
 4. `.agents/skills/build-frontend/SKILL.md` — build the React frontend
 5. `.agents/skills/verify-generation/SKILL.md` — run all five quality gates before sign-off
 6. `.agents/skills/platform-integration-check/SKILL.md` — validate and update SUBMISSION.md

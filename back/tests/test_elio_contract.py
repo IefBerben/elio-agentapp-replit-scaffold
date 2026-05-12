@@ -1,4 +1,4 @@
-"""Elio coding-contract test suite.
+"""Elio coding-contract test suite (v4).
 
 Single source of truth for the 23 B/F/I conformity rules documented in
 .agents/skills/platform-integration-check/SKILL.md. Every rule that can
@@ -36,6 +36,7 @@ I18N_DIR = FRONT / "src" / "i18n" / "locales"
 SHARED_TYPES = REPO_ROOT / "packages" / "shared-types" / "src" / "index.ts"
 CONFIG_LLMS = BACK / "services" / "config_llms.json"
 MAIN_PY = BACK / "main.py"
+REGISTERED_APPS_PY = BACK / "registered_apps.py"
 SUBMISSION = REPO_ROOT / "SUBMISSION.md"
 BACKLOG = REPO_ROOT / "backlog.md"
 
@@ -81,12 +82,39 @@ def _consultant_stores() -> list[Path]:
     )
 
 
-def _step_files(agent_dir: Path) -> list[Path]:
-    return sorted(agent_dir.glob("step*.py"))
+def _agent_source_files(agent_dir: Path) -> list[Path]:
+    """Return app.py (v4) and any legacy step*.py (v3) for an agent dir."""
+    files = []
+    app = agent_dir / "app.py"
+    if app.is_file():
+        files.append(app)
+    files.extend(sorted(agent_dir.glob("step*.py")))
+    return files
 
 
 def _read(path: Path) -> str:
     return path.read_text(encoding="utf-8")
+
+
+def _is_daa_class(node: ast.ClassDef) -> bool:
+    """Return True if the class inherits DeclarativeAgentApp."""
+    return any(
+        (isinstance(b, ast.Name) and b.id == "DeclarativeAgentApp")
+        or (isinstance(b, ast.Attribute) and b.attr == "DeclarativeAgentApp")
+        for b in node.bases
+    )
+
+
+def _has_step_decorator(method: ast.AsyncFunctionDef) -> bool:
+    """Return True if the method is decorated with @step or @step(...)."""
+    return any(
+        (isinstance(d, ast.Name) and d.id == "step")
+        or (isinstance(d, ast.Call) and (
+            (isinstance(d.func, ast.Name) and d.func.id == "step")
+            or (isinstance(d.func, ast.Attribute) and d.func.attr == "step")
+        ))
+        for d in method.decorator_list
+    )
 
 
 # ─── Fixtures ─────────────────────────────────────────────────────────────────
@@ -126,7 +154,6 @@ def allowed_models() -> set[str]:
     if not CONFIG_LLMS.is_file():
         pytest.skip("config_llms.json missing — backend not initialized.")
     data = json.loads(_read(CONFIG_LLMS))
-    # File shape: {"models": [{"name": "gpt-5-chat", ...}, ...]} or similar.
     if isinstance(data, dict) and "models" in data:
         return {m["name"] for m in data["models"] if "name" in m}
     if isinstance(data, list):
@@ -144,57 +171,85 @@ def test_B1_get_llm_uses_whitelisted_models(agent_dirs, allowed_models):
     pattern = re.compile(r"""get_llm\(\s*["']([^"']+)["']""")
     violations = []
     for agent in agent_dirs:
-        for step in _step_files(agent):
-            text = _read(step)
+        for src in _agent_source_files(agent):
+            text = _read(src)
             for match in pattern.finditer(text):
                 model = match.group(1)
                 if model not in allowed_models:
                     line = text[: match.start()].count("\n") + 1
-                    violations.append(f"{step.relative_to(REPO_ROOT)}:{line} — get_llm('{model}') not in whitelist {sorted(allowed_models)}")
+                    violations.append(
+                        f"{src.relative_to(REPO_ROOT)}:{line} — get_llm('{model}') not in whitelist {sorted(allowed_models)}"
+                    )
     assert not violations, "B1 violations:\n  " + "\n  ".join(violations)
 
 
-def test_B2_stream_functions_have_stream_safe(agent_dirs):
-    """Every `async def *_stream` is decorated with @stream_safe."""
+def test_B2_declarative_agent_app_with_step_decorators(agent_dirs):
+    """Each agent app.py defines a DeclarativeAgentApp subclass with @step-decorated methods."""
     violations = []
     for agent in agent_dirs:
-        for step in _step_files(agent):
-            tree = ast.parse(_read(step))
-            for node in ast.walk(tree):
-                if isinstance(node, ast.AsyncFunctionDef) and node.name.endswith("_stream"):
-                    decorators = {
-                        d.id if isinstance(d, ast.Name) else (d.attr if isinstance(d, ast.Attribute) else "")
-                        for d in node.decorator_list
-                    }
-                    if "stream_safe" not in decorators:
-                        violations.append(f"{step.relative_to(REPO_ROOT)}:{node.lineno} — async def {node.name} missing @stream_safe")
+        app_py = agent / "app.py"
+        if not app_py.is_file():
+            violations.append(f"{agent.relative_to(REPO_ROOT)}/app.py — missing (required in v4)")
+            continue
+        text = _read(app_py)
+        tree = ast.parse(text)
+
+        daa_classes = [n for n in ast.walk(tree) if isinstance(n, ast.ClassDef) and _is_daa_class(n)]
+        if not daa_classes:
+            violations.append(
+                f"{app_py.relative_to(REPO_ROOT)} — no class inheriting DeclarativeAgentApp found"
+            )
+            continue
+
+        for cls_node in daa_classes:
+            step_methods = [
+                n for n in ast.walk(cls_node)
+                if isinstance(n, ast.AsyncFunctionDef) and _has_step_decorator(n)
+            ]
+            if not step_methods:
+                violations.append(
+                    f"{app_py.relative_to(REPO_ROOT)} — class {cls_node.name} has no @step-decorated methods"
+                )
     assert not violations, "B2 violations:\n  " + "\n  ".join(violations)
 
 
 @pytest.mark.skip(reason=SKIP_B3)
 def test_B3_sse_payload_shape():
-    """SSE yield dicts have step/message/status/progress + final result."""
+    """SSE yields use self.in_progress()/self.completed()/self.error() helpers."""
 
 
-def test_B4_step_functions_registered_in_agents_map(agent_dirs, main_py_text):
-    """Every `*_stream` function is registered in AGENTS_MAP with kebab-case `<name>-step-N`."""
+def test_B4_app_registered_in_registered_apps(agent_dirs):
+    """Every DeclarativeAgentApp subclass is in registered_apps.py with a kebab-case key."""
+    if not REGISTERED_APPS_PY.is_file():
+        pytest.skip("back/registered_apps.py missing — backend not initialized.")
+    reg_text = _read(REGISTERED_APPS_PY)
     violations = []
+
     for agent in agent_dirs:
-        for step in _step_files(agent):
-            tree = ast.parse(_read(step))
-            for node in ast.walk(tree):
-                if isinstance(node, ast.AsyncFunctionDef) and node.name.endswith("_stream"):
-                    if node.name not in main_py_text:
-                        violations.append(f"{step.relative_to(REPO_ROOT)} — {node.name} not referenced in back/main.py")
-    # Every AGENTS_MAP key (excluding _reference-*) must match `<slug>-step-<N>`.
-    key_pattern = re.compile(r'"([a-z][a-z0-9-]*-step-\d+)"\s*:')
-    valid_keys = set(key_pattern.findall(main_py_text))
-    all_kebab = re.findall(r'"([^"]+)"\s*:\s*[a-z_]+_stream', main_py_text)
-    for key in all_kebab:
+        app_py = agent / "app.py"
+        if not app_py.is_file():
+            continue
+        tree = ast.parse(_read(app_py))
+        class_names = [
+            n.name for n in ast.walk(tree)
+            if isinstance(n, ast.ClassDef) and _is_daa_class(n)
+        ]
+        for cls_name in class_names:
+            if cls_name not in reg_text:
+                violations.append(
+                    f"{app_py.relative_to(REPO_ROOT)} — class {cls_name} not found in registered_apps.py"
+                )
+
+    # All non-reference keys must be kebab-case (hyphens, not underscores)
+    key_pattern = re.compile(r'"([a-z][a-z0-9-]*)"\s*:')
+    for key in key_pattern.findall(reg_text):
         if key.startswith("_"):
             continue
-        if key not in valid_keys:
-            violations.append(f"back/main.py — AGENTS_MAP key '{key}' does not match <slug>-step-<N>")
+        if "_" in key:
+            violations.append(
+                f"registered_apps.py — key '{key}' must be kebab-case (use hyphens, not underscores)"
+            )
+
     assert not violations, "B4 violations:\n  " + "\n  ".join(violations)
 
 
@@ -203,11 +258,13 @@ def test_B5_no_direct_llm_instantiation(agent_dirs):
     banned = re.compile(r"\b(AzureChatOpenAI|ChatOpenAI|ChatAnthropic|AzureOpenAI)\s*\(")
     violations = []
     for agent in agent_dirs:
-        for step in _step_files(agent):
-            text = _read(step)
+        for src in _agent_source_files(agent):
+            text = _read(src)
             for match in banned.finditer(text):
                 line = text[: match.start()].count("\n") + 1
-                violations.append(f"{step.relative_to(REPO_ROOT)}:{line} — direct {match.group(1)}() instantiation banned; use get_llm()")
+                violations.append(
+                    f"{src.relative_to(REPO_ROOT)}:{line} — direct {match.group(1)}() instantiation banned; use get_llm()"
+                )
     assert not violations, "B5 violations:\n  " + "\n  ".join(violations)
 
 
@@ -227,70 +284,81 @@ def test_B6_min_5_tests_per_agent(agent_dirs):
                 if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name.startswith("test_")
             )
         if count < 5:
-            violations.append(f"{agent.relative_to(REPO_ROOT)}/tests/ — only {count} test(s), min 5 required")
+            violations.append(
+                f"{agent.relative_to(REPO_ROOT)}/tests/ — only {count} test(s), min 5 required"
+            )
     assert not violations, "B6 violations:\n  " + "\n  ".join(violations)
 
 
-def test_B7_bilingual_prompts_exist_and_no_hardcoded_strings(agent_dirs):
-    """prompt_fr.py + prompt_en.py both exist. Step files contain no FR/EN user-facing strings."""
-    # Heuristic for hardcoded strings: accented French chars, OR common UI words
-    # inside string literals located in yield dicts / return values.
+def test_B7_prompts_file_exists_and_no_hardcoded_strings(agent_dirs):
+    """prompts.py exists. app.py contains no hardcoded FR/EN user-facing strings."""
     french_chars = re.compile(r"[éèêàâôùûçîï]")
-    # Ban common UI strings in step*.py (outside log messages, which use logger.*(...))
     banned_phrases = re.compile(
         r'["\'](Initialisation|Génération|Terminé|Draft generated|Done!|Terminé !|En cours|Complete)[^"\']*["\']'
     )
     violations = []
     for agent in agent_dirs:
-        if not (agent / "prompt_fr.py").is_file():
-            violations.append(f"{agent.relative_to(REPO_ROOT)}/prompt_fr.py — missing")
-        if not (agent / "prompt_en.py").is_file():
-            violations.append(f"{agent.relative_to(REPO_ROOT)}/prompt_en.py — missing")
-        for step in _step_files(agent):
-            text = _read(step)
-            # Strip logger.*(...) calls — those are developer-facing, not user-facing.
+        if not (agent / "prompts.py").is_file():
+            violations.append(f"{agent.relative_to(REPO_ROOT)}/prompts.py — missing")
+
+        for src in _agent_source_files(agent):
+            text = _read(src)
             stripped = re.sub(r"logger\.\w+\([^)]*\)", "", text)
             for match in banned_phrases.finditer(stripped):
                 line = stripped[: match.start()].count("\n") + 1
-                violations.append(f"{step.relative_to(REPO_ROOT)}:{line} — hardcoded UI string {match.group(0)}; move to prompt_fr/en.py")
-            # Detect stray accented strings outside imports/paths.
+                violations.append(
+                    f"{src.relative_to(REPO_ROOT)}:{line} — hardcoded UI string {match.group(0)}; move to prompts.py"
+                )
             for lineno, line in enumerate(stripped.splitlines(), 1):
                 if french_chars.search(line) and ('"' in line or "'" in line):
-                    # Only flag if it's clearly a string literal with UI content (skip comments).
                     if line.strip().startswith("#"):
                         continue
                     if re.search(r'["\'][^"\']*[éèêàâôùûçîï][^"\']*["\']', line):
-                        violations.append(f"{step.relative_to(REPO_ROOT)}:{lineno} — French string literal in step file; move to prompt_fr.py")
+                        violations.append(
+                            f"{src.relative_to(REPO_ROOT)}:{lineno} — French string literal; move to prompts.py"
+                        )
     assert not violations, "B7 violations:\n  " + "\n  ".join(violations)
 
 
-def test_B8_step_functions_accept_interface_language(agent_dirs):
-    """Every step function signature accepts `interface_language: str = "fr"`."""
+def test_B8_step_methods_handle_lang(agent_dirs):
+    """Every @step method reads `lang` from inputs or kwargs (i18n-aware generation)."""
     violations = []
     for agent in agent_dirs:
-        for step in _step_files(agent):
-            tree = ast.parse(_read(step))
-            for node in ast.walk(tree):
-                if isinstance(node, ast.AsyncFunctionDef) and node.name.endswith("_stream"):
-                    arg_names = [a.arg for a in node.args.args]
-                    if "interface_language" not in arg_names:
-                        violations.append(f"{step.relative_to(REPO_ROOT)}:{node.lineno} — {node.name} missing interface_language parameter")
+        app_py = agent / "app.py"
+        if not app_py.is_file():
+            continue
+        text = _read(app_py)
+        tree = ast.parse(text)
+
+        for cls_node in ast.walk(tree):
+            if not isinstance(cls_node, ast.ClassDef) or not _is_daa_class(cls_node):
+                continue
+            for method in ast.walk(cls_node):
+                if not isinstance(method, ast.AsyncFunctionDef):
+                    continue
+                if not _has_step_decorator(method):
+                    continue
+                method_src = ast.get_source_segment(text, method) or ""
+                if "lang" not in method_src:
+                    violations.append(
+                        f"{app_py.relative_to(REPO_ROOT)}:{method.lineno} — @step method "
+                        f"'{method.name}' does not read 'lang' "
+                        f"(add `lang = inputs.lang or kwargs.get(\"lang\", \"fr\")`)"
+                    )
     assert not violations, "B8 violations:\n  " + "\n  ".join(violations)
 
 
 @pytest.mark.skip(reason=SKIP_B9)
 def test_B9_google_style_docstrings():
-    """Google-style docstrings with Args and Yields."""
+    """Google-style docstrings with Args and Yields on class and @step methods."""
 
 
 def test_B10_reference_agent_unmodified():
-    """_reference/ files match their stored checksums (detect accidental edits)."""
+    """_reference/ v4 files still exist and are non-empty."""
     ref_dir = BACK / "agents" / "_reference"
     if not ref_dir.is_dir():
         pytest.skip("_reference agent not present.")
-    # Checksum-free check: the reference files simply must still exist and be non-empty.
-    # A deeper integrity check belongs in CI against the original commit.
-    required = ["step1_generate.py", "step2_refine.py", "__init__.py"]
+    required = ["app.py", "schemas.py", "prompts.py", "__init__.py"]
     violations = [
         f"back/agents/_reference/{name} missing or empty"
         for name in required
@@ -314,13 +382,14 @@ def test_F1_store_uses_persist_with_partialize(stores):
         if "partialize" not in text:
             violations.append(f"{store.relative_to(REPO_ROOT)} — missing partialize in persist config")
             continue
-        # If any transient field appears inside the partialize return object, flag it.
         m = re.search(r"partialize\s*:\s*\(?\s*[^)]*\)?\s*=>\s*\(\s*\{([^}]*)\}", text, re.DOTALL)
         if m:
             body = m.group(1)
             for t in transient:
                 if re.search(rf"\b{t}\b", body):
-                    violations.append(f"{store.relative_to(REPO_ROOT)} — transient field '{t}' must NOT be persisted")
+                    violations.append(
+                        f"{store.relative_to(REPO_ROOT)} — transient field '{t}' must NOT be persisted"
+                    )
     assert not violations, "F1 violations:\n  " + "\n  ".join(violations)
 
 
@@ -332,14 +401,15 @@ def test_F2_no_store_destructuring(pages):
         text = _read(page)
         for match in bad.finditer(text):
             line = text[: match.start()].count("\n") + 1
-            violations.append(f"{page.relative_to(REPO_ROOT)}:{line} — store destructuring banned; use useXStore((s) => s.field)")
+            violations.append(
+                f"{page.relative_to(REPO_ROOT)}:{line} — store destructuring banned; use useXStore((s) => s.field)"
+            )
     assert not violations, "F2 violations:\n  " + "\n  ".join(violations)
 
 
 def test_F3_no_hardcoded_user_strings(pages):
     """Pages use t("...") for user-facing strings. Common offenders: title, placeholder, aria-label."""
     violations = []
-    # Flag: prop="literal-word-with-space-or-accents" — words, not tokens.
     pattern = re.compile(
         r'(title|placeholder|aria-label|aria-description)\s*=\s*"([^"]*(?:\s|[éèêàâôùûçîï])[^"]*)"'
     )
@@ -347,7 +417,9 @@ def test_F3_no_hardcoded_user_strings(pages):
         text = _read(page)
         for match in pattern.finditer(text):
             line = text[: match.start()].count("\n") + 1
-            violations.append(f"{page.relative_to(REPO_ROOT)}:{line} — hardcoded {match.group(1)}=\"{match.group(2)}\"; use t(...)")
+            violations.append(
+                f"{page.relative_to(REPO_ROOT)}:{line} — hardcoded {match.group(1)}=\"{match.group(2)}\"; use t(...)"
+            )
     assert not violations, "F3 violations:\n  " + "\n  ".join(violations)
 
 
@@ -359,7 +431,9 @@ def test_F4_no_raw_fetch_in_pages_or_stores(pages, stores):
         text = _read(f)
         for match in bad.finditer(text):
             line = text[: match.start()].count("\n") + 1
-            violations.append(f"{f.relative_to(REPO_ROOT)}:{line} — raw fetch() banned; use executeAgentStreaming from @/services/agentService")
+            violations.append(
+                f"{f.relative_to(REPO_ROOT)}:{line} — raw fetch() banned; use executeAgentStreaming from @/services/agentService"
+            )
     assert not violations, "F4 violations:\n  " + "\n  ".join(violations)
 
 
@@ -371,7 +445,9 @@ def test_F5_no_raw_form_controls(pages):
         text = _read(page)
         for match in bad.finditer(text):
             line = text[: match.start()].count("\n") + 1
-            violations.append(f"{page.relative_to(REPO_ROOT)}:{line} — raw <{match.group(1)}> banned; use Form* components")
+            violations.append(
+                f"{page.relative_to(REPO_ROOT)}:{line} — raw <{match.group(1)}> banned; use Form* components"
+            )
     assert not violations, "F5 violations:\n  " + "\n  ".join(violations)
 
 
@@ -394,7 +470,9 @@ def test_F8_interface_language_from_i18n(stores):
             value = match.group(1).strip()
             if "i18n.language" not in value:
                 line = text[: match.start()].count("\n") + 1
-                violations.append(f"{store.relative_to(REPO_ROOT)}:{line} — interface_language={value}; must be i18n.language")
+                violations.append(
+                    f"{store.relative_to(REPO_ROOT)}:{line} — interface_language={value}; must be i18n.language"
+                )
     assert not violations, "F8 violations:\n  " + "\n  ".join(violations)
 
 
@@ -420,60 +498,67 @@ def test_F10_reference_frontend_unmodified():
 # ─── INTEGRATION RULES ────────────────────────────────────────────────────────
 
 
-def test_I1_api_contracts_match_agents_map(main_py_text):
-    """Routes in .agents/docs/api-contracts.md match AGENTS_MAP keys (for consultant agents)."""
+def test_I1_api_contracts_match_registered_apps(main_py_text):
+    """App IDs in registered_apps.py appear in api-contracts.md."""
     contracts = REPO_ROOT / ".agents" / "docs" / "api-contracts.md"
     if not contracts.is_file():
         pytest.skip("api-contracts.md missing (no consultant agent scaffolded yet).")
-    text = _read(contracts)
-    declared = set(re.findall(r"`([a-z][a-z0-9-]*-step-\d+)`", text))
-    registered = set(re.findall(r'"([a-z][a-z0-9-]*-step-\d+)"\s*:', main_py_text))
-    # Only compare consultant-owned (skip _reference-*).
-    declared = {k for k in declared if not k.startswith("_")}
-    registered = {k for k in registered if not k.startswith("_")}
-    missing = declared - registered
-    extra = registered - declared
+    if not REGISTERED_APPS_PY.is_file():
+        pytest.skip("registered_apps.py missing.")
+
+    reg_text = _read(REGISTERED_APPS_PY)
+    contracts_text = _read(contracts)
+
+    key_pattern = re.compile(r'"([a-z][a-z0-9-]*)"\s*:')
+    registered_ids = {k for k in key_pattern.findall(reg_text) if not k.startswith("_")}
+
     problems = []
-    if missing:
-        problems.append(f"declared in api-contracts.md but not in AGENTS_MAP: {sorted(missing)}")
-    if extra:
-        problems.append(f"in AGENTS_MAP but not declared in api-contracts.md: {sorted(extra)}")
+    for app_id in sorted(registered_ids):
+        if app_id not in contracts_text:
+            problems.append(
+                f"app_id '{app_id}' in registered_apps.py not referenced in api-contracts.md"
+            )
     assert not problems, "I1 violations:\n  " + "\n  ".join(problems)
 
 
 def test_I2_shared_types_match_pydantic_models(agent_dirs):
-    """Every Pydantic BaseModel in models.py has a matching TS interface in index.ts with the same field names."""
+    """Every Pydantic BaseModel in schemas.py / models.py has a matching TS interface in index.ts."""
     if not SHARED_TYPES.is_file():
         pytest.skip("packages/shared-types/src/index.ts missing.")
     ts_text = _read(SHARED_TYPES)
     violations = []
     for agent in agent_dirs:
-        models_py = agent / "models.py"
-        if not models_py.is_file():
-            continue
-        tree = ast.parse(_read(models_py))
-        for node in ast.walk(tree):
-            if isinstance(node, ast.ClassDef) and any(
-                isinstance(b, ast.Name) and b.id == "BaseModel"
-                or isinstance(b, ast.Attribute) and b.attr == "BaseModel"
-                for b in node.bases
-            ):
-                cls = node.name
-                iface_match = re.search(
-                    rf"interface\s+{cls}\s*\{{([^}}]*)\}}", ts_text, re.DOTALL
-                )
-                if not iface_match:
-                    violations.append(f"{models_py.relative_to(REPO_ROOT)} — class {cls} has no matching interface in shared-types/src/index.ts")
-                    continue
-                iface_body = iface_match.group(1)
-                py_fields = [
-                    sub.target.id
-                    for sub in node.body
-                    if isinstance(sub, ast.AnnAssign) and isinstance(sub.target, ast.Name)
-                ]
-                for field in py_fields:
-                    if not re.search(rf"\b{field}\b\s*[?:]", iface_body):
-                        violations.append(f"{SHARED_TYPES.relative_to(REPO_ROOT)} — interface {cls} missing field '{field}' present in {cls} pydantic model")
+        # v4: schemas.py; v3 legacy: models.py
+        for models_file in [agent / "schemas.py", agent / "models.py"]:
+            if not models_file.is_file():
+                continue
+            tree = ast.parse(_read(models_file))
+            for node in ast.walk(tree):
+                if isinstance(node, ast.ClassDef) and any(
+                    isinstance(b, ast.Name) and b.id == "BaseModel"
+                    or isinstance(b, ast.Attribute) and b.attr == "BaseModel"
+                    for b in node.bases
+                ):
+                    cls = node.name
+                    iface_match = re.search(
+                        rf"interface\s+{cls}\s*\{{([^}}]*)\}}", ts_text, re.DOTALL
+                    )
+                    if not iface_match:
+                        violations.append(
+                            f"{models_file.relative_to(REPO_ROOT)} — class {cls} has no matching interface in shared-types/src/index.ts"
+                        )
+                        continue
+                    iface_body = iface_match.group(1)
+                    py_fields = [
+                        sub.target.id
+                        for sub in node.body
+                        if isinstance(sub, ast.AnnAssign) and isinstance(sub.target, ast.Name)
+                    ]
+                    for field in py_fields:
+                        if not re.search(rf"\b{field}\b\s*[?:]", iface_body):
+                            violations.append(
+                                f"{SHARED_TYPES.relative_to(REPO_ROOT)} — interface {cls} missing field '{field}'"
+                            )
     assert not violations, "I2 violations:\n  " + "\n  ".join(violations)
 
 
@@ -482,17 +567,17 @@ def test_P1_backlog_stories_have_status_checkbox():
     if not BACKLOG.is_file():
         pytest.skip("backlog.md missing — nothing to check.")
     text = _read(BACKLOG)
-    # Scan for `### US-...` story headings and check the next ~3 lines for a Status: checkbox.
     heading_pattern = re.compile(r"^###\s+US-\d+[^\n]*$", re.MULTILINE)
     status_pattern = re.compile(r"\*\*Status:\*\*\s*\[( |x)\]")
     violations = []
     lines = text.splitlines()
     for match in heading_pattern.finditer(text):
         heading_line_idx = text[: match.start()].count("\n")
-        # Look at heading + next 3 lines for a Status checkbox.
         window = "\n".join(lines[heading_line_idx : heading_line_idx + 4])
         if not status_pattern.search(window):
-            violations.append(f"backlog.md:{heading_line_idx + 1} — '{match.group(0)}' missing `**Status:** [ ]` line")
+            violations.append(
+                f"backlog.md:{heading_line_idx + 1} — '{match.group(0)}' missing `**Status:** [ ]` line"
+            )
     assert not violations, "P1 violations:\n  " + "\n  ".join(violations)
 
 
@@ -503,9 +588,6 @@ def test_I3_submission_md_has_real_content():
     if not SUBMISSION.is_file():
         pytest.skip("SUBMISSION.md missing.")
     text = _read(SUBMISSION)
-    # Extract the first three sections (best-effort — numbered ## or # headings).
-    # We just flag any placeholder marker anywhere in the first ~120 lines,
-    # which covers sections 1-3 in the scaffold template.
     head = "\n".join(text.splitlines()[:120])
     placeholders = re.findall(r"_À compléter[^_]*_", head)
     assert not placeholders, (

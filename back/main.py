@@ -30,12 +30,6 @@ from pydantic import BaseModel
 TEMPFILES_DIR = Path(__file__).parent / "tempfiles"
 TEMPFILES_DIR.mkdir(exist_ok=True)
 
-# ─── Reference example ────────────────────────────────────────────────────────
-from agents._reference import (
-    reference_step_1_stream,
-    reference_step_2_stream,
-)
-
 # ─── Vos agents — ajouter vos imports ici ─────────────────────────────────────
 # from agents.{mon_usecase} import (
 #     mon_usecase_step_1_stream,
@@ -48,6 +42,16 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
 )
 logger = logging.getLogger("elio_scaffold")
+
+# ─── Framework (v4) ───────────────────────────────────────────────────────────
+from framework import (
+    register_apps,
+    get_action_handler,
+    get_stream_handler,
+    get_app_manifest,
+    get_all_app_ids,
+)
+from registered_apps import REGISTERED_APPS
 
 # ─── Scaffold version (single source of truth: SCAFFOLD_VERSION at repo root) ─
 _SCAFFOLD_VERSION = (Path(__file__).parent.parent / "SCAFFOLD_VERSION").read_text(encoding="utf-8").strip()
@@ -168,24 +172,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ─── Agents Registry ──────────────────────────────────────────────────────────
-# Convention: kebab-case, suffixe -step-N
-# Ajouter chaque step de chaque agent ici.
-#
-# EXEMPLE (référence, à ne pas décommenter) :
-#   "_reference-step-1": reference_step_1_stream,
-#   "_reference-step-2": reference_step_2_stream,
-#
-# VOS AGENTS (décommenter et remplacer) :
-#   "mon-usecase-step-1": mon_usecase_step_1_stream,
-#   "mon-usecase-step-2": mon_usecase_step_2_stream,
-AGENTS_MAP: dict[str, Any] = {
-    # ── Reference example (wired — shows the scaffold pattern in action) ──────
-    "_reference-step-1": reference_step_1_stream,
-    "_reference-step-2": reference_step_2_stream,
-    # ── Your agents — add here ────────────────────────────────────────────────
-    # "mon-usecase-step-1": mon_usecase_step_1_stream,
-}
+register_apps(REGISTERED_APPS)
+
+# ─── Legacy V1 agents (kept for backward compat) ──────────────────────────────
+# New agents use DeclarativeAgentApp + registered_apps.py instead.
+LEGACY_AGENTS_MAP: dict[str, Any] = {}
 
 SSE_MEDIA_TYPE = "text/event-stream"
 
@@ -286,7 +277,8 @@ async def health() -> dict[str, Any]:
     return {
         "status": "ok",
         "scaffold_version": _SCAFFOLD_VERSION,
-        "agents": list(AGENTS_MAP.keys()),
+        "agents": list(LEGACY_AGENTS_MAP.keys()),
+        "apps": get_all_app_ids(),
     }
 
 
@@ -303,7 +295,7 @@ async def scaffold_status() -> dict[str, Any]:
     """
     has_product, is_product_template, product_issues = _spec_status(PRODUCT_MD_PATH)
     has_backlog, is_backlog_template, backlog_issues = _spec_status(BACKLOG_MD_PATH)
-    has_generated_agent = any(not k.startswith("_") for k in AGENTS_MAP)
+    has_generated_agent = any(not k.startswith("_") for k in LEGACY_AGENTS_MAP)
     return {
         "hasProductMd": has_product,
         "isProductMdTemplate": is_product_template,
@@ -424,6 +416,55 @@ async def upload_prototype(files: list[UploadFile]) -> dict[str, Any]:
     return {"files": saved, "status": await scaffold_status()}
 
 
+@app.post("/agent-apps/execute/{app_id}/{step_id}/stream")
+async def execute_agent_v2_stream(app_id: str, step_id: str, request: Request) -> StreamingResponse:
+    """V2 SSE route — DeclarativeAgentApp pattern."""
+    payload = await request.json()
+    username = payload.get("username", "anonymous")
+
+    # Spec gate (same as V1)
+    product_ok, _, product_issues = _spec_status(PRODUCT_MD_PATH)
+    backlog_ok, _, backlog_issues = _spec_status(BACKLOG_MD_PATH)
+    if app_id != "_reference" and (not product_ok or not backlog_ok or product_issues or backlog_issues):
+        async def _gate_error():
+            yield f"data: {json.dumps({'step': 'error', 'message': 'Spec files missing or invalid. Fill product.md and backlog.md via the Starter page first.', 'status': 'error', 'progress': 0})}\n\n"
+        return StreamingResponse(_gate_error(), media_type="text/event-stream")
+
+    handler = get_stream_handler(app_id, step_id)
+
+    async def _stream():
+        async for event in handler(username=username, **{k: v for k, v in payload.items() if k != "username"}):
+            yield f"data: {json.dumps(event)}\n\n"
+
+    return StreamingResponse(_stream(), media_type="text/event-stream")
+
+
+@app.post("/agent-apps/execute/{app_id}/action/{action_id}/stream")
+async def execute_agent_action_stream(app_id: str, action_id: str, request: Request) -> StreamingResponse:
+    """V2 action SSE route."""
+    payload = await request.json()
+    username = payload.get("username", "anonymous")
+    handler = get_action_handler(app_id, action_id)
+
+    async def _stream():
+        async for event in handler(username=username, **{k: v for k, v in payload.items() if k != "username"}):
+            yield f"data: {json.dumps(event)}\n\n"
+
+    return StreamingResponse(_stream(), media_type="text/event-stream")
+
+
+@app.delete("/agent-apps/{app_id}/state")
+async def reset_agent_state(app_id: str, username: str = "anonymous"):
+    """Reset persisted state for an app+user pair."""
+    from framework.base_agent_app import _load_json_db, _save_json_db
+    db = _load_json_db()
+    key = f"{app_id}::{username}"
+    if key in db:
+        del db[key]
+        _save_json_db(db)
+    return {"status": "ok", "cleared": key}
+
+
 @app.post("/agent-apps/execute/{agent_id}/stream")
 async def execute_agent_stream(
     agent_id: str,
@@ -444,10 +485,10 @@ async def execute_agent_stream(
         HTTPException 404: If agent_id is not found in AGENTS_MAP.
         HTTPException 400: If request body is not valid JSON.
     """
-    if agent_id not in AGENTS_MAP:
+    if agent_id not in LEGACY_AGENTS_MAP:
         raise HTTPException(
             status_code=404,
-            detail=f"Agent '{agent_id}' not found. Available: {list(AGENTS_MAP.keys())}",
+            detail=f"Agent '{agent_id}' not found. Available: {list(LEGACY_AGENTS_MAP.keys())}",
         )
 
     # ── Spec gate — block real agents when specs are missing or invalid ────────
@@ -488,7 +529,7 @@ async def execute_agent_stream(
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Invalid JSON body: {e}") from e
 
-    stream_fn = AGENTS_MAP[agent_id]
+    stream_fn = LEGACY_AGENTS_MAP[agent_id]
 
     async def generate_sse_events() -> AsyncGenerator[str, None]:
         """Yield SSE-formatted events from agent execution.

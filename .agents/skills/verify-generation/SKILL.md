@@ -6,7 +6,7 @@ when_to_invoke:
   - User says "verify the app" / "vérifie l'app"
   - User says "is the generation actually working?" / "est-ce que ça tourne vraiment ?"
 when_NOT_to_invoke:
-  - No agent has been built yet (only `_reference` in AGENTS_MAP) — tell the user to build first
+  - No agent has been built yet (only `_reference` in registered_apps.py) — tell the user to build first
   - User is still iterating on `backlog.md` — verification is a post-build gate, not a review tool
 ---
 
@@ -54,14 +54,14 @@ On failure: read the tsc/vite error (file:line), fix the exact location, re-run.
 
 Grep-based, no LLM judgment:
 
-- Every new agent step function in `back/agents/<name>/` is registered in `back/main.py` `AGENTS_MAP` with a kebab-case key ending in `-step-N`.
+- Every new `DeclarativeAgentApp` subclass in `back/agents/<name>/app.py` is imported and registered in `back/registered_apps.py`.
 - Every new page in `front/src/pages/` (not `StarterPage`, `ShowcasePage`, `_ReferencePage`) is imported in `front/src/App.tsx` and has a render branch in the page switcher.
 - Every new Zustand store in `front/src/stores/agent-apps/` is used by at least one component.
 
 Concrete commands:
 ```bash
-grep -rE '^(async )?def [a-z_]+_stream' back/agents/ --include='*.py' | grep -v _reference
-grep -E '"[a-z0-9-]+-step-[0-9]+"' back/main.py
+grep -rE '^class [A-Z][a-zA-Z]+\(DeclarativeAgentApp\)' back/agents/ --include='*.py' | grep -v _reference
+grep -E 'from agents\.' back/registered_apps.py
 grep -E 'import.*from "@/pages' front/src/App.tsx
 ls front/src/pages/*.tsx
 ```
@@ -88,7 +88,7 @@ On failure in 4b: fix per the skill's own retry policy (max 2 attempts per rule)
 
 ### Gate 5 — SSE smoke
 
-For each new agent in `AGENTS_MAP` (keys not starting with `_`):
+For each new app registered in `back/registered_apps.py` (keys not starting with `_`):
 
 1. Check `http://localhost:8000/` with a 2-second timeout. If it responds, use it.
 2. If not reachable, start a transient backend:
@@ -96,7 +96,7 @@ For each new agent in `AGENTS_MAP` (keys not starting with `_`):
    cd back && uv run uvicorn main:app --port 8001 &
    ```
    Wait up to 10 seconds for `http://localhost:8001/` to respond, then use it.
-3. POST a minimal payload to `/agent-apps/execute/{agent_id}/stream` with:
+3. POST a minimal payload to `/agent-apps/execute/{app_id}/{step_id}/stream` (use the first `@step` method's id) with:
    ```json
    {"username": "verify", "prompt": "smoke test", "interface_language": "fr"}
    ```

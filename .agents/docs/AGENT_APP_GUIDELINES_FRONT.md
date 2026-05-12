@@ -47,6 +47,151 @@ src/
 
 ---
 
+## Persistance d'état (CRITIQUE)
+
+> Cette section est **non négociable**. Toute Agent App doit suivre ces 4 règles, sinon elle aura des comportements incohérents (données fantômes après reset, résultats perdus au refresh, UI désynchronisée du backend).
+
+### Principe : le backend est la source de vérité pour les outputs
+
+Chaque étape de votre Agent App appelle `self.completed(data=...)`. Le framework écrit **chaque clé** du `data=` directement dans `app_state` côté backend (à plat, top-level — un champ par clé). Cet état est ensuite exposé via :
+
+- `GET /agent-apps/{app_id}/state` → renvoie `{ status, last_step_id, state }` où `state` est le dict plat
+- `DELETE /agent-apps/{app_id}/state` → efface tout
+
+Le **store Zustand** ne doit donc jamais être considéré comme la source de vérité pour des outputs générés. Le localStorage ne sert qu'à persister :
+
+- les **inputs** du formulaire (texte saisi, fichiers uploadés, paramètres)
+- la **navigation** (`currentStep`, `maxReachedStep`)
+
+Tout output produit par un step (résultat de génération, chat history, image générée, etc.) est rechargé depuis le backend au montage de la page via `loadFromBackend()`.
+
+### Helper : `services/agentStateService.ts`
+
+Le toolkit fournit deux helpers HTTP :
+
+```typescript
+import {
+    getAgentAppState,
+    deleteAgentAppState,
+} from "@/services/agentStateService";
+
+// Lire l'état persisté (renvoie { status, last_step_id, state })
+const envelope = await getAgentAppState("my-app");
+const flat = envelope.state; // dict plat des champs persistés
+
+// Effacer l'état persisté
+await deleteAgentAppState("my-app");
+```
+
+### Les 4 règles d'or pour le store
+
+#### Règle 1 — `partialize` ne contient QUE les inputs et la navigation
+
+```typescript
+persist(
+  (set) => ({ ... }),
+  {
+    name: "my-agent-store",
+    partialize: (s) => ({
+      // ✅ Inputs et navigation
+      topic: s.topic,
+      uploadedFiles: s.uploadedFiles,
+      currentStep: s.currentStep,
+      maxReachedStep: s.maxReachedStep,
+      // ❌ JAMAIS d'outputs ici (result, persona1, conversation, etc.)
+    }),
+  },
+)
+```
+
+#### Règle 2 — `resetAll` doit aussi effacer le backend
+
+Sinon, après un reset, le prochain `loadFromBackend` va ressusciter les anciennes données.
+
+```typescript
+resetAll: () => {
+  set(initialState);
+  // Fire-and-forget : le wipe local est synchrone, le DELETE backend best-effort
+  void deleteAgentAppState(MY_APP_ID).catch((err) =>
+    console.warn("[myStore] failed to clear backend state:", err),
+  );
+},
+```
+
+#### Règle 3 — `loadFromBackend` projette les outputs depuis le state plat ET dérive le `currentStep`
+
+```typescript
+loadFromBackend: async () => {
+  set({ isSyncing: true });
+  try {
+    const envelope = await getAgentAppState(MY_APP_ID);
+    const flat = envelope.state ?? {};
+
+    // App_state vide → reset propre (couvre le cas d'un reset/handover externe)
+    if (Object.keys(flat).length === 0) {
+      set(initialState);
+      return;
+    }
+
+    // Projeter chaque clé d'output que vos steps ont écrite via self.completed(data=...)
+    const myResult = (flat.my_result as MyResult | undefined) ?? null;
+    const myList = Array.isArray(flat.my_list) ? (flat.my_list as Item[]) : [];
+
+    // Dériver currentStep depuis les outputs présents (jamais depuis localStorage)
+    let derivedStep = 1;
+    if (myList.length > 0) derivedStep = 3;
+    else if (myResult) derivedStep = 2;
+
+    set((s) => ({
+      // Inputs : préférer le backend, fallback sur le local
+      topic: typeof flat.topic === "string" ? flat.topic : s.topic,
+      // Outputs : source de vérité = backend
+      myResult,
+      myList,
+      // Navigation : dérivée du backend
+      currentStep: derivedStep,
+      maxReachedStep: derivedStep,
+    }));
+  } catch (err) {
+    console.warn("[myStore] loadFromBackend failed:", err);
+  } finally {
+    set({ isSyncing: false });
+  }
+},
+```
+
+#### Règle 4 — Appeler `loadFromBackend()` au montage de la page
+
+```typescript
+const MyAgentPage: React.FC = () => {
+    // ...
+    useEffect(() => {
+        useMyStore
+            .getState()
+            .loadFromBackend()
+            .catch(() => {
+                /* swallowed — store logs internally */
+            });
+    }, []);
+    // ...
+};
+```
+
+### Bug évité par cette discipline
+
+| Sans la règle…                             | Symptôme                                                                |
+| ------------------------------------------ | ----------------------------------------------------------------------- |
+| Règle 1 (outputs dans `partialize`)        | Divergence entre localStorage et backend après un step                  |
+| Règle 2 (reset sans DELETE)                | Reset → refresh → les anciens résultats reviennent                      |
+| Règle 3 (mauvais shape ou step non dérivé) | Refresh après génération → on retombe sur le formulaire vide            |
+| Règle 4 (pas de loadFromBackend au mount)  | Pas de reprise cross-device, pas de récupération après crash navigateur |
+
+### Référence vivante
+
+Voir `front/src/stores/conversationAgentStore.ts` pour un exemple complet appliquant les 4 règles. Le template `front/src/stores/yourUseCaseAgentStore.ts` est prêt à être dupliqué et adapté.
+
+---
+
 ## Gestion de fichiers
 
 Le toolkit fournit un pipeline complet pour l'upload, le listing et le téléchargement de fichiers, intégré dans le store Zustand.
@@ -190,6 +335,37 @@ const payload = {
 ```
 
 > **Important** : transmettre `file_paths` (les chemins `path` du store, pas les noms), car le backend a besoin des chemins absolus pour lire les fichiers dans `tempfiles/`.
+
+### Règle d'or : fichiers par référence, JAMAIS de base64 dans le payload
+
+> Toute Agent App doit envoyer ses fichiers sous forme de **référence** (le `path` retourné par `POST /files/upload`), jamais le contenu binaire ou une chaîne base64 dans le payload SSE.
+
+Le pipeline canonique est :
+
+1. L'utilisateur drop un fichier dans `FileUploadZone` → `uploadFiles()` poste en `multipart/form-data` vers `/files/upload`.
+2. Le backend répond avec `{ name, path, size }` où `path` est une référence stable.
+3. Le store ne garde QUE ces métadonnées (`UploadedFile[]`) — jamais le `File` natif, jamais une `dataURL`.
+4. Au moment du `POST /agents/.../stream`, on transmet `file_paths: uploadedFiles.map(f => f.path)` — une simple liste de chaînes.
+5. Le step backend reçoit ces chaînes et les passe à `print_or_summarize` (toolkit) ou au reader Blob (prod).
+
+#### Pourquoi cette règle est non négociable
+
+| Si vous mettez du base64 dans...   | Ce qui casse                                                                                              |
+| ---------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Le payload SSE                     | Taille ×1.33, canal SSE saturé, latence énorme                                                            |
+| Le store Zustand (même en mémoire) | localStorage éclate au premier `partialize` (limite ~5 Mo, voir section « Stockage des images générées ») |
+| L'`app_state` backend              | Document Mongo plafonné à 16 Mo — perte de l'état                                                         |
+| Le payload de handover             | Référence portable → OK, blob inline → explosion                                                          |
+
+#### Et les fichiers « générés » par un step (PDF, image) ?
+
+Même discipline côté backend : le step écrit le fichier dans `tempfiles/` et renvoie un `path` (ou un `download_url`) dans `data=`. Le frontend récupère ce `path` via `loadFromBackend()` et propose un bouton « Télécharger » qui appelle `downloadUploadedFile(path)` — toujours par référence.
+
+#### Toolkit vs prod
+
+Le toolkit simule le Blob Storage par un dossier local `back/tempfiles/`. En prod Elio, le même `path` est remplacé par une URL Azure Blob Storage. **Le contrat front/back est identique** — votre code Agent App n'a rien à changer.
+
+Côté backend, le champ Pydantic correspondant est marqué `json_schema_extra={"is_blob": True}` (voir `AGENT_APP_GUIDELINES_BACK.md` → « Règle d'or : fichiers par référence »). C'est ce flag qui permet au manifest et à l'orchestrateur de handover de router correctement le fichier.
 
 ### Formats acceptés
 
@@ -804,73 +980,103 @@ useEffect(() => {
 
 ---
 
-## GeneratingOverlay (IMPORTANT)
+## Pattern de génération : Banderole bleue + Bloqueur de clics (OBLIGATOIRE)
 
-Le `GeneratingOverlay` est un composant commun qui affiche un overlay semi-transparent avec un bouton stop pendant les opérations longues.
+### Principe
 
-### Elio vs Neo
+**Ne jamais utiliser `GeneratingOverlay`** pour les nouvelles pages Agent App. Ce composant couvre l'écran et masque les résultats au fur et à mesure qu'ils se streament.
 
-- **Elio** : utiliser directement le composant partagé
-- **Neo** : utiliser la même logique partagée, sans recréer un overlay local divergent. Le rendu Neo doit passer par des classes/overrides et des icônes Vuesax, tout en gardant le comportement partagé
-- **Neo** : l'overlay ne doit pas recouvrir la navigation latérale ni casser le fond global de l'application
+Le pattern recommandé est :
+
+1. **Banderole bleue** (`ActionBanner` / `ProgressBanner`) en haut de chaque étape — toujours visible, avec spinner pendant la génération et bouton d'action quand idle
+2. **Bloqueur de clics** : un `div` invisible en `absolute inset-0 z-50 cursor-not-allowed` qui empêche les interactions sans cacher le contenu
+
+Ce pattern garantit que :
+
+- Les champs se remplissent en temps réel pendant le stream SSE (visible)
+- L'utilisateur ne peut pas cliquer sur les boutons ou inputs pendant la génération (bloqué)
+- La banderole reste visible après une interruption et propose de régénérer
+
+### Implémentation
 
 ```tsx
-import { GeneratingOverlay } from "@/components/agent-apps/GeneratingOverlay";
+// ✅ Pattern recommandé — banderole + bloqueur de clics
 
-// Usage standard
+// 1. Banderole toujours visible (même step qu'on est)
+<div className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-950/20 dark:to-blue-900/20
+                rounded-2xl p-4 md:p-5 border border-blue-200 dark:border-blue-800 shadow-sm">
+  <div className="flex items-center justify-between gap-4">
+    <div className="flex-1 min-w-0">
+      {isProcessing ? (
+        // État génération : spinner + barre de progression
+        <div className="space-y-2">
+          <div className="flex items-center gap-3">
+            <Loader2 className="w-5 h-5 animate-spin text-blue-600 dark:text-blue-400 shrink-0" />
+            <span className="text-base font-semibold text-foreground truncate">
+              {progressInfo?.message ?? t("myAgent.generating")}
+            </span>
+          </div>
+          {progressInfo?.progress !== undefined && (
+            <div className="w-full bg-blue-100 dark:bg-blue-900/30 rounded-full h-1.5 overflow-hidden">
+              <div
+                className="h-full bg-blue-600 dark:bg-blue-400 rounded-full transition-all duration-500"
+                style={{ width: `${progressInfo.progress}%` }}
+              />
+            </div>
+          )}
+        </div>
+      ) : (
+        // État idle : titre + description
+        <div>
+          <p className="text-base font-semibold text-foreground">{t("myAgent.stepTitle")}</p>
+          <p className="text-sm text-muted-foreground">{t("myAgent.stepDescription")}</p>
+        </div>
+      )}
+    </div>
+    {!isProcessing && (
+      <div className="shrink-0">
+        <GenerateButton
+          onClick={handleGenerate}
+          disabled={!canGenerate}
+          isLoading={false}
+          label={t("myAgent.generate")}
+        />
+      </div>
+    )}
+  </div>
+</div>
+
+// 2. Bloqueur de clics sur la zone de contenu (dans le wrapper parent)
+<div className="relative">
+  {children}
+  {isProcessing && (
+    <div className="absolute inset-0 z-50 cursor-not-allowed" aria-hidden="true" />
+  )}
+</div>
+```
+
+### ❌ Ne plus utiliser
+
+```tsx
+// ❌ INTERDIT — masque le contenu pendant le stream
+import { GeneratingOverlay } from "@/components/agent-apps/GeneratingOverlay";
 <GeneratingOverlay
     isVisible={isProcessing}
-    message={loadingAction} // Ex: "Phase 2 · Rédaction détaillée..."
-    onStop={handleStop} // Optionnel - si omis, pas de bouton stop
+    message={loadingAction}
+    onStop={handleStop}
 />;
 ```
 
-### Props disponibles
-
-| Prop         | Type          | Description                                    |
-| ------------ | ------------- | ---------------------------------------------- |
-| `isVisible`  | `boolean`     | Affiche/masque l'overlay                       |
-| `message`    | `string`      | Message principal (obligatoire)                |
-| `subMessage` | `string?`     | Message secondaire (optionnel)                 |
-| `onStop`     | `() => void?` | Handler du bouton stop (si omis = pas de stop) |
-
-### Comportement
-
-- **Position** : `absolute` sur le conteneur parent (ne couvre PAS la sidebar)
-- **Style** : Fond `bg-black/15`, blur léger, coins arrondis
-- **Bouton stop** : Rouge, visible uniquement si `onStop` est fourni
-- **Z-index** : 50
-
 ### isProcessing doit venir du Store Zustand
 
-L'état `isProcessing` doit être géré dans le store Zustand (pas un `useState` local) pour que l'overlay persiste lors de la navigation entre pages :
+L'état `isProcessing` doit être géré dans le store Zustand (pas un `useState` local) pour que le bloqueur persiste lors de la navigation entre pages :
 
 ```tsx
-// ❌ MAUVAIS - l'overlay disparaît si l'utilisateur navigue ailleurs
+// ❌ MAUVAIS - se réinitialise à chaque montage
 const [isProcessing, setIsProcessing] = useState(false);
 
-// ✅ BON - l'overlay reste visible car le store Zustand persiste en mémoire
-const { isProcessing, setIsProcessing } = useMyAgentStore();
-```
-
-**Pourquoi ?** Le store Zustand reste en mémoire entre les navigations de route. Un `useState` local est réinitialisé à `false` à chaque montage du composant.
-
-### Placement dans le JSX
-
-Toujours placer l'overlay **à la fin** du composant, juste avant la fermeture du conteneur principal :
-
-```tsx
-return (
-    <div className="relative min-h-screen ...">
-        {/* Contenu de la page */}
-
-        <GeneratingOverlay
-            isVisible={isProcessing}
-            message={loadingAction}
-            onStop={handleStop}
-        />
-    </div>
-);
+// ✅ BON - persiste en mémoire
+const isProcessing = useMyAgentStore((s) => s.isProcessing);
 ```
 
 ---
